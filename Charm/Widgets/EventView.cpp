@@ -30,7 +30,6 @@
 #include "FindAndReplaceEventsDialog.h"
 #include "MessageBox.h"
 #include "SelectTaskDialog.h"
-#include "TasksView.h"
 #include "ViewHelpers.h"
 #include "WeeklyTimesheet.h"
 #include "WidgetUtils.h"

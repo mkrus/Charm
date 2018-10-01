@@ -19,7 +19,6 @@ SET(
     Commands/CommandSetAllTasks.cpp
     Commands/CommandAddTask.cpp
     Commands/CommandModifyTask.cpp
-    Commands/CommandDeleteTask.cpp
     Commands/CommandMakeEvent.cpp
     Commands/CommandExportToXml.cpp
     Commands/CommandImportFromXml.cpp
@@ -57,10 +56,7 @@ SET(
     Widgets/ReportConfigurationDialog.cpp
     Widgets/ReportPreviewWindow.cpp
     Widgets/SelectTaskDialog.cpp
-    Widgets/TaskIdDialog.cpp
     Widgets/TaskEditor.cpp
-    Widgets/TasksView.cpp
-    Widgets/TasksViewDelegate.cpp
     Widgets/TimeTrackingView.cpp
     Widgets/TimeTrackingWindow.cpp
     Widgets/TimeTrackingTaskSelector.cpp
@@ -147,7 +143,6 @@ QT5_WRAP_UI(
     Widgets/CommentEditorPopup.ui
     Widgets/ConfigurationDialog.ui
     Widgets/CharmPreferences.ui
-    Widgets/TaskIdDialog.ui
     Widgets/TaskEditor.ui
     Widgets/EnterVacationDialog.ui
     Widgets/EventEditor.ui
