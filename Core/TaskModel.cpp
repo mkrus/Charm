@@ -193,6 +193,12 @@ TaskIdList TaskModel::childrenIds(TaskId id) const
     return item.children;
 }
 
+bool TaskModel::taskExists(TaskId id)
+{
+    return std::find_if(m_tasks.cbegin(), m_tasks.cend(), [id](const Task& t) {
+               return t.id == id;}) != m_tasks.end();
+}
+
 QModelIndex TaskModel::indexForTreeItem(const TreeItem &item) const
 {
     if (item.id == 0)

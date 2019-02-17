@@ -48,6 +48,9 @@ SET(
     Widgets/TasksView.cpp
     Widgets/TasksViewWidget.cpp
     Widgets/TimeTrackingView.cpp
+    Widgets/TimeularAdaptor.cpp
+    Widgets/TimeularManager.cpp
+    Widgets/TimeularSetupDialog.cpp
     Widgets/TimeTrackingWindow.cpp
     Widgets/TimeTrackingTaskSelector.cpp
     Widgets/TrayIcon.cpp
@@ -130,6 +133,7 @@ QT5_WRAP_UI(
     Widgets/TasksViewWidget.ui
     Widgets/NotificationPopup.ui
     Widgets/FindAndReplaceEventsDialog.ui
+    Widgets/TimeularSetupDialog.ui
 )
 ecm_qt_declare_logging_category(CharmApplication_SRCS HEADER charm_application_debug.h IDENTIFIER CHARM_APPLICATION_LOG CATEGORY_NAME org.kdab.charm.application)
 QT5_ADD_RESOURCES( Resources_SRCS CharmResources.qrc )
@@ -147,6 +151,7 @@ TARGET_LINK_LIBRARIES(CharmApplication ${CharmApplication_LIBS}
     Qt5::Network
     Qt5::Sql
     Qt5::PrintSupport
+    Qt5::Bluetooth
     qt5keychain)
 
 IF (WIN32)

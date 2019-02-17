@@ -1,6 +1,6 @@
 INCLUDE_DIRECTORIES( ${Charm_SOURCE_DIR} )
 
-SET( TEST_LIBRARIES CharmCore Qt5::Test Qt5::Network)
+SET( TEST_LIBRARIES CharmCore Qt5::Test Qt5::Network Qt5::Bluetooth)
 
 QT5_ADD_RESOURCES( TestDataResources_SRCS TestData.qrc )
 

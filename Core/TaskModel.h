@@ -63,6 +63,8 @@ public:
     QString smartTaskName(TaskId id) const;
     TaskIdList childrenIds(TaskId id) const;
 
+    bool taskExists(TaskId id);
+
 private:
     struct TreeItem
     {
