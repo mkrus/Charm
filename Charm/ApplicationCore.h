@@ -43,7 +43,7 @@
 #include "Widgets//TimeTrackingWindow.h"
 #include "Widgets/TasksView.h"
 #include "Widgets/TrayIcon.h"
-
+#include "Widgets/TimeularAdaptor.h"
 #include "ModelConnector.h"
 
 // FIXME read configuration name from command line
@@ -88,6 +88,7 @@ public:
     void createWindowMenu(QMenuBar *menuBar);
     void createFileMenu(QMenuBar *menuBar);
     void createHelpMenu(QMenuBar *menuBar);
+    void createTimeularMenu(QMenuBar *menuBar);
 
     /** The main view is the window responsible for managing state during command execution.
      * It is an internal concept, not a notion for the end user. */
@@ -165,6 +166,7 @@ private:
     QList<QAction *> m_taskActions;
     EventView m_eventView;
     TasksView m_tasksView;
+    TimeularAdaptor m_timeularAdaptor;
     QVector<UIStateInterface *> m_uiElements;
     IdleDetector *m_idleDetector = nullptr;
     CharmCommandInterface *m_cmdInterface = nullptr;

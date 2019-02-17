@@ -62,6 +62,9 @@ SET(
     Widgets/TasksView.cpp
     Widgets/TasksViewDelegate.cpp
     Widgets/TimeTrackingView.cpp
+    Widgets/TimeularAdaptor.cpp
+    Widgets/TimeularManager.cpp
+    Widgets/TimeularSetupDialog.cpp
     Widgets/TimeTrackingWindow.cpp
     Widgets/TimeTrackingTaskSelector.cpp
     Widgets/TrayIcon.cpp
@@ -161,6 +164,7 @@ QT5_WRAP_UI(
     Widgets/ReportPreviewWindow.ui
     Widgets/NotificationPopup.ui
     Widgets/FindAndReplaceEventsDialog.ui
+    Widgets/TimeularSetupDialog.ui
 )
 
 QT5_ADD_RESOURCES( Resources_SRCS CharmResources.qrc )
@@ -178,6 +182,7 @@ TARGET_LINK_LIBRARIES(CharmApplication ${CharmApplication_LIBS}
     Qt5::Network
     Qt5::Sql
     Qt5::PrintSupport
+    Qt5::Bluetooth
     qt5keychain)
 
 IF (WIN32)

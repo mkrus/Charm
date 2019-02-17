@@ -68,6 +68,7 @@ void CharmWindow::stateChanged(State)
         configurationChanged();
         ApplicationCore::instance().createFileMenu(menuBar());
         insertEditMenu();
+        ApplicationCore::instance().createTimeularMenu(menuBar());
         ApplicationCore::instance().createWindowMenu(menuBar());
         ApplicationCore::instance().createHelpMenu(menuBar());
         setEnabled(true);
