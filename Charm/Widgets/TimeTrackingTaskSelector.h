@@ -29,7 +29,6 @@
 
 #include "Core/Event.h"
 #include "Core/Task.h"
-
 #include "WeeklySummary.h"
 
 class QAction;

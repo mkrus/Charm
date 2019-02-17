@@ -179,6 +179,8 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
 
     m_systrayContextMenu.addAction(&m_actionStopAllTasks);
     m_systrayContextMenu.addSeparator();
+    m_timeularAdaptor.addActions(&m_systrayContextMenu);
+    m_systrayContextMenu.addSeparator();
 
     m_systrayContextMenu.addAction(&m_actionQuit);
 
@@ -187,6 +189,9 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
     m_trayIcon.setIcon(Data::charmTrayIcon());
     m_trayIcon.show();
 
+    connect(&m_timeularAdaptor, &TimeularAdaptor::message, [this](const QString &m) {
+        slotShowNotification(tr("Timeular"), m);
+    });
     QApplication::setWindowIcon(Data::charmIcon());
 
     // set up actions:
@@ -369,6 +374,14 @@ void ApplicationCore::createHelpMenu(QMenuBar *menuBar)
         menu->addAction(&m_actionCheckForUpdates);
 
 #endif
+    menuBar->addMenu(menu);
+}
+
+void ApplicationCore::createTimeularMenu(QMenuBar *menuBar)
+{
+    auto menu = new QMenu(menuBar);
+    menu->setTitle(tr("Timeular"));
+    m_timeularAdaptor.addActions(menu);
     menuBar->addMenu(menu);
 }
 

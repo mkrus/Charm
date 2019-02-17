@@ -53,6 +53,7 @@ find_package(Qt5Xml ${QT_REQUIRED_VERSION} REQUIRED)
 find_package(Qt5Network ${QT_REQUIRED_VERSION} REQUIRED)
 find_package(Qt5Sql ${QT_REQUIRED_VERSION} REQUIRED)
 find_package(Qt5Test ${QT_REQUIRED_VERSION} REQUIRED)
+find_package(Qt5Bluetooth ${QT_REQUIRED_VERSION} REQUIRED)
 find_package(Qt5PrintSupport ${QT_REQUIRED_VERSION})
 
 if(WIN32)
