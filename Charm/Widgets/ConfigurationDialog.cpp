@@ -35,9 +35,6 @@ ConfigurationDialog::ConfigurationDialog(const Configuration &config, QWidget *p
     m_ui.databaseLocation->setText(config.localStorageDatabase);
     connect(m_ui.buttonBox, &QDialogButtonBox::rejected, this, &ConfigurationDialog::reject);
     connect(m_ui.buttonBox, &QDialogButtonBox::accepted, this, &ConfigurationDialog::accept);
-#ifdef Q_OS_ANDROID
-    setWindowState(windowState() | Qt::WindowMaximized);
-#endif
 }
 
 Configuration ConfigurationDialog::configuration() const
