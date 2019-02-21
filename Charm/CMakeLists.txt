@@ -17,8 +17,6 @@ SET(
     Commands/CommandModifyEvent.cpp
     Commands/CommandDeleteEvent.cpp
     Commands/CommandSetAllTasks.cpp
-    Commands/CommandAddTask.cpp
-    Commands/CommandModifyTask.cpp
     Commands/CommandMakeEvent.cpp
     Commands/CommandExportToXml.cpp
     Commands/CommandImportFromXml.cpp

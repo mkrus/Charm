@@ -127,28 +127,6 @@ void SqLiteStorageTests::makeModifyDeleteTasksTest()
     }
     QVERIFY(task1 == task1_1);
     QVERIFY(task2 == task2_1);
-
-    // modify the tasks
-    const QString Task1NewName(QStringLiteral("Name-1-Task"));
-    task1.setName(Task1NewName);
-    task1.setParent(task2.id());
-    QVERIFY(m_storage->modifyTask(task1));
-    task1_1 = m_storage->getTask(task1.id());
-    QVERIFY(task1_1 == task1);
-    QVERIFY(m_storage->getAllTasks().size() == 2);
-
-    // delete the task
-    QVERIFY(m_storage->deleteTask(task2));
-    QVERIFY(m_storage->getAllTasks().size() == 1);
-
-    // verify the task is gone:
-    QVERIFY(!m_storage->getTask(task2.id()).isValid());
-
-    // verify the other task is still there:
-    QVERIFY(m_storage->getTask(task1.id()).isValid());
-
-    // put the second task back in for later tests:
-    QVERIFY(m_storage->addTask(task2));
 }
 
 void SqLiteStorageTests::makeModifyDeleteEventsTest()
@@ -265,21 +243,19 @@ void SqLiteStorageTests::deleteTaskWithEventsTest()
         event.setComment(EventComment);
         QVERIFY(m_storage->modifyEvent(event));
     }
-    // this is the event that is supposed to remain in the DB:
-    Event event = m_storage->makeEvent();
-    QVERIFY(event.isValid());
-    event.setTaskId(task2.id());
-    event.setUserId(1);
-    event.setReportId(43);
-    const QString EventComment(QStringLiteral("Event-Comment 2"));
-    event.setComment(EventComment);
-    QVERIFY(m_storage->modifyEvent(event));
-
+    {
+        Event event = m_storage->makeEvent();
+        QVERIFY(event.isValid());
+        event.setTaskId(task2.id());
+        event.setUserId(1);
+        event.setReportId(43);
+        const QString EventComment(QStringLiteral("Event-Comment 2"));
+        event.setComment(EventComment);
+        QVERIFY(m_storage->modifyEvent(event));
+    }
     // verify task database entries
-    QVERIFY(m_storage->deleteTask(task));
     EventList events = m_storage->getAllEvents();
-    QVERIFY(events.count() == 1);
-    QVERIFY(events.first() == event);
+    QVERIFY(events.count() == 3);
 }
 
 void SqLiteStorageTests::setGetMetaDataTest()

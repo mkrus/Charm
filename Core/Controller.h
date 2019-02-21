@@ -84,12 +84,6 @@ public:
     /** Add a task, and send the result to the view as a signal. */
     bool addTask(const Task &parent);
 
-    /** Modify the task, the user has changed it in the view. */
-    bool modifyTask(const Task &);
-
-    /** Delete the task. Send a signal to the view confirming it. */
-    bool deleteTask(const Task &);
-
     /** Set all tasks. Updates the view, after. */
     bool setAllTasks(const TaskList &);
 

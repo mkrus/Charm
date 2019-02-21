@@ -30,7 +30,6 @@
 
 #include "Core/CharmConstants.h"
 #include "Core/Configuration.h"
-#include "Commands/CommandModifyTask.h"
 #include "Commands/CommandModifyEvent.h"
 
 #include <QApplication>
@@ -169,7 +168,7 @@ Qt::ItemFlags TaskModelAdapter::flags(const QModelIndex &index) const
 
     if (index.isValid()) {
         const TaskTreeItem *item = itemFor(index);
-        flags = Qt::ItemIsUserCheckable|Qt::ItemIsSelectable|Qt::ItemIsEnabled;
+        flags = Qt::ItemIsSelectable|Qt::ItemIsEnabled;
         const bool isCurrent = item->task().isCurrentlyValid();
         if (isCurrent) {
             const TaskId id = item->task().id();
@@ -200,11 +199,6 @@ bool TaskModelAdapter::setData(const QModelIndex &index, const QVariant &value, 
         Event event(old);
         event.setComment(comment);
         auto command = new CommandModifyEvent(event, old, this);
-        VIEW.sendCommand(command);
-        return true;
-    } else if (role == Qt::CheckStateRole) {
-        task.setSubscribed(!task.subscribed());
-        auto command = new CommandModifyTask(task, this);
         VIEW.sendCommand(command);
         return true;
     }

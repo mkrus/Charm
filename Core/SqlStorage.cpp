@@ -172,40 +172,6 @@ Task SqlStorage::getTask(int taskid)
     }
 }
 
-bool SqlStorage::modifyTask(const Task &task)
-{
-    QSqlQuery query(database());
-    query.prepare(QLatin1String("UPDATE Tasks set name = :name, parent = :parent, "
-                                "validfrom = :validfrom, validuntil = :validuntil, trackable = :trackable "
-                                "where task_id = :task_id;"));
-    query.bindValue(QStringLiteral(":task_id"), task.id());
-    query.bindValue(QStringLiteral(":name"), task.name());
-    query.bindValue(QStringLiteral(":parent"), task.parent());
-    query.bindValue(QStringLiteral(":validfrom"), task.validFrom());
-    query.bindValue(QStringLiteral(":validuntil"), task.validUntil());
-    query.bindValue(QStringLiteral(":trackable"), task.trackable() ? 1 : 0);
-    return runQuery(query);
-}
-
-bool SqlStorage::deleteTask(const Task &task)
-{
-    SqlRaiiTransactor transactor(database());
-    QSqlQuery query(database());
-    query.prepare(QStringLiteral("DELETE from Tasks where task_id = :task_id;"));
-    query.bindValue(QStringLiteral(":task_id"), task.id());
-    bool rc = runQuery(query);
-    QSqlQuery query2(database());
-    query2.prepare(QStringLiteral("DELETE from Events where task = :task_id;"));
-    query2.bindValue(QStringLiteral(":task_id"), task.id());
-    bool rc2 = runQuery(query2);
-    if (rc && rc2) {
-        transactor.commit();
-        return true;
-    } else {
-        return false;
-    }
-}
-
 bool SqlStorage::deleteAllTasks()
 {
     SqlRaiiTransactor t(database());

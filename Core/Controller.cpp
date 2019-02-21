@@ -109,34 +109,6 @@ bool Controller::addTask(const Task &task)
     }
 }
 
-bool Controller::modifyTask(const Task &task)
-{
-    // modify the task itself:
-    bool result = m_storage->modifyTask(task);
-    Q_ASSERT(result);
-    if (!result) {
-        qCritical() << Q_FUNC_INFO << "modifyTask failed!";
-        return result;
-    }
-
-    updateSubscriptionForTask(task);
-    emit(taskUpdated(task));
-
-    return true;
-}
-
-bool Controller::deleteTask(const Task &task)
-{
-    if (m_storage->deleteTask(task)) {
-        m_storage->deleteSubscription(CONFIGURATION.user, task);
-        emit taskDeleted(task);
-        return true;
-    } else {
-        Q_ASSERT(false);   // impossible
-        return false;
-    }
-}
-
 bool Controller::setAllTasks(const TaskList &tasks)
 {
     if (m_storage->setAllTasks(CONFIGURATION.user, tasks)) {

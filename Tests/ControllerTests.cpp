@@ -199,31 +199,9 @@ void ControllerTests::addModifyDeleteTaskTest()
     }
     QVERIFY(m_definedTasks[task1Position] == task1);
     QVERIFY(m_definedTasks[task2Position] == task2);
-    // modify one of the tasks:
-    const QString Task1_1Name(QStringLiteral("Task-1-1-Name"));
-    task1.setName(Task1_1Name);
-    task1.setSubscribed(false);
-    m_controller->modifyTask(task1);
     QVERIFY(m_definedTasks.size() == 2);
     QVERIFY(m_definedTasks[task1Position] == task1);
     QVERIFY(m_definedTasks[task2Position] == task2);
-    const QString Task2_1Name(QStringLiteral("Task-2-1-Name"));
-    task2.setName(Task2_1Name);
-    task2.setSubscribed(true);
-    m_controller->modifyTask(task2);
-    QVERIFY(m_definedTasks[task1Position] == task1);
-    QVERIFY(m_definedTasks[task2Position] == task2);
-    // delete the tasks:
-    m_controller->deleteTask(task1);
-    QVERIFY(m_definedTasks.size() == 1);
-    QVERIFY(m_definedTasks[0] == task2);
-    m_controller->deleteTask(task2);
-    QVERIFY(m_definedTasks.isEmpty());
-    //  leave both tasks in for later tests:
-    m_controller->addTask(task2);
-    QVERIFY(m_definedTasks.size() == 1);
-    m_controller->addTask(task1);
-    QVERIFY(m_definedTasks.size() == 2);
 }
 
 void ControllerTests::toAndFromXmlTest()

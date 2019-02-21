@@ -68,8 +68,6 @@ public:
     bool addTask(const Task &task);
     bool addTask(const Task &task, const SqlRaiiTransactor &);
     Task getTask(int taskid);
-    bool modifyTask(const Task &task);
-    bool deleteTask(const Task &task);
     bool deleteAllTasks();
     bool deleteAllTasks(const SqlRaiiTransactor &);
 
