@@ -83,8 +83,6 @@ SelectTaskDialog::SelectTaskDialog(QWidget *parent)
             this, &SelectTaskDialog::slotFilterTextChanged);
     connect(m_ui->showExpired, &QCheckBox::toggled,
             this, &SelectTaskDialog::slotPrefilteringChanged);
-    connect(m_ui->showSelected, &QCheckBox::toggled,
-            this, &SelectTaskDialog::slotPrefilteringChanged);
     connect(this, &SelectTaskDialog::accepted,
             this, &SelectTaskDialog::slotAccepted);
     connect(MODEL.charmDataModel(), &CharmDataModel::resetGUIState,
@@ -122,7 +120,6 @@ void SelectTaskDialog::slotResetState()
     }
 
     m_ui->showExpired->setChecked(state.showExpired());
-    m_ui->showSelected->setChecked(state.showCurrents());
 }
 
 void SelectTaskDialog::showEvent(QShowEvent *event)
@@ -231,7 +228,6 @@ void SelectTaskDialog::slotAccepted()
         }
         state.setExpandedTasks(expandedTasks);
         state.setShowExpired(m_ui->showExpired->isChecked());
-        state.setShowCurrents(m_ui->showSelected->isChecked());
         settings.beginGroup(QString::fromUtf8(staticMetaObject.className()));
         state.saveTo(settings);
     }
@@ -240,18 +236,9 @@ void SelectTaskDialog::slotAccepted()
 void SelectTaskDialog::slotPrefilteringChanged()
 {
     // find out about the selected mode:
-    Configuration::TaskPrefilteringMode mode;
     const bool showCurrentOnly = !m_ui->showExpired->isChecked();
-    const bool showSubscribedOnly = m_ui->showSelected->isChecked();
-    if (showCurrentOnly && showSubscribedOnly) {
-        mode = Configuration::TaskPrefilter_SubscribedAndCurrentOnly;
-    } else if (showCurrentOnly && !showSubscribedOnly) {
-        mode = Configuration::TaskPrefilter_CurrentOnly;
-    } else if (!showCurrentOnly && showSubscribedOnly) {
-        mode = Configuration::TaskPrefilter_SubscribedOnly;
-    } else {
-        mode = Configuration::TaskPrefilter_ShowAll;
-    }
+    const auto mode = showCurrentOnly ? Configuration::TaskPrefilter_CurrentOnly
+                                      : Configuration::TaskPrefilter_ShowAll;
 
     CONFIGURATION.taskPrefilteringMode = mode;
     Charm::saveExpandStates(m_ui->treeView, &m_expansionStates);

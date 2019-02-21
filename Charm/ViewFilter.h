@@ -66,7 +66,6 @@ Q_SIGNALS:
 private:
     enum CheckFor {
         HaveValidChild,
-        HaveSubscribedChild
     };
 
     bool checkChildren(Task task, CheckFor checkFor) const;

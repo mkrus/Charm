@@ -99,9 +99,7 @@ bool Controller::deleteEvent(const Event &e)
 bool Controller::addTask(const Task &task)
 {
     if (m_storage->addTask(task)) {
-        updateSubscriptionForTask(task);
         emit taskAdded(task);
-
         return true;
     } else {
         Q_ASSERT(false);   // impossible
@@ -118,19 +116,6 @@ bool Controller::setAllTasks(const TaskList &tasks)
         return true;
     } else {
         return false;
-    }
-}
-
-void Controller::updateSubscriptionForTask(const Task &task)
-{
-    if (task.subscribed()) {
-        bool result = m_storage->addSubscription(CONFIGURATION.user, task);
-        Q_ASSERT(result);
-        Q_UNUSED(result);
-    } else {
-        bool result = m_storage->deleteSubscription(CONFIGURATION.user, task);
-        Q_ASSERT(result);
-        Q_UNUSED(result);
     }
 }
 

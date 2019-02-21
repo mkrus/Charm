@@ -104,19 +104,6 @@ bool ViewFilter::filterAcceptsRow(int source_row, const QModelIndex &parent) con
         accepted &= ok;
         break;
     }
-    case Configuration::TaskPrefilter_SubscribedOnly:
-    {
-        const bool ok = (task.subscribed() || checkChildren(task, HaveSubscribedChild));
-        accepted &= ok;
-        break;
-    }
-    case Configuration::TaskPrefilter_SubscribedAndCurrentOnly:
-        accepted
-            &= ((task.subscribed()
-                 || checkChildren(task,
-                                  HaveSubscribedChild))
-                && (task.isCurrentlyValid() || checkChildren(task, HaveValidChild)));
-        break;
     default:
         break;
     }
@@ -139,9 +126,7 @@ bool ViewFilter::checkChildren(Task task, CheckFor checkFor) const
     if (taskHasChildren(task)) {
         const TaskList taskList = m_model.children(task);
         for (const Task &taskChild : taskList) {
-            if (checkFor == HaveSubscribedChild && taskChild.subscribed()) {
-                return true;
-            } else if (checkFor == HaveValidChild && taskChild.isCurrentlyValid()) {
+            if (checkFor == HaveValidChild && taskChild.isCurrentlyValid()) {
                 return true;
             }
         }

@@ -52,8 +52,6 @@ private Q_SLOTS:
 
     void makeModifyDeleteEventsTest();
 
-    void addDeleteSubscriptionsTest();
-
     void setGetMetaDataTest();
 
     void deleteTaskWithEventsTest();

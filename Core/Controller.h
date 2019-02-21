@@ -144,8 +144,6 @@ Q_SIGNALS:
     void commandCompleted(CharmCommand *);
 
 private:
-    void updateSubscriptionForTask(const Task &);
-
     template<class T> void loadConfigValue(const QString &key, T &configValue) const;
     SqlStorage *m_storage = nullptr;
 };

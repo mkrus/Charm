@@ -65,13 +65,6 @@
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QCheckBox" name="showSelected">
-       <property name="text">
-        <string>Show only subscribed</string>
-       </property>
-      </widget>
-     </item>
     </layout>
    </item>
    <item row="3" column="0">

@@ -104,13 +104,6 @@ QVariant TaskModelAdapter::data(const QModelIndex &index, int role) const
             return QVariant();
         }
         break;
-    case Qt::CheckStateRole:
-        if (item->task().subscribed()) {
-            return Qt::Checked;
-        } else {
-            return Qt::Unchecked;
-        }
-        break;
     case TasksViewRole_TaskDescription:
         return item->task().comment();
     case TasksViewRole_Name: // now unused

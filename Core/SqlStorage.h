@@ -84,12 +84,6 @@ public:
     bool deleteAllEvents();
     bool deleteAllEvents(const SqlRaiiTransactor &);
 
-    // subscription management functions
-    // (subscriptions cannot be modified, they are just boolean flags)
-    // (subscription status is retrieved with the tasks)
-    bool addSubscription(User, Task);
-    bool deleteSubscription(User, Task);
-
     // implement metadata management functions:
     bool setMetaData(const QString &, const QString &);
     bool setMetaData(const QString &, const QString &, const SqlRaiiTransactor &);

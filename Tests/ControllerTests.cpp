@@ -86,10 +86,6 @@ void ControllerTests:: persistProvideMetaDataTest()
                       Configuration::TimeTrackerFont_Regular,
                       Configuration::Minutes, false, Qt::ToolButtonTextOnly, false, false, false,
                       false, 5),
-        Configuration(Configuration::TaskPrefilter_SubscribedAndCurrentOnly,
-                      Configuration::TimeTrackerFont_Large,
-                      Configuration::Minutes, true, Qt::ToolButtonTextBesideIcon, true, true, true,
-                      false, 5),
     };
     const int NumberOfConfigurations = sizeof configs / sizeof configs[0];
 
@@ -173,7 +169,6 @@ void ControllerTests::addModifyDeleteTaskTest()
     Task task1;
     task1.setId(Task1Id);
     task1.setName(Task1Name);
-    task1.setSubscribed(true);
     task1.setValidFrom(QDateTime::currentDateTime());
     const int Task2Id = 2000;
     const QString Task2Name(QStringLiteral("Task-2-Name"));

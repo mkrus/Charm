@@ -115,16 +115,11 @@ bool SqlStorage::setAllTasks(const User &user, const TaskList &tasks)
     deleteAllTasks(transactor);
     // add tasks
     Q_FOREACH (Task task, tasks) {
-        task.setSubscribed(false);
         addTask(task, transactor);
     }
     // try to restore subscriptions where possible
     Q_FOREACH (const Task &oldTask, oldTasks) {
         const Task task = getTask(oldTask.id());
-        if (task.isValid()) {
-            if (oldTask.subscribed())
-                addSubscription(user, task);
-        }
     }
     transactor.commit();
     return true;
@@ -514,31 +509,6 @@ bool SqlStorage::deleteUser(const User &user)
     return runQuery(query);
 }
 
-bool SqlStorage::addSubscription(User user, Task task)
-{
-    Task dbTask = getTask(task.id());
-
-    if (!dbTask.isValid() || (dbTask.isValid() && !dbTask.subscribed())) {
-        QSqlQuery query(database());
-        query.prepare(QStringLiteral("INSERT into Subscriptions VALUES (NULL, :user_id, :task);"));
-        query.bindValue(QStringLiteral(":user_id"), user.id());
-        query.bindValue(QStringLiteral(":task"), task.id());
-        return runQuery(query);
-    } else {
-        return true;
-    }
-}
-
-bool SqlStorage::deleteSubscription(User user, Task task)
-{
-    QSqlQuery query(database());
-    query.prepare(QStringLiteral(
-                      "DELETE from Subscriptions WHERE user_id = :user_id AND task = :task;"));
-    query.bindValue(QStringLiteral(":user_id"), user.id());
-    query.bindValue(QStringLiteral(":task"), task.id());
-    return runQuery(query);
-}
-
 bool SqlStorage::setMetaData(const QString &key, const QString &value)
 {
     SqlRaiiTransactor transactor(database());
@@ -613,7 +583,6 @@ Task SqlStorage::makeTaskFromRecord(const QSqlRecord &record)
     task.setId(record.field(idField).value().toInt());
     task.setName(record.field(nameField).value().toString());
     task.setParent(record.field(parentField).value().toInt());
-    task.setSubscribed(!record.field(useridField).value().toString().isEmpty());
     QString from = record.field(validfromField).value().toString();
     if (!from.isEmpty()) {
         task.setValidFrom
@@ -650,17 +619,7 @@ QString SqlStorage::setAllTasksAndEvents(const User &user, const TaskList &tasks
     Q_FOREACH (const Task &task, tasks) {
         // don't use our own addTask method, it emits signals and that
         // confuses the model, because the task tree is not inserted depth-first:
-        if (addTask(task, transactor)) {
-            if (task.subscribed()) {
-                bool result = addSubscription(user, task);
-                Q_ASSERT(result);
-                Q_UNUSED(result);
-            } else {
-                bool result = deleteSubscription(user, task);
-                Q_ASSERT(result);
-                Q_UNUSED(result);
-            }
-        } else {
+        if (!addTask(task, transactor)) {
             return QObject::tr("Cannot add imported tasks.");
         }
     }

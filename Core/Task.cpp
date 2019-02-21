@@ -40,7 +40,6 @@ Task::Task(TaskId id, const QString &name, TaskId parent, bool subscribed)
     : m_id(id)
     , m_parent(parent)
     , m_name(name)
-    , m_subscribed(subscribed)
 {
 }
 
@@ -66,7 +65,6 @@ bool Task::operator ==(const Task &other) const
     return other.id() == id()
            && other.parent() == parent()
            && other.name() == name()
-           && other.subscribed() == subscribed()
            && other.m_trackable == m_trackable
            && other.validFrom() == validFrom()
            && other.validUntil() == validUntil();
@@ -100,16 +98,6 @@ int Task::parent() const
 void Task::setParent(int parent)
 {
     m_parent = parent;
-}
-
-bool Task::subscribed() const
-{
-    return m_subscribed;
-}
-
-void Task::setSubscribed(bool value)
-{
-    m_subscribed = value;
 }
 
 bool Task::trackable() const
@@ -158,7 +146,7 @@ bool Task::isCurrentlyValid() const
 void Task::dump() const
 {
     qDebug() << "[Task " << this << "] task id:" << id() << "- name:" << name()
-             << " - parent:" << parent() << " - subscribed:" << subscribed()
+             << " - parent:" << parent()
              << " - valid from:" << validFrom() << " - valid until:"
              << validUntil() << " - trackable:" << trackable();
 }
@@ -184,7 +172,6 @@ QDomElement Task::toXml(QDomDocument document) const
     QDomElement element = document.createElement(tagName());
     element.setAttribute(TaskIdElement, id());
     element.setAttribute(TaskParentId, parent());
-    element.setAttribute(TaskSubscribed, (subscribed() ? 1 : 0));
     element.setAttribute(TaskTrackable, (trackable() ? 1 : 0));
     if (!name().isEmpty()) {
         QDomText taskName = document.createTextNode(name());
@@ -214,9 +201,6 @@ Task Task::fromXml(const QDomElement &element, int databaseSchemaVersion)
     task.setParent(element.attribute(TaskParentId).toInt(&ok));
     if (!ok)
         throw XmlSerializationException(QObject::tr("Task::fromXml: invalid parent task id"));
-    task.setSubscribed(element.attribute(TaskSubscribed).toInt(&ok) == 1);
-    if (!ok)
-        throw XmlSerializationException(QObject::tr("Task::fromXml: invalid subscription setting"));
 
     if (databaseSchemaVersion > CHARM_DATABASE_VERSION_BEFORE_TASK_EXPIRY) {
         if (element.hasAttribute(TaskValidFrom)) {
