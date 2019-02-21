@@ -97,19 +97,6 @@ IF( CHARM_DATABASE_CONFIGURATION )
         PROPERTY ENVIRONMENT
         "CHARM_DATABASE_CONFIGURATION=${CHARM_DATABASE_CONFIGURATION}"
     )
-
-    SET(TimeSheetProcessorTests_SRCS TimeSheetProcessorTests.cpp
-                                     ${Charm_SOURCE_DIR}/Tools/TimesheetProcessor/Operations.cpp
-                                     ${Charm_SOURCE_DIR}/Tools/TimesheetProcessor/CommandLine.cpp
-                                     ${Charm_SOURCE_DIR}/Tools/TimesheetProcessor/Database.cpp
-    )
-    ADD_EXECUTABLE(TimeSheetProcessorTests
-                   ${TimeSheetProcessorTests_SRCS}
-                   ${TestDataResources_SRCS}
-    )
-    TARGET_LINK_LIBRARIES(TimeSheetProcessorTests ${TEST_LIBRARIES} )
-    ADD_TEST(NAME TimeSheetProcessorTests COMMAND TimeSheetProcessorTests )
-
 ENDIF()
 
 SET( UpdateCheckerTests_SRCS ${Charm_SOURCE_DIR}/Charm/HttpClient/CheckForUpdatesJob.cpp UpdateCheckerTests.cpp )

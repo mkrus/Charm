@@ -90,7 +90,6 @@ SET( BIN_INSTALL_DIR . )
 ENDIF()
 
 OPTION( CHARM_IDLE_DETECTION "Build the Charm idle detector" ON )
-OPTION( CHARM_TIMESHEET_TOOLS "Build the Charm timesheet tools" OFF )
 set( CHARM_IDLE_TIME "360" CACHE STRING "Set the idle timeout (in seconds, default 360)" )
 OPTION( CHARM_CI_SUPPORT "Build Charm with command interface support" OFF )
 
@@ -103,15 +102,6 @@ OPTION(CHARM_PREPARE_DEPLOY "Deploy dependencies with install target(Windows, Ap
 
 ADD_SUBDIRECTORY( Core )
 ADD_SUBDIRECTORY( Charm )
-
-IF( CHARM_TIMESHEET_TOOLS AND UNIX )
-    # Only build the tools if they are explicitly requested to avoid
-    # the Qt MySQL driver dependency.
-    ADD_SUBDIRECTORY( Tools/TimesheetProcessor )
-    ADD_SUBDIRECTORY( Tools/TimesheetGenerator )
-    MESSAGE( STATUS "Building the Charm timesheet tools")
-ENDIF()
-
 ADD_SUBDIRECTORY( Tests )
 
 CONFIGURE_FILE( CharmCMake.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/CharmCMake.h )
