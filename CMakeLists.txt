@@ -40,27 +40,25 @@ ENDIF()
 
 MESSAGE( STATUS "Building Charm ${Charm_VERSION} in ${CMAKE_BUILD_TYPE} mode" )
 
-find_package( Qt5Core REQUIRED)
-
-find_package(Qt5Widgets REQUIRED)
-find_package(Qt5Xml REQUIRED)
-find_package(Qt5Network REQUIRED)
-find_package(Qt5Sql REQUIRED)
-find_package(Qt5Test REQUIRED)
-find_package(Qt5PrintSupport)
+find_package(Qt5Core 5.9 REQUIRED)
+find_package(Qt5Widgets 5.9 REQUIRED)
+find_package(Qt5Xml 5.9 REQUIRED)
+find_package(Qt5Network 5.9 REQUIRED)
+find_package(Qt5Sql 5.9 REQUIRED)
+find_package(Qt5Test 5.9 REQUIRED)
+find_package(Qt5PrintSupport 5.9)
 
 if(WIN32)
-    find_package(Qt5WinExtras REQUIRED)
+    find_package(Qt5WinExtras 5.9 REQUIRED)
 endif()
 
 IF(APPLE)
-    find_package(Qt5MacExtras REQUIRED)
+    find_package(Qt5MacExtras 5.9 REQUIRED)
 ENDIF()
 
 IF(UNIX AND NOT APPLE)
-    find_package(Qt5DBus QUIET)
+    find_package(Qt5DBus 5.9 QUIET)
 ENDIF()
-
 
 
 find_package(Qt5Keychain REQUIRED)
