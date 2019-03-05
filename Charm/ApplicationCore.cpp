@@ -108,7 +108,11 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
     // note that this modifies the behaviour of QSettings:
     QCoreApplication::setOrganizationName(QStringLiteral("KDAB"));
     QCoreApplication::setOrganizationDomain(QStringLiteral("kdab.com"));
+#ifdef NDEBUG
     QCoreApplication::setApplicationName(QStringLiteral("Charm"));
+#else
+    QCoreApplication::setApplicationName(QStringLiteral("Charm_debug"));
+#endif
     QCoreApplication::setApplicationVersion(CharmVersion());
 
     QLocalSocket uniqueApplicationSocket;
@@ -721,9 +725,9 @@ QString ApplicationCore::titleString(const QString &text) const
         } else {
             dbInfo = text;
         }
-        return tr("Charm (%1)").arg(dbInfo);
+        return QStringLiteral("%1 (%2)").arg(QCoreApplication::applicationName(), dbInfo);
     } else {
-        return tr("Charm");
+        return QCoreApplication::applicationName();
     }
 }
 
