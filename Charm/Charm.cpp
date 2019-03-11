@@ -79,21 +79,6 @@ int main(int argc, char **argv)
     }
 #endif
 
-    const QByteArray charmHomeEnv = qgetenv("CHARM_HOME");
-    if (!charmHomeEnv.isEmpty()) {
-        const QString charmHome = QFile::decodeName(charmHomeEnv);
-        const QString user = charmHome + QLatin1String("/userConfig");
-        const QString sys = charmHome + QLatin1String("/systemConfig");
-        QSettings::setPath(QSettings::NativeFormat, QSettings::UserScope, user);
-        QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, user);
-        QSettings::setPath(QSettings::NativeFormat, QSettings::SystemScope, sys);
-        QSettings::setPath(QSettings::IniFormat, QSettings::SystemScope, sys);
-#ifdef Q_OS_WIN
-        // Use ini for storing settings as the registry path is not affected by CHARM_HOME.
-        QSettings::setDefaultFormat(QSettings::IniFormat);
-#endif
-    }
-
     try {
 #ifdef Q_OS_WIN
         // High DPI support

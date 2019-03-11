@@ -111,12 +111,6 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
 
     QLocalSocket uniqueApplicationSocket;
     QString serverName(QStringLiteral("com.kdab.charm"));
-    QString charmHomeEnv(QString::fromLocal8Bit(qgetenv("CHARM_HOME")));
-    if (!charmHomeEnv.isEmpty()) {
-        serverName.append(QStringLiteral("_%1").arg(
-                              charmHomeEnv.replace(QRegExp(QLatin1String(":?/|:?\\\\")),
-                                                   QStringLiteral("_"))));
-    }
 #ifndef NDEBUG
     serverName.append(QStringLiteral("_debug"));
 #endif
@@ -628,9 +622,6 @@ void ApplicationCore::slotGoToConnectedState()
 
 static QString charmDataDir()
 {
-    const QByteArray charmHome = qgetenv("CHARM_HOME");
-    if (!charmHome.isEmpty())
-        return QFile::decodeName(charmHome) + QLatin1String("/data/");
     return QStandardPaths::writableLocation(QStandardPaths::DataLocation) + QLatin1Char('/');
 }
 
