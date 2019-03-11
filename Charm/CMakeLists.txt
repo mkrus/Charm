@@ -30,7 +30,6 @@ SET(
     Reports/MonthlyTimesheetXmlWriter.cpp
     Reports/WeeklyTimesheetXmlWriter.cpp
     Reports/TimesheetXmlWriter.cpp
-    Widgets/ActivityReport.cpp
     Widgets/BillDialog.cpp
     Widgets/CharmPreferences.cpp
     Widgets/CharmWindow.cpp
@@ -130,7 +129,6 @@ QT5_WRAP_UI(
     Widgets/CharmAboutDialog.ui
     Widgets/CharmNewReleaseDialog.ui
     Widgets/IdleCorrectionDialog.ui
-    Widgets/ActivityReportConfigurationDialog.ui
     Widgets/WeeklyTimesheetConfigurationDialog.ui
     Widgets/MonthlyTimesheetConfigurationDialog.ui
     Widgets/ReportPreviewWindow.ui

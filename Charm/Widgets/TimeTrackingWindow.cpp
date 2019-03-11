@@ -23,7 +23,6 @@
 */
 
 #include "TimeTrackingWindow.h"
-#include "ActivityReport.h"
 #include "ApplicationCore.h"
 #include "CharmAboutDialog.h"
 #include "CharmCMake.h"
@@ -333,16 +332,6 @@ void TimeTrackingWindow::slotEnterVacation()
     }
 }
 
-void TimeTrackingWindow::slotActivityReport()
-{
-    delete m_activityReportDialog;
-    m_activityReportDialog = new ActivityReportConfigurationDialog(this);
-    m_activityReportDialog->setAttribute(Qt::WA_DeleteOnClose);
-    connect(m_activityReportDialog, &ActivityReportConfigurationDialog::finished,
-            this, &TimeTrackingWindow::slotActivityReportPreview);
-    m_activityReportDialog->open();
-}
-
 void TimeTrackingWindow::resetWeeklyTimesheetDialog()
 {
     delete m_weeklyTimesheetDialog;
@@ -383,12 +372,6 @@ void TimeTrackingWindow::slotMonthlyTimesheetPreview(int result)
 {
     showPreview(m_monthlyTimesheetDialog, result);
     m_monthlyTimesheetDialog = nullptr;
-}
-
-void TimeTrackingWindow::slotActivityReportPreview(int result)
-{
-    showPreview(m_activityReportDialog, result);
-    m_activityReportDialog = nullptr;
 }
 
 void TimeTrackingWindow::showPreview(ReportConfigurationDialog *dialog, int result)

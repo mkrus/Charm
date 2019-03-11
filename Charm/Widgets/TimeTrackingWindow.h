@@ -42,7 +42,6 @@ class IdleDetector;
 class ReportConfigurationDialog;
 class WeeklyTimesheetConfigurationDialog;
 class MonthlyTimesheetConfigurationDialog;
-class ActivityReportConfigurationDialog;
 
 class TimeTrackingWindow : public CharmWindow, public CharmDataModelAdapterInterface
 {
@@ -84,7 +83,6 @@ public Q_SLOTS:
     void slotEditPreferences(bool);   // show prefs dialog
     void slotAboutDialog();
     void slotEnterVacation();
-    void slotActivityReport();
     void slotWeeklyTimesheetReport();
     void slotMonthlyTimesheetReport();
     void slotSyncTasks(VerboseMode mode = Verbose);
@@ -106,7 +104,6 @@ private Q_SLOTS:
     void slotSelectTasksToShow();
     void slotWeeklyTimesheetPreview(int result);
     void slotMonthlyTimesheetPreview(int result);
-    void slotActivityReportPreview(int result);
     void slotCheckUploadedTimesheets();
     void slotBillGone(int result);
     void slotCheckForUpdatesAutomatic();
@@ -135,7 +132,6 @@ private:
 
     WeeklyTimesheetConfigurationDialog *m_weeklyTimesheetDialog = nullptr;
     MonthlyTimesheetConfigurationDialog *m_monthlyTimesheetDialog = nullptr;
-    ActivityReportConfigurationDialog *m_activityReportDialog = nullptr;
     TimeTrackingView *m_summaryWidget;
     QVector<WeeklySummary> m_summaries;
     QTimer m_checkUploadedSheetsTimer;

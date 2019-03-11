@@ -82,7 +82,6 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
     , m_actionExportTasks(this)
     , m_actionCheckForUpdates(this)
     , m_actionEnterVacation(this)
-    , m_actionActivityReport(this)
     , m_actionWeeklyTimesheetReport(this)
     , m_actionMonthlyTimesheetReport(this)
     , m_uiElements(
@@ -241,10 +240,6 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
     m_actionEnterVacation.setText(tr("Enter Vacation..."));
     connect(&m_actionEnterVacation, &QAction::triggered,
             &m_timeTracker, &TimeTrackingWindow::slotEnterVacation);
-    m_actionActivityReport.setText(tr("Activity Report..."));
-    m_actionActivityReport.setShortcut(Qt::CTRL + Qt::Key_A);
-    connect(&m_actionActivityReport, &QAction::triggered,
-            &m_timeTracker, &TimeTrackingWindow::slotActivityReport);
     m_actionWeeklyTimesheetReport.setText(tr("Weekly Timesheet..."));
     m_actionWeeklyTimesheetReport.setShortcut(Qt::CTRL + Qt::Key_R);
     connect(&m_actionWeeklyTimesheetReport, &QAction::triggered,
@@ -350,7 +345,6 @@ void ApplicationCore::createWindowMenu(QMenuBar *menuBar)
     menu->addSeparator();
     menu->addAction(&m_actionEnterVacation);
     menu->addSeparator();
-    menu->addAction(&m_actionActivityReport);
     menu->addAction(&m_actionWeeklyTimesheetReport);
     menu->addAction(&m_actionMonthlyTimesheetReport);
 #ifndef Q_OS_OSX
