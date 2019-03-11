@@ -26,8 +26,6 @@
 
 #include <QObject>
 
-#include "Core/MySqlStorage.h"
-
 class SqlTransactionTests : public QObject
 {
     Q_OBJECT
@@ -36,16 +34,7 @@ public:
     SqlTransactionTests();
 
 private Q_SLOTS:
-    void testMySqlDriverRequirements();
     void testSqLiteDriverRequirements();
-#if 0
-    void testMySqlTransactionRollback();
-    void testMySqlTransactionCommit();
-    void testMySqlNestedTransactions();
-#endif
-
-private:
-    MySqlStorage prepareMySqlStorage();
 };
 
 #endif // SQLTRANSACTIONTESTS_H

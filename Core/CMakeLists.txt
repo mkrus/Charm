@@ -10,7 +10,6 @@ SET(
     Dates.cpp
     SqlRaiiTransactor.cpp
     SqLiteStorage.cpp
-    MySqlStorage.cpp
     Configuration.cpp
     SqlStorage.cpp
     Event.cpp
