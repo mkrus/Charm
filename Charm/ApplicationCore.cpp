@@ -63,10 +63,6 @@
 #include <functional>
 #include <iostream>
 
-#ifdef CHARM_CI_SUPPORT
-#  include "CI/CharmCommandInterface.h"
-#endif
-
 namespace {
 static const QByteArray StartTaskCommand = QByteArrayLiteral("start-task: ");
 static const QByteArray RaiseWindowCommand = QByteArrayLiteral("raise-window");
@@ -278,11 +274,6 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
     if (QCoreApplication::applicationDirPath().endsWith(QLatin1String("MacOS")))
         QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath()
                                          + QStringLiteral("/../plugins"));
-
-    // set up command interface
-#ifdef CHARM_CI_SUPPORT
-    m_cmdInterface = new CharmCommandInterface(this);
-#endif // CHARM_CI_SUPPORT
 
     // Ladies and gentlemen, please raise upon your seats -
     // the show is about to begin:
@@ -615,17 +606,10 @@ void ApplicationCore::enterConnectedState()
 #ifdef Q_OS_WIN
     updateTaskList();
 #endif
-#ifdef CHARM_CI_SUPPORT
-    m_cmdInterface->start();
-#endif
 }
 
 void ApplicationCore::leaveConnectedState()
 {
-#ifdef CHARM_CI_SUPPORT
-    m_cmdInterface->stop();
-#endif
-
     m_controller.persistMetaData(CONFIGURATION);
 }
 
@@ -767,9 +751,6 @@ void ApplicationCore::slotSaveConfiguration()
     CONFIGURATION.writeTo(settings);
     if (state() == Connected) {
         m_controller.persistMetaData(CONFIGURATION);
-#ifdef CHARM_CI_SUPPORT
-        m_cmdInterface->configurationChanged();
-#endif
     }
     Q_FOREACH (auto e, m_uiElements)
         e->configurationChanged();
