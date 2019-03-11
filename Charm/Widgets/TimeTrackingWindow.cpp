@@ -41,8 +41,6 @@
 #include "ViewHelpers.h"
 #include "WeeklyTimesheet.h"
 
-#include "Commands/CommandExportToXml.h"
-#include "Commands/CommandImportFromXml.h"
 #include "Commands/CommandMakeEvent.h"
 #include "Commands/CommandModifyEvent.h"
 #include "Commands/CommandSetAllTasks.h"
@@ -397,64 +395,6 @@ void TimeTrackingWindow::showPreview(ReportConfigurationDialog *dialog, int resu
 {
     if (result == QDialog::Accepted)
         dialog->showReportPreviewDialog();
-}
-
-void TimeTrackingWindow::slotExportToXml()
-{
-    MakeTemporarilyVisible m(this);
-    // ask for a filename:
-    QSettings settings;
-    QString path;
-    if (settings.contains(MetaKey_ExportToXmlRecentSavePath)) {
-        path = settings.value(MetaKey_ExportToXmlRecentSavePath).toString();
-        QDir dir(path);
-        if (!dir.exists()) path = QString();
-    }
-
-    QString filename = QFileDialog::getSaveFileName(this, tr("Enter File Name"), path);
-    if (filename.isEmpty()) return;
-
-    QFileInfo fileinfo(filename);
-    path = fileinfo.absolutePath();
-
-    if (!path.isEmpty())
-        settings.setValue(MetaKey_ExportToXmlRecentSavePath, path);
-
-    if (fileinfo.suffix().isEmpty())
-        filename += QLatin1String(".charmdatabaseexport");
-
-    // get a XML export:
-    CommandExportToXml *command = new CommandExportToXml(filename, this);
-    sendCommand(command);
-}
-
-void TimeTrackingWindow::slotImportFromXml()
-{
-    MakeTemporarilyVisible m(this);
-    // ask for the filename:
-    QSettings settings;
-    QString path;
-    if (settings.contains(MetaKey_ExportToXmlRecentSavePath)) {
-        path = settings.value(MetaKey_ExportToXmlRecentSavePath).toString();
-        QDir dir(path);
-        if (!dir.exists()) path = QString();
-    }
-
-    QString filename = QFileDialog::getOpenFileName(this, tr("Please Select File"), path);
-    if (filename.isEmpty()) return;
-    QFileInfo fileinfo(filename);
-    Q_ASSERT(fileinfo.exists());
-
-    // warn the user about the consequences:
-    if (MessageBox::warning(this, tr("Watch out!"),
-                            tr("During import, all existing tasks and events will be deleted"
-                               " and replaced with the imported ones. Are you sure?"), tr("Delete"),
-                            tr("Cancel")) != QMessageBox::Yes)
-        return;
-
-    // ask the controller to import the file:
-    CommandImportFromXml *cmd = new CommandImportFromXml(filename, this);
-    sendCommand(cmd);
 }
 
 void TimeTrackingWindow::slotSyncTasks(VerboseMode mode)

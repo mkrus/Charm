@@ -18,8 +18,6 @@ SET(
     Commands/CommandDeleteEvent.cpp
     Commands/CommandSetAllTasks.cpp
     Commands/CommandMakeEvent.cpp
-    Commands/CommandExportToXml.cpp
-    Commands/CommandImportFromXml.cpp
     Commands/CommandMakeAndActivateEvent.cpp
     HttpClient/CheckForUpdatesJob.cpp
     HttpClient/GetProjectCodesJob.cpp

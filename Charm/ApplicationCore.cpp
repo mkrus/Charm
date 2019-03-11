@@ -76,8 +76,6 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
     , m_actionQuit(this)
     , m_actionAboutDialog(this)
     , m_actionPreferences(this)
-    , m_actionExportToXml(this)
-    , m_actionImportFromXml(this)
     , m_actionSyncTasks(this)
     , m_actionImportTasks(this)
     , m_actionExportTasks(this)
@@ -220,12 +218,6 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
             &m_timeTracker, &TimeTrackingWindow::slotEditPreferences);
     m_actionPreferences.setEnabled(true);
 
-    m_actionImportFromXml.setText(tr("Import Database from Previous Export..."));
-    connect(&m_actionImportFromXml, &QAction::triggered,
-            &m_timeTracker, &TimeTrackingWindow::slotImportFromXml);
-    m_actionExportToXml.setText(tr("Export Database..."));
-    connect(&m_actionExportToXml, &QAction::triggered,
-            &m_timeTracker, &TimeTrackingWindow::slotExportToXml);
     m_actionSyncTasks.setText(tr("Update Task Definitions..."));
     //the signature of QAction::triggered does not match slotSyncTasks
     connect(&m_actionSyncTasks,&QAction::triggered,
@@ -369,9 +361,6 @@ void ApplicationCore::createFileMenu(QMenuBar *menuBar)
 {
     auto menu = new QMenu(menuBar);
     menu->setTitle(tr("File"));
-    menu->addAction(&m_actionImportFromXml);
-    menu->addAction(&m_actionExportToXml);
-    menu->addSeparator();
     menu->addAction(&m_actionSyncTasks);
     menu->addAction(&m_actionImportTasks);
     menu->addAction(&m_actionExportTasks);

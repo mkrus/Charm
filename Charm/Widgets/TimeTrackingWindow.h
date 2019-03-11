@@ -87,12 +87,10 @@ public Q_SLOTS:
     void slotActivityReport();
     void slotWeeklyTimesheetReport();
     void slotMonthlyTimesheetReport();
-    void slotExportToXml();
-    void slotImportFromXml();
     void slotSyncTasks(VerboseMode mode = Verbose);
     void slotSyncTasksVerbose();
-    void slotImportTasks();
     void slotExportTasks();
+    void slotImportTasks();
     void maybeIdle(IdleDetector *idleDetector);
     void slotTasksDownloaded(HttpJob *);
     void slotUserInfoDownloaded(HttpJob *);
