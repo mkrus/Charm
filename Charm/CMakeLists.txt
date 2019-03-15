@@ -52,7 +52,6 @@ SET(
     Widgets/ReportConfigurationDialog.cpp
     Widgets/ReportPreviewWindow.cpp
     Widgets/SelectTaskDialog.cpp
-    Widgets/TaskEditor.cpp
     Widgets/TasksView.cpp
     Widgets/TimeTrackingView.cpp
     Widgets/TimeTrackingWindow.cpp
@@ -125,7 +124,6 @@ QT5_WRAP_UI(
     Widgets/CommentEditorPopup.ui
     Widgets/ConfigurationDialog.ui
     Widgets/CharmPreferences.ui
-    Widgets/TaskEditor.ui
     Widgets/EnterVacationDialog.ui
     Widgets/EventEditor.ui
     Widgets/SelectTaskDialog.ui

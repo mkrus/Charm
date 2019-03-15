@@ -26,7 +26,6 @@
 #include "Data.h"
 #include "GUIState.h"
 #include "MessageBox.h"
-#include "TaskEditor.h"
 #include "ViewFilter.h"
 #include "ViewHelpers.h"
 #include "WidgetUtils.h"
