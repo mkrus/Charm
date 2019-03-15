@@ -41,6 +41,7 @@
 #include "Widgets/CharmWindow.h"
 #include "Widgets/EventView.h"
 #include "Widgets/TimeTrackingWindow.h"
+#include "Widgets/TasksView.h"
 #include "Widgets/TrayIcon.h"
 
 #include "ModelConnector.h"
@@ -115,6 +116,7 @@ private Q_SLOTS:
     void slotHandleUniqueApplicationConnection();
     void slotPopulateTrayIconMenu();
     void slotShowNotification(const QString &title, const QString &message);
+    void slotShowTasksEditor();
     void slotShowEventEditor();
 
 Q_SIGNALS:
@@ -160,6 +162,7 @@ private:
     QAction m_actionMonthlyTimesheetReport;
     QList<QAction *> m_taskActions;
     EventView m_eventView;
+    TasksView m_tasksView;
     QVector<UIStateInterface *> m_uiElements;
     IdleDetector *m_idleDetector = nullptr;
     CharmCommandInterface *m_cmdInterface = nullptr;

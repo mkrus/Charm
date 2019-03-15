@@ -35,6 +35,7 @@
 #include "Lotsofcake/Configuration.h"
 #include "Widgets/ConfigurationDialog.h"
 #include "Widgets/NotificationPopup.h"
+#include "Widgets/TasksView.h"
 
 #include <QDir>
 #include <QTimer>
@@ -86,7 +87,7 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
     , m_actionMonthlyTimesheetReport(this)
     , m_uiElements(
 {
-    &m_timeTracker, &m_eventView
+    &m_timeTracker, &m_tasksView, &m_eventView
 }),
     m_startupTask(startupTask)
   , m_hideAtStart(hideAtStart)
@@ -165,7 +166,13 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
             this, &ApplicationCore::slotPopulateTrayIconMenu);
 
     // save the configuration (configuration is managed by the application)
+    connect(&m_tasksView, &TasksView::saveConfiguration,
+            this, &ApplicationCore::slotSaveConfiguration);
     // due to multiple inheritence we can't use the new style connects here
+    connect(&m_tasksView, SIGNAL(emitCommand(CharmCommand*)),
+            &m_timeTracker, SLOT(sendCommand(CharmCommand*)));
+    connect(&m_tasksView, SIGNAL(emitCommandRollback(CharmCommand*)),
+            &m_timeTracker, SLOT(sendCommandRollback(CharmCommand*)));
     connect(&m_eventView, SIGNAL(emitCommand(CharmCommand*)),
             &m_timeTracker, SLOT(sendCommand(CharmCommand*)));
     connect(&m_eventView, SIGNAL(emitCommandRollback(CharmCommand*)),
@@ -336,6 +343,8 @@ void ApplicationCore::createWindowMenu(QMenuBar *menuBar)
 {
     auto menu = new QMenu(menuBar);
     menu->setTitle(tr("Window"));
+    menu->addAction(tr("Show Tasks Window"), this,
+                    SLOT(slotShowTasksEditor()), QKeySequence(tr("Ctrl+1")));
     menu->addAction(tr("Show Event Editor Window"), this,
                     SLOT(slotShowEventEditor()), QKeySequence(tr("Ctrl+2")));
     menu->addSeparator();
@@ -825,6 +834,11 @@ void ApplicationCore::slotShowNotification(const QString &title, const QString &
         NotificationPopup *popup = new NotificationPopup(nullptr);
         popup->showNotification(title, message);
     }
+}
+
+void ApplicationCore::slotShowTasksEditor()
+{
+    CharmWindow::showView(&m_tasksView);
 }
 
 void ApplicationCore::slotShowEventEditor()

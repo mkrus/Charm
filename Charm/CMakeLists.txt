@@ -53,6 +53,7 @@ SET(
     Widgets/ReportPreviewWindow.cpp
     Widgets/SelectTaskDialog.cpp
     Widgets/TaskEditor.cpp
+    Widgets/TasksView.cpp
     Widgets/TimeTrackingView.cpp
     Widgets/TimeTrackingWindow.cpp
     Widgets/TimeTrackingTaskSelector.cpp
