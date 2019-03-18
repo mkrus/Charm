@@ -45,7 +45,6 @@ SET(
     Widgets/ExpandStatesHelper.cpp
     Widgets/HttpJobProgressDialog.cpp
     Widgets/IdleCorrectionDialog.cpp
-    Widgets/MessageBox.cpp
     Widgets/MonthlyTimesheet.cpp
     Widgets/MonthlyTimesheetConfigurationDialog.cpp
     Widgets/ReportConfigurationDialog.cpp

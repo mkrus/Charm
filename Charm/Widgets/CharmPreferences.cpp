@@ -24,7 +24,6 @@
 
 #include "CharmPreferences.h"
 #include "ApplicationCore.h"
-#include "MessageBox.h"
 
 #include "Core/Configuration.h"
 #include "Idle/IdleDetector.h"
@@ -196,14 +195,16 @@ void CharmPreferences::slotWarnUnuploadedChanged(bool enabled)
         return;
 
     if (!enabled) {
-        const int response = MessageBox::question(this,
-                                                  tr("Bill is sad :(."),
-                                                  tr(
-                                                      "Bill has always been misunderstood. All he really wants is your reports, and even when he doesn't get them you only have to evade him once per hour. I'm sure you want to keep Bill's gentle reminders?"),
-                                                  tr("Mmmmkay"),
-                                                  tr("No, Stop Bill"),
-                                                  QMessageBox::Yes);
-        if (response == QMessageBox::Yes)
+        QMessageBox mbox(QMessageBox::Question,
+                         tr("Bill is sad :(."),
+                         tr("Bill has always been misunderstood. All he really wants is your reports, and even when he doesn't get them you only have to evade him once per hour. I'm sure you want to keep Bill's gentle reminders?"),
+                         QMessageBox::Yes|QMessageBox::No);
+        auto buttonYes = mbox.button(QMessageBox::Yes);
+        buttonYes->setText(tr("Mmmmkay"));
+        auto buttonNo = mbox.button(QMessageBox::No);
+        buttonNo->setText(tr("No, Stop Bill"));
+
+        if (mbox.exec() == QMessageBox::Yes)
             m_ui.cbWarnUnuploadedTimesheets->setCheckState(Qt::Checked);
     }
 }

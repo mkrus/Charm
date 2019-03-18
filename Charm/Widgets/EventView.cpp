@@ -28,7 +28,6 @@
 #include "EventEditorDelegate.h"
 #include "EventModelFilter.h"
 #include "FindAndReplaceEventsDialog.h"
-#include "MessageBox.h"
 #include "SelectTaskDialog.h"
 #include "ViewHelpers.h"
 #include "WeeklyTimesheet.h"
@@ -53,6 +52,8 @@
 #include <QTimer>
 #include <QToolBar>
 #include <QVBoxLayout>
+#include <QMessageBox>
+#include <QAbstractButton>
 
 EventView::EventView(QWidget *parent)
     : QDialog(parent)
@@ -290,8 +291,14 @@ void EventView::slotDeleteEvent()
                        hoursAndMinutes(m_event.duration()));
     }
 
-    if (MessageBox::question(this, tr("Delete Event?"), message, tr("Delete"), tr("Cancel"))
-        == QMessageBox::Yes) {
+    QMessageBox mbox(QMessageBox::Question,
+                     tr("Delete Event?"),
+                     message,
+                     QMessageBox::Yes|QMessageBox::Cancel);
+    auto buttonYes = mbox.button(QMessageBox::Yes);
+    buttonYes->setText(tr("Delete"));
+
+    if (mbox.exec() == QMessageBox::Yes) {
         auto command = new CommandDeleteEvent(m_event, this);
         command->prepare();
         stageCommand(command);

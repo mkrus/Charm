@@ -32,7 +32,6 @@
 #include "EnterVacationDialog.h"
 #include "IdleCorrectionDialog.h"
 #include "MakeTemporarilyVisible.h"
-#include "MessageBox.h"
 #include "MonthlyTimesheet.h"
 #include "MonthlyTimesheetConfigurationDialog.h"
 #include "TemporaryValue.h"
