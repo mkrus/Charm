@@ -54,22 +54,15 @@ public:
     ~WeeklyTimesheetConfigurationDialog() override;
 
     void showReportPreviewDialog() override;
-    void showEvent(QShowEvent *) override;
     void setDefaultWeek(int yearOfWeek, int week);
 
-public Q_SLOTS:
-    void accept() override;
-
 private Q_SLOTS:
-    void slotCheckboxSubtasksOnlyChecked(bool);
     void slotStandardTimeSpansChanged();
     void slotWeekComboItemSelected(int);
-    void slotSelectTask();
 
 private:
     QScopedPointer<Ui::WeeklyTimesheetConfigurationDialog> m_ui;
     QList<NamedTimeSpan> m_weekInfo;
-    TaskId m_rootTask = {};
 };
 
 class WeeklyTimeSheetReport : public TimeSheetReport

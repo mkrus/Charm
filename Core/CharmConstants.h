@@ -44,6 +44,11 @@
 #define CHARM_SQLITE_BACKEND_DESCRIPTOR QStringLiteral("sqlite")
 #define CHARM_MYSQL_BACKEND_DESCRIPTOR QStringLiteral("mysql")
 
+namespace Constants {
+const int RootTaskId = 1;
+}
+
+
 // Metadata and QSettings Keys:
 extern const QString MetaKey_MainWindowGeometry;
 extern const QString MetaKey_MainWindowVisible;
@@ -57,9 +62,6 @@ extern const QString MetaKey_EventEditorGeometry;
 extern const QString MetaKey_TaskEditorGeometry;
 extern const QString MetaKey_ReportsRecentSavePath;
 extern const QString MetaKey_ExportToXmlRecentSavePath;
-extern const QString MetaKey_TimesheetActiveOnly;
-extern const QString MetaKey_TimesheetSubscribedOnly;
-extern const QString MetaKey_TimesheetRootTask;
 extern const QString MetaKey_LastEventEditorDateTime;
 extern const QString MetaKey_Key_InstallationId;
 extern const QString MetaKey_Key_UserName;

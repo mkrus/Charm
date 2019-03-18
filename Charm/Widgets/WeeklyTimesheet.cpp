@@ -39,6 +39,7 @@
 
 #include "SelectTaskDialog.h"
 #include "ViewHelpers.h"
+#include "Core/CharmConstants.h"
 
 #include "ui_WeeklyTimesheetConfigurationDialog.h"
 
@@ -121,25 +122,12 @@ WeeklyTimesheetConfigurationDialog::WeeklyTimesheetConfigurationDialog(QWidget *
 
     connect(m_ui->comboBoxWeek, SIGNAL(currentIndexChanged(int)),
             SLOT(slotWeekComboItemSelected(int)));
-    connect(m_ui->toolButtonSelectTask, &QToolButton::clicked,
-            this, &WeeklyTimesheetConfigurationDialog::slotSelectTask);
-    connect(m_ui->checkBoxSubTasksOnly, &QCheckBox::toggled,
-            this, &WeeklyTimesheetConfigurationDialog::slotCheckboxSubtasksOnlyChecked);
     m_ui->comboBoxWeek->setCurrentIndex(1);
-    slotCheckboxSubtasksOnlyChecked(m_ui->checkBoxSubTasksOnly->isChecked());
     new DateEntrySyncer(m_ui->spinBoxWeek, m_ui->spinBoxYear, m_ui->dateEditDay, 1, this);
 
     slotStandardTimeSpansChanged();
     connect(ApplicationCore::instance().dateChangeWatcher(), &DateChangeWatcher::dateChanged,
             this, &WeeklyTimesheetConfigurationDialog::slotStandardTimeSpansChanged);
-
-    // load settings:
-    QSettings settings;
-    if (settings.contains(MetaKey_TimesheetActiveOnly)) {
-        m_ui->checkBoxActiveOnly->setChecked(settings.value(MetaKey_TimesheetActiveOnly).toBool());
-    } else {
-        m_ui->checkBoxActiveOnly->setChecked(true);
-    }
 }
 
 WeeklyTimesheetConfigurationDialog::~WeeklyTimesheetConfigurationDialog()
@@ -151,18 +139,6 @@ void WeeklyTimesheetConfigurationDialog::setDefaultWeek(int yearOfWeek, int week
     m_ui->spinBoxWeek->setValue(week);
     m_ui->spinBoxYear->setValue(yearOfWeek);
     m_ui->comboBoxWeek->setCurrentIndex(4);
-}
-
-void WeeklyTimesheetConfigurationDialog::accept()
-{
-    // save settings:
-    QSettings settings;
-    settings.setValue(MetaKey_TimesheetActiveOnly,
-                      m_ui->checkBoxActiveOnly->isChecked());
-    settings.setValue(MetaKey_TimesheetRootTask,
-                      m_rootTask);
-
-    QDialog::accept();
 }
 
 void WeeklyTimesheetConfigurationDialog::showReportPreviewDialog()
@@ -178,38 +154,9 @@ void WeeklyTimesheetConfigurationDialog::showReportPreviewDialog()
         start = m_weekInfo[index].timespan.first;
         end = m_weekInfo[index].timespan.second;
     }
-    bool activeOnly = m_ui->checkBoxActiveOnly->isChecked();
     auto report = new WeeklyTimeSheetReport();
-    report->setReportProperties(start, end, m_rootTask, activeOnly);
+    report->setReportProperties(start, end, Constants::RootTaskId, true);
     report->show();
-}
-
-void WeeklyTimesheetConfigurationDialog::showEvent(QShowEvent *)
-{
-    QSettings settings;
-
-    // we only want to do this once a backend is loaded, and we ignore
-    // the saved root task if it does not exist anymore
-    if (settings.contains(MetaKey_TimesheetRootTask)) {
-        TaskId root = settings.value(MetaKey_TimesheetRootTask).toInt();
-        const TaskTreeItem &item = DATAMODEL->taskTreeItem(root);
-        if (item.isValid()) {
-            m_rootTask = root;
-            m_ui->labelTaskName->setText(DATAMODEL->fullTaskName(item.task()));
-            m_ui->checkBoxSubTasksOnly->setChecked(true);
-        }
-    }
-}
-
-void WeeklyTimesheetConfigurationDialog::slotCheckboxSubtasksOnlyChecked(bool checked)
-{
-    if (checked && m_rootTask == 0)
-        slotSelectTask();
-
-    if (!checked) {
-        m_rootTask = 0;
-        m_ui->labelTaskName->setText(tr("(All Tasks)"));
-    }
 }
 
 void WeeklyTimesheetConfigurationDialog::slotStandardTimeSpansChanged()
@@ -240,21 +187,6 @@ void WeeklyTimesheetConfigurationDialog::slotWeekComboItemSelected(int index)
     } else {
         m_ui->dateEditDay->setDate(m_weekInfo[index].timespan.first);
         m_ui->groupBox->setEnabled(false);
-    }
-}
-
-void WeeklyTimesheetConfigurationDialog::slotSelectTask()
-{
-    SelectTaskDialog dialog(this);
-    dialog.setNonTrackableSelectable();
-    dialog.setNonValidSelectable();
-    if (dialog.exec()) {
-        m_rootTask = dialog.selectedTask();
-        const TaskTreeItem &item = DATAMODEL->taskTreeItem(m_rootTask);
-        m_ui->labelTaskName->setText(DATAMODEL->fullTaskName(item.task()));
-    } else {
-        if (m_rootTask == 0)
-            m_ui->checkBoxSubTasksOnly->setChecked(false);
     }
 }
 

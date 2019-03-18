@@ -44,22 +44,15 @@ public:
     ~MonthlyTimesheetConfigurationDialog() override;
 
     void showReportPreviewDialog() override;
-    void showEvent(QShowEvent *) override;
     void setDefaultMonth(int yearOfMonth, int month);
 
-public Q_SLOTS:
-    void accept() override;
-
 private Q_SLOTS:
-    void slotCheckboxSubtasksOnlyChecked(bool);
     void slotStandardTimeSpansChanged();
     void slotMonthComboItemSelected(int);
-    void slotSelectTask();
 
 private:
     QScopedPointer<Ui::MonthlyTimesheetConfigurationDialog> m_ui;
     QList<NamedTimeSpan> m_monthInfo;
-    TaskId m_rootTask;
 };
 
 #endif

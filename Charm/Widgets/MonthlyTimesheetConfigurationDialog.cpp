@@ -49,12 +49,7 @@ MonthlyTimesheetConfigurationDialog::MonthlyTimesheetConfigurationDialog(QWidget
 
     connect(m_ui->comboBoxMonth, SIGNAL(currentIndexChanged(int)),
             SLOT(slotMonthComboItemSelected(int)));
-    connect(m_ui->toolButtonSelectTask, &QToolButton::clicked,
-            this, &MonthlyTimesheetConfigurationDialog::slotSelectTask);
-    connect(m_ui->checkBoxSubTasksOnly, &QCheckBox::toggled,
-            this, &MonthlyTimesheetConfigurationDialog::slotCheckboxSubtasksOnlyChecked);
     m_ui->comboBoxMonth->setCurrentIndex(1);
-    slotCheckboxSubtasksOnlyChecked(m_ui->checkBoxSubTasksOnly->isChecked());
 
     slotStandardTimeSpansChanged();
     connect(ApplicationCore::instance().dateChangeWatcher(), &DateChangeWatcher::dateChanged,
@@ -63,14 +58,6 @@ MonthlyTimesheetConfigurationDialog::MonthlyTimesheetConfigurationDialog(QWidget
     // set current month and year:
     m_ui->spinBoxMonth->setValue(QDate::currentDate().month());
     m_ui->spinBoxYear->setValue(QDate::currentDate().year());
-
-    // load settings:
-    QSettings settings;
-    if (settings.contains(MetaKey_TimesheetActiveOnly)) {
-        m_ui->checkBoxActiveOnly->setChecked(settings.value(MetaKey_TimesheetActiveOnly).toBool());
-    } else {
-        m_ui->checkBoxActiveOnly->setChecked(true);
-    }
 }
 
 MonthlyTimesheetConfigurationDialog::~MonthlyTimesheetConfigurationDialog()
@@ -82,18 +69,6 @@ void MonthlyTimesheetConfigurationDialog::setDefaultMonth(int yearOfMonth, int m
     m_ui->spinBoxMonth->setValue(month);
     m_ui->spinBoxYear->setValue(yearOfMonth);
     m_ui->comboBoxMonth->setCurrentIndex(4);
-}
-
-void MonthlyTimesheetConfigurationDialog::accept()
-{
-    // save settings:
-    QSettings settings;
-    settings.setValue(MetaKey_TimesheetActiveOnly,
-                      m_ui->checkBoxActiveOnly->isChecked());
-    settings.setValue(MetaKey_TimesheetRootTask,
-                      m_rootTask);
-
-    QDialog::accept();
 }
 
 void MonthlyTimesheetConfigurationDialog::showReportPreviewDialog()
@@ -108,38 +83,9 @@ void MonthlyTimesheetConfigurationDialog::showReportPreviewDialog()
         start = m_monthInfo[index].timespan.first;
         end = m_monthInfo[index].timespan.second;
     }
-    bool activeOnly = m_ui->checkBoxActiveOnly->isChecked();
     auto report = new MonthlyTimeSheetReport();
-    report->setReportProperties(start, end, m_rootTask, activeOnly);
+    report->setReportProperties(start, end, Constants::RootTaskId, true);
     report->show();
-}
-
-void MonthlyTimesheetConfigurationDialog::showEvent(QShowEvent *)
-{
-    QSettings settings;
-
-    // we only want to do this once a backend is loaded, and we ignore
-    // the saved root task if it does not exist anymore
-    if (settings.contains(MetaKey_TimesheetRootTask)) {
-        TaskId root = settings.value(MetaKey_TimesheetRootTask).toInt();
-        const TaskTreeItem &item = DATAMODEL->taskTreeItem(root);
-        if (item.isValid()) {
-            m_rootTask = root;
-            m_ui->labelTaskName->setText(DATAMODEL->fullTaskName(item.task()));
-            m_ui->checkBoxSubTasksOnly->setChecked(true);
-        }
-    }
-}
-
-void MonthlyTimesheetConfigurationDialog::slotCheckboxSubtasksOnlyChecked(bool checked)
-{
-    if (checked && m_rootTask == 0)
-        slotSelectTask();
-
-    if (!checked) {
-        m_rootTask = 0;
-        m_ui->labelTaskName->setText(tr("(All Tasks)"));
-    }
 }
 
 void MonthlyTimesheetConfigurationDialog::slotStandardTimeSpansChanged()
@@ -169,20 +115,5 @@ void MonthlyTimesheetConfigurationDialog::slotMonthComboItemSelected(int index)
         m_ui->groupBox->setEnabled(true);
     } else {
         m_ui->groupBox->setEnabled(false);
-    }
-}
-
-void MonthlyTimesheetConfigurationDialog::slotSelectTask()
-{
-    SelectTaskDialog dialog(this);
-    dialog.setNonTrackableSelectable();
-    dialog.setNonValidSelectable();
-    if (dialog.exec()) {
-        m_rootTask = dialog.selectedTask();
-        const TaskTreeItem &item = DATAMODEL->taskTreeItem(m_rootTask);
-        m_ui->labelTaskName->setText(DATAMODEL->fullTaskName(item.task()));
-    } else {
-        if (m_rootTask == 0)
-            m_ui->checkBoxSubTasksOnly->setChecked(false);
     }
 }

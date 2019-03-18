@@ -30,6 +30,7 @@
 #include <QObject>
 #include <QTextStream>
 
+
 const QString MetaKey_EventsInLeafsOnly = QStringLiteral("EventsInLeafsOnly");
 const QString MetaKey_OneEventAtATime = QStringLiteral("OneEventAtATime");
 const QString MetaKey_MainWindowGeometry = QStringLiteral("MainWindowGeometry");
@@ -48,9 +49,6 @@ const QString MetaKey_EventEditorGeometry = QStringLiteral("EventEditorGeometry"
 const QString MetaKey_TaskEditorGeometry = QStringLiteral("TaskEditorGeometry");
 const QString MetaKey_ReportsRecentSavePath = QStringLiteral("ReportsRecentSavePath");
 const QString MetaKey_ExportToXmlRecentSavePath = QStringLiteral("ExportToXmlSavePath");
-const QString MetaKey_TimesheetSubscribedOnly = QStringLiteral("TimesheetSubscribedOnly");
-const QString MetaKey_TimesheetActiveOnly = QStringLiteral("TimesheetActiveOnly");
-const QString MetaKey_TimesheetRootTask = QStringLiteral("TimesheetRootTask");
 const QString MetaKey_LastEventEditorDateTime = QStringLiteral("LastEventEditorDateTime");
 const QString MetaKey_Key_InstallationId = QStringLiteral("InstallationId");
 const QString MetaKey_Key_UserName = QStringLiteral("UserName");
