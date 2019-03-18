@@ -109,7 +109,7 @@ bool Controller::addTask(const Task &task)
 
 bool Controller::setAllTasks(const TaskList &tasks)
 {
-    if (m_storage->setAllTasks(CONFIGURATION.user, tasks)) {
+    if (m_storage->setAllTasks(tasks)) {
         const TaskList newTasks = m_storage->getAllTasks();
         // tell the view about the existing tasks;
         emit definedTasks(newTasks);
@@ -174,7 +174,7 @@ void Controller::persistMetaData(Configuration &configuration)
     Q_ASSERT_X(m_storage != nullptr, Q_FUNC_INFO, "No storage interface available");
     Setting settings[] = {
         { MetaKey_Key_UserName,
-          configuration.user.name() },
+          configuration.userName },
         { MetaKey_Key_SubscribedTasksOnly,
           QString().setNum(configuration.taskPrefilteringMode) },
         { MetaKey_Key_TimeTrackerFontSize,
@@ -218,7 +218,7 @@ void Controller::loadConfigValue(const QString &key, T &configValue) const
 void Controller::provideMetaData(Configuration &configuration)
 {
     Q_ASSERT_X(m_storage != nullptr, Q_FUNC_INFO, "No storage interface available");
-    configuration.user.setName(m_storage->getMetaData(MetaKey_Key_UserName));
+    configuration.userName = m_storage->getMetaData(MetaKey_Key_UserName);
 
     loadConfigValue(MetaKey_Key_TimeTrackerFontSize, configuration.timeTrackerFontSize);
     loadConfigValue(MetaKey_Key_DurationFormat, configuration.durationFormat);

@@ -296,7 +296,7 @@ void WeeklyTimeSheetReport::update()
     {
         QDomElement headline = doc.createElement(QStringLiteral("h3"));
         QString content = tr("Report for %1, Week %2 (%3 to %4)")
-                          .arg(CONFIGURATION.user.name())
+                          .arg(CONFIGURATION.userName)
                           .arg(m_weekNumber, 2, 10, QLatin1Char('0'))
                           .arg(startDate().toString(Qt::TextDate))
                           .arg(endDate().addDays(-1).toString(Qt::TextDate));

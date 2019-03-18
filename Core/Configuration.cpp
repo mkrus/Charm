@@ -68,7 +68,7 @@ Configuration::Configuration(TaskPrefilteringMode _taskPrefilteringMode,
 
 bool Configuration::operator==(const Configuration &other) const
 {
-    return user == other.user
+    return userName == other.userName
            && taskPrefilteringMode == other.taskPrefilteringMode
            && timeTrackerFontSize == other.timeTrackerFontSize
            && durationFormat == other.durationFormat
@@ -87,7 +87,6 @@ bool Configuration::operator==(const Configuration &other) const
 void Configuration::writeTo(QSettings &settings)
 {
     settings.setValue(MetaKey_Key_InstallationId, installationId);
-    settings.setValue(MetaKey_Key_UserId, user.id());
     settings.setValue(MetaKey_Key_LocalStorageType, localStorageType);
     settings.setValue(MetaKey_Key_LocalStorageDatabase, localStorageDatabase);
     dump(QStringLiteral("(Configuration::writeTo stored configuration)"));
@@ -106,11 +105,6 @@ bool Configuration::readFrom(QSettings &settings)
             installationId = newId;
             dirty = true;
         }
-    } else {
-        complete = false;
-    }
-    if (settings.contains(MetaKey_Key_UserId)) {
-        user.setId(settings.value(MetaKey_Key_UserId).toInt());
     } else {
         complete = false;
     }
@@ -139,7 +133,6 @@ void Configuration::dump(const QString &why)
              << (why.isEmpty() ? QString() : why)
              << endl
              << "--> installation id:          " << installationId << endl
-             << "--> userid:                   " << user.id() << endl
              << "--> local storage type:       " << localStorageType << endl
              << "--> local storage database:   " << localStorageDatabase << endl
              << "--> task prefiltering mode:   " << taskPrefilteringMode << endl

@@ -86,6 +86,10 @@ bool SqlStorage::verifyDatabase()
         return migrateDB(QStringLiteral(
                              "DROP TABLE Subscriptions"),
                          CHARM_DATABASE_VERSION_BEFORE_SUBSCRIPTION_REMOVAL);
+    } else if (version == CHARM_DATABASE_VERSION_BEFORE_USER_REMOVAL) {
+        return migrateDB(QStringLiteral(
+                             "DROP TABLE Users"),
+                         CHARM_DATABASE_VERSION_BEFORE_USER_REMOVAL);
     }
 
     throw UnsupportedDatabaseVersionException(QObject::tr("Database version is not supported."));
@@ -110,7 +114,7 @@ TaskList SqlStorage::getAllTasks()
     return tasks;
 }
 
-bool SqlStorage::setAllTasks(const User &user, const TaskList &tasks)
+bool SqlStorage::setAllTasks(const TaskList &tasks)
 {
     SqlRaiiTransactor transactor(database());
     const TaskList oldTasks = getAllTasks();
@@ -192,7 +196,6 @@ Event SqlStorage::makeEventFromRecord(const QSqlRecord &record)
     Event event;
 
     int idField = record.indexOf(QStringLiteral("event_id"));
-    int userIdField = record.indexOf(QStringLiteral("user_id"));
     int reportIdField = record.indexOf(QStringLiteral("report_id"));
     int taskField = record.indexOf(QStringLiteral("task"));
     int commentField = record.indexOf(QStringLiteral("comment"));
@@ -200,7 +203,6 @@ Event SqlStorage::makeEventFromRecord(const QSqlRecord &record)
     int endField = record.indexOf(QStringLiteral("end"));
 
     event.setId(record.field(idField).value().toInt());
-    event.setUserId(record.field(userIdField).value().toInt());
     event.setReportId(record.field(reportIdField).value().toInt());
     event.setTaskId(record.field(taskField).value().toInt());
     event.setComment(record.field(commentField).value().toString());
@@ -244,8 +246,7 @@ Event SqlStorage::makeEvent(const SqlRaiiTransactor &)
 
     { // insert a new record in the database
         QSqlQuery query(database());
-        query.prepare(QLatin1String("INSERT into Events values "
-                                    "( NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL );"));
+        query.prepare(QLatin1String("INSERT INTO Events DEFAULT VALUES;"));
         result = runQuery(query);
         Q_ASSERT(result); // this has to suceed
     }
@@ -320,10 +321,9 @@ bool SqlStorage::modifyEvent(const Event &event, const SqlRaiiTransactor &)
 {
     QSqlQuery query(database());
     query.prepare(QLatin1String("UPDATE Events set task = :task, comment = :comment, "
-                                "start = :start, end = :end, user_id = :user, report_id = :report "
+                                "start = :start, end = :end, report_id = :report "
                                 "where event_id = :id;"));
     query.bindValue(QStringLiteral(":id"), event.id());
-    query.bindValue(QStringLiteral(":user"), event.userId());
     query.bindValue(QStringLiteral(":task"), event.taskId());
     query.bindValue(QStringLiteral(":report"), event.reportId());
     query.bindValue(QStringLiteral(":comment"), event.comment());
@@ -414,103 +414,6 @@ void SqlStorage::stateChanged(State previous)
     // atm, SqlStorage does not care about state
 }
 
-User SqlStorage::getUser(int userid)
-{
-    User user;
-
-    QSqlQuery query(database());
-    query.prepare(QStringLiteral("SELECT * from Users WHERE user_id = :user_id;"));
-    query.bindValue(QStringLiteral(":user_id"), userid);
-
-    if (runQuery(query)) {
-        if (query.next()) {
-            int userIdPosition = query.record().indexOf(QStringLiteral("user_id"));
-            int namePosition = query.record().indexOf(QStringLiteral("name"));
-            Q_ASSERT(userIdPosition != -1 && namePosition != -1);
-
-            user.setId(query.value(userIdPosition).toInt());
-            user.setName(query.value(namePosition).toString());
-            Q_ASSERT(user.isValid());
-        } else {
-            qCritical() << "SqlStorage::getUser: no user with id" << userid;
-        }
-    }
-
-    return user;
-}
-
-User SqlStorage::makeUser(const QString &name)
-{
-    SqlRaiiTransactor transactor(database());
-    bool result;
-    User user;
-    user.setName(name);
-
-    { // create a new record:
-        QSqlQuery query(database());
-        query.prepare(QStringLiteral(
-                          "INSERT into Users ( id, user_id, name ) VALUES (NULL, NULL, :name);"));
-        query.bindValue(QStringLiteral(":name"), user.name());
-
-        result = runQuery(query);
-        if (!result) {
-            qDebug() << "SqlStorage::makeUser: FAILED to create new user";
-            return user;
-        }
-    }
-    if (result) { // find it and determine key:
-        QSqlQuery query(database());
-
-        const QString statement = QString::fromLocal8Bit(
-            "SELECT id from Users WHERE id = %1();").arg(
-            lastInsertRowFunction());
-        query.prepare(statement);
-
-        result = runQuery(query);
-        if (result && query.next()) {
-            int idField = query.record().indexOf(QStringLiteral("id"));
-            user.setId(query.value(idField).toInt());
-            Q_ASSERT(user.id() != 0);
-        } else {
-            qCritical()
-                << "SqlStorage::makeUser: FAILED to find newly created user";
-            return user;
-        }
-    }
-    if (result) { // make a unique user id:
-        QSqlQuery query(database());
-        query.prepare(QStringLiteral("UPDATE Users SET user_id = :id WHERE id = :idx;"));
-        query.bindValue(QStringLiteral(":id"), user.id());
-        query.bindValue(QStringLiteral(":idx"), user.id());
-        result = runQuery(query);
-        if (!result)
-            user.setId(0); // make invalid
-    }
-
-    if (result)
-        transactor.commit();
-
-    return user;
-}
-
-bool SqlStorage::modifyUser(const User &user)
-{
-    QSqlQuery query(database());
-    query.prepare(QStringLiteral("UPDATE Users SET name = :name WHERE user_id = :id;"));
-    query.bindValue(QStringLiteral(":name"), user.name());
-    query.bindValue(QStringLiteral(":id"), user.id());
-
-    return runQuery(query);
-}
-
-bool SqlStorage::deleteUser(const User &user)
-{
-    QSqlQuery query(database());
-    query.prepare(QStringLiteral("DELETE from Users WHERE user_id = :id;"));
-    query.bindValue(QStringLiteral(":id"), user.id());
-    return runQuery(query);
-}
-
 bool SqlStorage::setMetaData(const QString &key, const QString &value)
 {
     SqlRaiiTransactor transactor(database());
@@ -576,7 +479,6 @@ Task SqlStorage::makeTaskFromRecord(const QSqlRecord &record)
     int idField = record.indexOf(QStringLiteral("task_id"));
     int nameField = record.indexOf(QStringLiteral("name"));
     int parentField = record.indexOf(QStringLiteral("parent"));
-    int useridField = record.indexOf(QStringLiteral("user_id"));
     int validfromField = record.indexOf(QStringLiteral("validfrom"));
     int validuntilField = record.indexOf(QStringLiteral("validuntil"));
     int trackableField = record.indexOf(QStringLiteral("trackable"));
@@ -604,8 +506,7 @@ Task SqlStorage::makeTaskFromRecord(const QSqlRecord &record)
     return task;
 }
 
-QString SqlStorage::setAllTasksAndEvents(const User &user, const TaskList &tasks,
-                                         const EventList &events)
+QString SqlStorage::setAllTasksAndEvents(const TaskList &tasks, const EventList &events)
 {
     SqlRaiiTransactor transactor(database());
 

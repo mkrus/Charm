@@ -137,7 +137,7 @@ void MonthlyTimeSheetReport::update()
     {
         QDomElement headline = doc.createElement(QStringLiteral("h3"));
         QString content = tr("Report for %1, %2 %3 (%4 to %5)")
-                          .arg(CONFIGURATION.user.name(),
+                          .arg(CONFIGURATION.userName,
                                QLocale::system().monthName(m_monthNumber),
                                QString::number(startDate().year()),
                                startDate().toString(Qt::TextDate),

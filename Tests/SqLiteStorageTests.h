@@ -46,8 +46,6 @@ private Q_SLOTS:
 
     void connectAndCreateDatabaseTest();
 
-    void makeModifyDeleteUserTest();
-
     void makeModifyDeleteTasksTest();
 
     void makeModifyDeleteEventsTest();

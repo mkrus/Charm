@@ -27,8 +27,6 @@
 
 #include <QObject>
 
-#include "User.h"
-
 class QSettings;
 
 class Configuration
@@ -68,7 +66,7 @@ public:
 
     quint32 createInstallationId() const;
 
-    User user;  // this user's id
+    QString userName;
     TaskPrefilteringMode taskPrefilteringMode = TaskPrefilter_ShowAll;
     TimeTrackerFontSize timeTrackerFontSize = TimeTrackerFont_Regular;
     DurationFormat durationFormat = Minutes;

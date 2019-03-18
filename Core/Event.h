@@ -55,10 +55,6 @@ public:
 
     void setId(EventId id);
 
-    int userId() const;
-
-    void setUserId(int userId);
-
     int reportId() const;
 
     void setReportId(int userId);
@@ -92,8 +88,6 @@ public:
     static QString tagName();
 
 private:
-    /** The id of the user who owns the event. */
-    int m_userid = {};
     /** The report id. This field is only useful
      * if the event is imported from a report.
      */

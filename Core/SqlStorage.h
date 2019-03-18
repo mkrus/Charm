@@ -27,7 +27,6 @@
 #include <QString>
 
 #include "Task.h"
-#include "User.h"
 #include "State.h"
 #include "Event.h"
 #include "CharmExceptions.h"
@@ -56,15 +55,9 @@ public:
     // application:
     void stateChanged(State previous);
 
-    // user database functions:
-    User getUser(int userid);
-    User makeUser(const QString &name);
-    bool modifyUser(const User &user);
-    bool deleteUser(const User &user);
-
     // task database functions:
     TaskList getAllTasks();
-    bool setAllTasks(const User &user, const TaskList &tasks);
+    bool setAllTasks(const TaskList &tasks);
     bool addTask(const Task &task);
     bool addTask(const Task &task, const SqlRaiiTransactor &);
     Task getTask(int taskid);
@@ -94,7 +87,7 @@ public:
     /*! @brief update all tasks and events in a single-transaction during imports
       @return an empty String on success, an error message otherwise
       */
-    QString setAllTasksAndEvents(const User &, const TaskList &, const EventList &);
+    QString setAllTasksAndEvents(const TaskList &, const EventList &);
 
     /**
      * @throws UnsupportedDatabaseVersionException

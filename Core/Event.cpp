@@ -38,7 +38,6 @@ bool Event::operator ==(const Event &other) const
            && other.comment() == comment()
            && other.startDateTime() == startDateTime()
            && other.endDateTime() == endDateTime()
-           && other.userId() == userId()
            && other.reportId() == reportId();
 }
 
@@ -50,16 +49,6 @@ EventId Event::id() const
 void Event::setId(EventId id)
 {
     m_id = id;
-}
-
-int Event::userId() const
-{
-    return m_userid;
-}
-
-void Event::setUserId(int userId)
-{
-    m_userid = userId;
 }
 
 int Event::reportId() const
@@ -153,7 +142,6 @@ void dumpEvents(const EventList &events)
 const QString EventElement(QStringLiteral("event"));
 const QString EventIdAttribute(QStringLiteral("eventid"));
 const QString EventTaskIdAttribute(QStringLiteral("taskid"));
-const QString EventUserIdAttribute(QStringLiteral("userid"));
 const QString EventReportIdAttribute(QStringLiteral("reportid"));
 const QString EventStartAttribute(QStringLiteral("start"));
 const QString EventEndAttribute(QStringLiteral("end"));
@@ -163,7 +151,6 @@ QDomElement Event::toXml(QDomDocument document) const
     QDomElement element = document.createElement(EventElement);
     element.setAttribute(EventIdAttribute, QString().setNum(id()));
     element.setAttribute(EventTaskIdAttribute, QString().setNum(taskId()));
-    element.setAttribute(EventUserIdAttribute, QString().setNum(userId()));
     element.setAttribute(EventReportIdAttribute, QString().setNum(reportId()));
     if (m_start.isValid())
         element.setAttribute(EventStartAttribute, m_start.toString(Qt::ISODate));
@@ -194,11 +181,6 @@ Event Event::fromXml(const QDomElement &element, int databaseSchemaVersion)
 
     event.setTaskId(element.attribute(EventTaskIdAttribute).toInt(&ok));
     if (!ok) throw XmlSerializationException(QObject::tr("Event::fromXml: invalid task id"));
-    event.setUserId(element.attribute(EventUserIdAttribute).toInt(&ok));
-    if (!ok && databaseSchemaVersion > 1) {
-        throw XmlSerializationException(QObject::tr("Event::fromXml: invalid user id"));
-        event.setUserId(0);
-    }
     event.setReportId(element.attribute(EventReportIdAttribute).toInt(&ok));
     if (!ok && databaseSchemaVersion > 1) {
         throw XmlSerializationException(QObject::tr("Event::fromXml: invalid report id"));

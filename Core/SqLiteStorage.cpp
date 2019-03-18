@@ -40,7 +40,7 @@
 // DATABASE STRUCTURE DEFINITION
 static const QString Tables[] = {
     QStringLiteral("MetaData"), QStringLiteral("Installations"), QStringLiteral("Tasks"),
-    QStringLiteral("Events"), QStringLiteral("Users")
+    QStringLiteral("Events")
 };
 
 static const int NumberOfTables = sizeof Tables / sizeof Tables[0];
@@ -64,7 +64,6 @@ static const Fields MetaData_Fields[] = {
 static const Fields Installations_Fields[] = {
     { QStringLiteral("id"), QStringLiteral("INTEGER PRIMARY KEY") },
     { QStringLiteral("inst_id"), QStringLiteral("INTEGER") },
-    { QStringLiteral("user_id"), QStringLiteral("INTEGER") },
     { QStringLiteral("name"), QStringLiteral("varchar(256)") }, LastField
 };
 
@@ -91,15 +90,8 @@ static const Fields Event_Fields[] = {
     { QStringLiteral("end"), QStringLiteral("date") }, LastField
 };
 
-static const Fields Users_Fields[] = {
-    { QStringLiteral("id"), QStringLiteral("INTEGER PRIMARY KEY") },
-    { QStringLiteral("user_id"), QStringLiteral("INTEGER UNIQUE") },
-    { QStringLiteral("name"), QStringLiteral("varchar(256)") }, LastField
-};
-
 static const Fields *Database_Fields[NumberOfTables] = {
-    MetaData_Fields, Installations_Fields, Tasks_Fields, Event_Fields,
-    Users_Fields
+    MetaData_Fields, Installations_Fields, Tasks_Fields, Event_Fields
 };
 
 const QString DatabaseName = QStringLiteral("charm.kdab.com");
@@ -219,16 +211,6 @@ bool SqLiteStorage::connect(Configuration &configuration)
         }
     }
 
-    if (!configuration.newDatabase) {
-        const int userid = configuration.user.id();
-        const User user = getUser(userid);
-        if (!user.isValid())
-            return false;
-
-        configuration.user = user;
-    }
-    // FIXME verify that a database user id has been generated
-
     if (error)
         return false;
 
@@ -266,16 +248,8 @@ QSqlDatabase &SqLiteStorage::database()
 
 bool SqLiteStorage::createDatabase(Configuration &configuration)
 {
+    Q_UNUSED(configuration);
     bool success = createDatabaseTables();
     if (!success) return false;
-
-    // add installation id and user id:
-    const QString userName = configuration.user.name();
-    configuration.user = makeUser(userName);
-    if (!configuration.user.isValid()) {
-        qDebug() << "SqLiteStorage::createDatabase: cannot store user name";
-        return false;
-    }
-
     return true;
 }

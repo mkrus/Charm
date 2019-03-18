@@ -37,7 +37,8 @@
 #define CHARM_DATABASE_VERSION_BEFORE_TRACKABLE 3
 #define CHARM_DATABASE_VERSION_BEFORE_COMMENT 4
 #define CHARM_DATABASE_VERSION_BEFORE_SUBSCRIPTION_REMOVAL 5
-#define CHARM_DATABASE_VERSION 6
+#define CHARM_DATABASE_VERSION_BEFORE_USER_REMOVAL 6
+#define CHARM_DATABASE_VERSION 7
 #define REQUIRED_CHARM_DATABASE_VERSION CHARM_DATABASE_VERSION
 // FIXME this may have to go into some plugin configuration later:
 // FIXME also, we may need some verbose descriptors for configuration
@@ -65,7 +66,6 @@ extern const QString MetaKey_ExportToXmlRecentSavePath;
 extern const QString MetaKey_LastEventEditorDateTime;
 extern const QString MetaKey_Key_InstallationId;
 extern const QString MetaKey_Key_UserName;
-extern const QString MetaKey_Key_UserId;
 extern const QString MetaKey_Key_LocalStorageDatabase;
 extern const QString MetaKey_Key_LocalStorageType;
 extern const QString MetaKey_Key_SubscribedTasksOnly;

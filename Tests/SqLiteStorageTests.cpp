@@ -23,7 +23,6 @@
 
 #include "SqLiteStorageTests.h"
 
-#include "Core/User.h"
 #include "Core/CharmConstants.h"
 #include "Core/SqLiteStorage.h"
 
@@ -54,7 +53,6 @@ void SqLiteStorageTests::initTestCase()
     }
 
     m_configuration.installationId = 1;
-    m_configuration.user.setId(1);
     m_configuration.localStorageType = CHARM_SQLITE_BACKEND_DESCRIPTOR;
     m_configuration.localStorageDatabase = m_localPath;
     m_configuration.newDatabase = true;
@@ -64,38 +62,6 @@ void SqLiteStorageTests::connectAndCreateDatabaseTest()
 {
     bool result = m_storage->connect(m_configuration);
     QVERIFY(result);
-}
-
-void SqLiteStorageTests::makeModifyDeleteUserTest()
-{
-    // make two user accounts
-    QString name1 = QStringLiteral("Test-User-1");
-    User user1 = m_storage->makeUser(name1);
-    QVERIFY(user1.name() == name1);
-    QString name2 = QStringLiteral("Test-User-2");
-    User user2 = m_storage->makeUser(name2);
-    QVERIFY(user2.name() == name2);
-
-    // modify the user
-    QString newName = QStringLiteral("User-Test-1");
-    user1.setName(newName);
-    QVERIFY(m_storage->modifyUser(user1));
-
-    // verify user database entry
-    User user1_1 = m_storage->getUser(user1.id());
-    QVERIFY(user1_1.name() == newName);
-    QVERIFY(user1.id() == user1_1.id());
-
-    // delete the user
-    QVERIFY(m_storage->deleteUser(user1_1));     // same id as user1
-    // verify user2 is unchanged
-    User user2_1 = m_storage->getUser(user2.id());
-    QVERIFY(user2_1.id() == user2.id() && user2_1.name() == user2.name());
-
-    // verify the user account is gone:
-    QVERIFY(!m_storage->getUser(user1.id()).isValid());
-    // verify user 2 is still there:
-    QVERIFY(m_storage->getUser(user2.id()).isValid());
 }
 
 void SqLiteStorageTests::makeModifyDeleteTasksTest()
@@ -131,8 +97,6 @@ void SqLiteStorageTests::makeModifyDeleteTasksTest()
 
 void SqLiteStorageTests::makeModifyDeleteEventsTest()
 {
-    // make a user
-    User user = m_storage->makeUser(tr("MakeEventTestUser"));
     // make two events
     Task task = m_storage->getTask(1);
     // WARNING: depends on leftover task created in previous test
@@ -141,7 +105,6 @@ void SqLiteStorageTests::makeModifyDeleteEventsTest()
     Event event1 = m_storage->makeEvent();
     QVERIFY(event1.isValid());
     event1.setTaskId(task.id());
-    event1.setUserId(user.id());
     event1.setReportId(42);
     const QString Event1Comment(QStringLiteral("Event-1-Comment"));
     event1.setComment(Event1Comment);
@@ -149,7 +112,6 @@ void SqLiteStorageTests::makeModifyDeleteEventsTest()
     Event event2 = m_storage->makeEvent();
     QVERIFY(event2.isValid());
     event2.setTaskId(task.id());
-    event2.setUserId(user.id());
     const QString Event2Comment(QStringLiteral("Event-2-Comment"));
     event2.setComment(Event2Comment);
 
@@ -200,7 +162,6 @@ void SqLiteStorageTests::deleteTaskWithEventsTest()
         Event event = m_storage->makeEvent();
         QVERIFY(event.isValid());
         event.setTaskId(task.id());
-        event.setUserId(1);
         event.setReportId(42);
         const QString EventComment(QStringLiteral("Event-Comment"));
         event.setComment(EventComment);
@@ -210,7 +171,6 @@ void SqLiteStorageTests::deleteTaskWithEventsTest()
         Event event = m_storage->makeEvent();
         QVERIFY(event.isValid());
         event.setTaskId(task.id());
-        event.setUserId(1);
         event.setReportId(43);
         const QString EventComment(QStringLiteral("Event-Comment 2"));
         event.setComment(EventComment);
@@ -220,7 +180,6 @@ void SqLiteStorageTests::deleteTaskWithEventsTest()
         Event event = m_storage->makeEvent();
         QVERIFY(event.isValid());
         event.setTaskId(task2.id());
-        event.setUserId(1);
         event.setReportId(43);
         const QString EventComment(QStringLiteral("Event-Comment 2"));
         event.setComment(EventComment);

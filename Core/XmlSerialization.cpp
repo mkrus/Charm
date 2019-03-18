@@ -69,7 +69,7 @@ QDomDocument createXmlTemplate(const QString &docClass)
         root.appendChild(metadata);
         QDomElement username = doc.createElement(QStringLiteral("username"));
         metadata.appendChild(username);
-        QDomText text = doc.createTextNode(Configuration::instance().user.name());
+        QDomText text = doc.createTextNode(Configuration::instance().userName);
         username.appendChild(text);
         QDomElement creationTime = doc.createElement(QStringLiteral("creation-time"));
         metadata.appendChild(creationTime);

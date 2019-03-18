@@ -84,7 +84,6 @@ void TestApplication::initialize()
     // -----
     // ... make the controller:
     m_configuration->installationId = InstallationId;
-    m_configuration->user.setId(UserId);
     m_configuration->localStorageType = CHARM_SQLITE_BACKEND_DESCRIPTOR;
     m_configuration->localStorageDatabase = m_localPath;
     m_configuration->newDatabase = true;

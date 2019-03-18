@@ -31,7 +31,6 @@
 
 // this is an application, not a library:
 // no pimpling, and data members instead of forward declarations
-#include "Core/User.h"
 #include "Core/State.h"
 #include "Core/TimeSpans.h"
 #include "Core/Controller.h"
