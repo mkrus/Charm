@@ -50,15 +50,11 @@ Q_SIGNALS:
 protected:
     void setDocument(const QTextDocument *document);
     QDomDocument createReportTemplate() const;
-    QPushButton *saveToXmlButton() const;
-    QPushButton *saveToTextButton() const;
     QPushButton *uploadButton() const;
 
     QTimer m_updateTimer;
 
 private Q_SLOTS:
-    virtual void slotSaveToXml();
-    virtual void slotSaveToText();
     virtual void slotPrint();
     virtual void slotUpdate();
     virtual void slotClose();

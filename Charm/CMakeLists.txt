@@ -27,7 +27,6 @@ SET(
     Idle/IdleDetector.cpp
     Lotsofcake/Configuration.cpp
     Reports/TimesheetInfo.cpp
-    Reports/MonthlyTimesheetXmlWriter.cpp
     Reports/WeeklyTimesheetXmlWriter.cpp
     Reports/TimesheetXmlWriter.cpp
     Widgets/BillDialog.cpp

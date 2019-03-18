@@ -22,7 +22,6 @@
 */
 
 #include "MonthlyTimesheet.h"
-#include "Reports/MonthlyTimesheetXmlWriter.h"
 
 #include <QFile>
 #include <QMessageBox>
@@ -76,64 +75,6 @@ QString MonthlyTimeSheetReport::suggestedFileName() const
 {
     return tr("MonthlyTimeSheet-%1-%2").arg(m_yearOfMonth).arg(m_monthNumber, 2, 10, QLatin1Char(
                                                                    '0'));
-}
-
-QByteArray MonthlyTimeSheetReport::saveToText()
-{
-    QByteArray output;
-    QTextStream stream(&output);
-    QString content = tr("Report for %1, %2 %3 (%4 to %5)")
-                      .arg(CONFIGURATION.user.name(),
-                           QLocale::system().monthName(m_monthNumber),
-                           QString::number(startDate().year()),
-                           startDate().toString(Qt::TextDate),
-                           endDate().addDays(-1).toString(Qt::TextDate));
-    stream << content << '\n';
-    stream << '\n';
-    TimeSheetInfoList timeSheetInfo = TimeSheetInfo::filteredTaskWithSubTasks(
-        TimeSheetInfo::taskWithSubTasks(DATAMODEL, m_numberOfWeeks, rootTask(), secondsMap()),
-        activeTasksOnly());
-
-    TimeSheetInfo totalsLine(m_numberOfWeeks);
-    if (!timeSheetInfo.isEmpty()) {
-        totalsLine = timeSheetInfo.first();
-        if (rootTask() == 0)
-            timeSheetInfo.removeAt(0);   // there is always one, because there is always the root item
-    }
-
-    for (int i = 0; i < timeSheetInfo.size(); ++i)
-        stream << timeSheetInfo[i].formattedTaskIdAndName(CONFIGURATION.taskPaddingLength)
-               << "\t" << hoursAndMinutes(timeSheetInfo[i].total()) << '\n';
-    stream << '\n';
-    stream << "Month total: " << hoursAndMinutes(totalsLine.total()) << '\n';
-    stream.flush();
-
-    return output;
-}
-
-QByteArray MonthlyTimeSheetReport::saveToXml(SaveToXmlMode mode)
-{
-    try {
-        MonthlyTimesheetXmlWriter timesheet;
-        timesheet.setDataModel(DATAMODEL);
-        timesheet.setMonthNumber(m_monthNumber);
-        timesheet.setYearOfMonth(m_yearOfMonth);
-        timesheet.setNumberOfWeeks(m_numberOfWeeks);
-        timesheet.setRootTask(rootTask());
-        timesheet.setIncludeTaskList(mode == IncludeTaskList);
-        const EventIdList matchingEventIds = DATAMODEL->eventsThatStartInTimeFrame(
-            startDate(), endDate());
-        EventList events;
-        events.reserve(matchingEventIds.size());
-        Q_FOREACH (const EventId &eventId, matchingEventIds)
-            events.append(DATAMODEL->eventForId(eventId));
-        timesheet.setEvents(events);
-        return timesheet.saveToXml();
-    } catch (const XmlSerializationException &e) {
-        QMessageBox::critical(this, tr("Error exporting the report"), e.what());
-    }
-
-    return QByteArray();
 }
 
 static QDomElement addTblHdr(QDomElement &toRow, const QString &text)
