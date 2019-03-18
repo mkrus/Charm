@@ -77,15 +77,6 @@ ADD_EXECUTABLE(
 TARGET_LINK_LIBRARIES( XmlSerializationTests ${TEST_LIBRARIES} )
 ADD_TEST( NAME XmlSerializationTests COMMAND XmlSerializationTests )
 
-SET( ImportExportTests_SRCS ImportExportTests.cpp ${TestApplication_SRCS} )
-ADD_EXECUTABLE(
-    ImportExportTests
-    ${ImportExportTests_SRCS}
-    ${TestDataResources_SRCS}
-)
-TARGET_LINK_LIBRARIES( ImportExportTests ${TEST_LIBRARIES} )
-ADD_TEST( NAME ImportExportTests COMMAND ImportExportTests )
-
 SET( SqlTransactionTests_SRCS SqlTransactionTests.cpp )
 ADD_EXECUTABLE( SqlTransactionTests ${SqlTransactionTests_SRCS} )
 TARGET_LINK_LIBRARIES( SqlTransactionTests ${TEST_LIBRARIES} )

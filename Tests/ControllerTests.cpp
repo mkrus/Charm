@@ -219,23 +219,6 @@ void ControllerTests::toAndFromXmlTest()
     TaskList tasksBefore = m_controller->storage()->getAllTasks();
     EventList eventsBefore = m_controller->storage()->getAllEvents();
     QVERIFY(tasksBefore == tasks);
-    QDomDocument document = m_controller->exportDatabasetoXml();
-    if (!m_controller->importDatabaseFromXml(document).isEmpty()) {
-        QFAIL("Cannot reimport exported Xml Database Dump");
-    } else {
-        TaskList tasksAfter = m_controller->storage()->getAllTasks();
-        if (tasksBefore != tasksAfter) {
-            qDebug() << "XML Document created during failed test:" << endl
-                     << document.toString();
-            Q_FOREACH (const Task &task, tasksBefore)
-                task.dump();
-            Q_FOREACH (const Task &task, tasksAfter)
-                task.dump();
-        }
-        QVERIFY(tasksBefore == tasksAfter);
-        EventList eventsAfter = m_controller->storage()->getAllEvents();
-    }
-    QDomDocument document2 = m_controller->exportDatabasetoXml();
 }
 
 void ControllerTests::disconnectFromBackendTest()

@@ -87,15 +87,6 @@ public:
     /** Set all tasks. Updates the view, after. */
     bool setAllTasks(const TaskList &);
 
-    /** Export the database contents into a XML document. */
-    QDomDocument exportDatabasetoXml() const;
-
-    /** Import the content of the Xml document into the currently open database.
-     *  This will modify the database.
-     *  @return An empty string on no error, an human-readable error message otherwise.
-     */
-    QString importDatabaseFromXml(const QDomDocument &);
-
     void updateModelEventsAndTasks();
 
 public Q_SLOTS:
