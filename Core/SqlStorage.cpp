@@ -82,6 +82,10 @@ bool SqlStorage::verifyDatabase()
         return migrateDB(QStringLiteral(
                              "ALTER TABLE Tasks ADD comment varchar(256)"),
                          CHARM_DATABASE_VERSION_BEFORE_COMMENT);
+    } else if (version == CHARM_DATABASE_VERSION_BEFORE_SUBSCRIPTION_REMOVAL) {
+        return migrateDB(QStringLiteral(
+                             "DROP TABLE Subscriptions"),
+                         CHARM_DATABASE_VERSION_BEFORE_SUBSCRIPTION_REMOVAL);
     }
 
     throw UnsupportedDatabaseVersionException(QObject::tr("Database version is not supported."));
@@ -92,8 +96,7 @@ TaskList SqlStorage::getAllTasks()
 {
     TaskList tasks;
     QSqlQuery query(database());
-    query.prepare(QStringLiteral(
-                      "select * from Tasks left join Subscriptions on Tasks.task_id = Subscriptions.task;"));
+    query.prepare(QStringLiteral("select * from Tasks;"));
 
     // FIXME merge record retrieval with getTask:
     if (runQuery(query)) {
@@ -155,8 +158,7 @@ bool SqlStorage::addTask(const Task &task, const SqlRaiiTransactor &)
 Task SqlStorage::getTask(int taskid)
 {
     QSqlQuery query(database());
-    query.prepare(QStringLiteral(
-                      "SELECT * FROM Tasks LEFT JOIN Subscriptions ON Tasks.task_id = Subscriptions.task WHERE task_id = :id;"));
+    query.prepare(QStringLiteral("SELECT * FROM Tasks WHERE task_id = :id;"));
     query.bindValue(QStringLiteral(":id"), taskid);
 
     if (runQuery(query) && query.next()) {

@@ -40,7 +40,7 @@
 // DATABASE STRUCTURE DEFINITION
 static const QString Tables[] = {
     QStringLiteral("MetaData"), QStringLiteral("Installations"), QStringLiteral("Tasks"),
-    QStringLiteral("Events"), QStringLiteral("Subscriptions"), QStringLiteral("Users")
+    QStringLiteral("Events"), QStringLiteral("Users")
 };
 
 static const int NumberOfTables = sizeof Tables / sizeof Tables[0];
@@ -91,12 +91,6 @@ static const Fields Event_Fields[] = {
     { QStringLiteral("end"), QStringLiteral("date") }, LastField
 };
 
-static const Fields Subscriptions_Fields[] = {
-    { QStringLiteral("id"), QStringLiteral("INTEGER PRIMARY KEY") },
-    { QStringLiteral("user_id"), QStringLiteral("INTEGER") },
-    { QStringLiteral("task"), QStringLiteral("INTEGER") }, LastField
-};
-
 static const Fields Users_Fields[] = {
     { QStringLiteral("id"), QStringLiteral("INTEGER PRIMARY KEY") },
     { QStringLiteral("user_id"), QStringLiteral("INTEGER UNIQUE") },
@@ -105,7 +99,7 @@ static const Fields Users_Fields[] = {
 
 static const Fields *Database_Fields[NumberOfTables] = {
     MetaData_Fields, Installations_Fields, Tasks_Fields, Event_Fields,
-    Subscriptions_Fields, Users_Fields
+    Users_Fields
 };
 
 const QString DatabaseName = QStringLiteral("charm.kdab.com");
