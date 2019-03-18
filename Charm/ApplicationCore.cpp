@@ -79,7 +79,6 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
     , m_actionPreferences(this)
     , m_actionSyncTasks(this)
     , m_actionImportTasks(this)
-    , m_actionExportTasks(this)
     , m_actionCheckForUpdates(this)
     , m_actionEnterVacation(this)
     , m_actionWeeklyTimesheetReport(this)
@@ -225,9 +224,6 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
     m_actionImportTasks.setText(tr("Import and Merge Task Definitions..."));
     connect(&m_actionImportTasks, &QAction::triggered,
             &m_timeTracker, &TimeTrackingWindow::slotImportTasks);
-    m_actionExportTasks.setText(tr("Export Task Definitions..."));
-    connect(&m_actionExportTasks, &QAction::triggered,
-            &m_timeTracker, &TimeTrackingWindow::slotExportTasks);
     m_actionCheckForUpdates.setText(tr("Check for Updates..."));
 #if 0
     // TODO this role should be set to have the action in the app menu, but that
@@ -360,7 +356,6 @@ void ApplicationCore::createFileMenu(QMenuBar *menuBar)
     menu->setTitle(tr("File"));
     menu->addAction(&m_actionSyncTasks);
     menu->addAction(&m_actionImportTasks);
-    menu->addAction(&m_actionExportTasks);
 
 #ifdef Q_OS_OSX
     if (!CharmUpdateCheckUrl().isEmpty()) {

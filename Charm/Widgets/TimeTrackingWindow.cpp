@@ -450,29 +450,6 @@ void TimeTrackingWindow::slotImportTasks()
     importTasksFromDeviceOrFile(0, filename);
 }
 
-void TimeTrackingWindow::slotExportTasks()
-{
-    const MakeTemporarilyVisible m(this);
-    const QString filename = QFileDialog::getSaveFileName(this, tr(
-                                                              "Please select export filename"),
-                                                          QLatin1String(""),
-                                                          tr(
-                                                              "Task definitions (*.xml);;All Files (*)"));
-    if (filename.isNull()) return;
-
-    try {
-        const TaskList tasks = DATAMODEL->getAllTasks();
-        TaskExport::writeTo(filename, tasks);
-    } catch (const XmlSerializationException &e) {
-        const QString message = e.what().isEmpty()
-                                ? tr("Error exporting the task definitions!")
-                                : tr("There was an error exporting the task definitions:<br />%1").
-                                arg(e.what());
-        QMessageBox::critical(this, tr("Error during export"), message);
-        return;
-    }
-}
-
 void TimeTrackingWindow::slotCheckUploadedTimesheets()
 {
     WeeksByYear missing = missingTimeSheets();

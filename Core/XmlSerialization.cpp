@@ -120,28 +120,6 @@ QString TaskExport::reportType()
     return QStringLiteral("taskdefinitions");
 }
 
-void TaskExport::writeTo(const QString &filename, const TaskList &tasks)
-{
-    QDomDocument document = XmlSerialization::createXmlTemplate(reportType());
-    QDomElement report = XmlSerialization::reportElement(document);
-
-    // write tasks
-    {
-        QDomElement tasksElement = Task::makeTasksElement(document, tasks);
-        report.appendChild(tasksElement);
-    }
-
-    // all done, write to file:
-    QFile file(filename);
-    if (file.open(QIODevice::WriteOnly)) {
-        QTextStream stream(&file);
-        document.save(stream, 4);
-    } else {
-        throw XmlSerializationException(QObject::tr("Cannot write to file: %1").arg(
-                                            file.errorString()));
-    }
-}
-
 void TaskExport::readFrom(const QString &filename)
 {
     // load the time sheet:

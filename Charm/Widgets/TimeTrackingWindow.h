@@ -87,7 +87,6 @@ public Q_SLOTS:
     void slotMonthlyTimesheetReport();
     void slotSyncTasks(VerboseMode mode = Verbose);
     void slotSyncTasksVerbose();
-    void slotExportTasks();
     void slotImportTasks();
     void maybeIdle(IdleDetector *idleDetector);
     void slotTasksDownloaded(HttpJob *);
