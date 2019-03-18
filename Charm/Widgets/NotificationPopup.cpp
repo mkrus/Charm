@@ -24,8 +24,8 @@
 #include "NotificationPopup.h"
 #include "ui_NotificationPopup.h"
 
-#include <QApplication>
-#include <QDesktopWidget>
+#include <QGuiApplication>
+#include <QScreen>
 #include <QTimer>
 #include <QStyle>
 
@@ -51,7 +51,7 @@ void NotificationPopup::showNotification(const QString &title, const QString &me
     m_ui->messageLB->setText(messageText.replace(QLatin1String("MESSAGE"), message));
 
     setGeometry(QStyle::alignedRect(Qt::RightToLeft, Qt::AlignBottom, size(),
-                                    qApp->desktop()->availableGeometry()));
+                                    qGuiApp->primaryScreen()->availableGeometry()));
     show();
     QTimer::singleShot(10000, this, SLOT(slotCloseNotification()));
 }

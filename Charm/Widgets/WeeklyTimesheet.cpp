@@ -415,13 +415,13 @@ void WeeklyTimeSheetReport::update()
 
         const QString Headlines[NumberOfColumns] = {
             tr("Task"),
-            QDate::shortDayName(1),
-            QDate::shortDayName(2),
-            QDate::shortDayName(3),
-            QDate::shortDayName(4),
-            QDate::shortDayName(5),
-            QDate::shortDayName(6),
-            QDate::shortDayName(7),
+            QLocale::system().dayName(1, QLocale::ShortFormat),
+            QLocale::system().dayName(2, QLocale::ShortFormat),
+            QLocale::system().dayName(3, QLocale::ShortFormat),
+            QLocale::system().dayName(4, QLocale::ShortFormat),
+            QLocale::system().dayName(5, QLocale::ShortFormat),
+            QLocale::system().dayName(6, QLocale::ShortFormat),
+            QLocale::system().dayName(7, QLocale::ShortFormat),
             tr("Total")
         };
         const QString DayHeadlines[NumberOfColumns] = {

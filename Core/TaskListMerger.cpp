@@ -32,7 +32,7 @@ void TaskListMerger::setOldTasks(const TaskList &tasks)
 {
     verifyTaskList(tasks);
     m_oldTasks = tasks;
-    qSort(m_oldTasks.begin(), m_oldTasks.end(), Task::lowerTaskId);
+    std::sort(m_oldTasks.begin(), m_oldTasks.end(), Task::lowerTaskId);
     m_resultsValid = false;
 }
 
@@ -40,7 +40,7 @@ void TaskListMerger::setNewTasks(const TaskList &tasks)
 {
     verifyTaskList(tasks);
     m_newTasks = tasks;
-    qSort(m_newTasks.begin(), m_newTasks.end(), Task::lowerTaskId);
+    std::sort(m_newTasks.begin(), m_newTasks.end(), Task::lowerTaskId);
     m_resultsValid = false;
 }
 

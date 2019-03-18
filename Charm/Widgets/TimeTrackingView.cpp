@@ -48,7 +48,7 @@ TimeTrackingView::TimeTrackingView(QWidget *parent)
     // plumbing
     m_paintAttributes.initialize(palette());
     for (int i = 0; i < 7; ++i)
-        m_shortDayNames[i] = QDate::shortDayName(i + 1);
+        m_shortDayNames[i] = QLocale::system().dayName(i + 1, QLocale::ShortFormat);
     connect(m_taskSelector, &TimeTrackingTaskSelector::startEvent,
             this, &TimeTrackingView::startEvent);
     connect(m_taskSelector, &TimeTrackingTaskSelector::stopEvents,

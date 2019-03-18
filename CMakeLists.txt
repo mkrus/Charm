@@ -12,6 +12,7 @@ include(KDEFrameworkCompilerSettings NO_POLICY_SCOPE)
 
 include(ECMInstallIcons)
 
+add_definitions( -DQT_DEPRECATED_WARNINGS )
 
 IF( NOT Charm_VERSION )
     FIND_PACKAGE( Git QUIET )

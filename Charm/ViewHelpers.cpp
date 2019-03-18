@@ -121,7 +121,7 @@ int Charm::collatorCompare(const QString &left, const QString &right)
 EventIdList Charm::eventIdsSortedBy(EventIdList ids, const Charm::SortOrderList &orders)
 {
     if (!orders.isEmpty())
-        qStableSort(ids.begin(), ids.end(), EventSorter(orders));
+        std::stable_sort(ids.begin(), ids.end(), EventSorter(orders));
 
     return ids;
 }
