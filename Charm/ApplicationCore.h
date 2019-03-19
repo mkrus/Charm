@@ -110,7 +110,6 @@ public Q_SLOTS:
     void commitData(QSessionManager &manager);
 
 private Q_SLOTS:
-    void slotCurrentBackendStatusChanged(const QString &text);
     void slotMaybeIdle();
     void slotHandleUniqueApplicationConnection();
     void slotPopulateTrayIconMenu();

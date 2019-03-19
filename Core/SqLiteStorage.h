@@ -42,12 +42,11 @@ public:
     bool connect(Configuration &) override;
     bool disconnect() override;
 
+protected:
     QSqlDatabase &database() override;
 
-protected:
     bool createDatabase(Configuration &) override;
     bool createDatabaseTables() override;
-    bool migrateDatabaseDirectory(QDir, const QDir &) const;
     QString lastInsertRowFunction() const override;
 
 private:

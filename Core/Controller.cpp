@@ -157,11 +157,6 @@ void Controller::stateChanged(State previous, State next)
     default:
         break;
     }
-
-    if (m_storage) {
-        emit currentBackendStatus(m_storage->description());
-        m_storage->stateChanged(previous);
-    }
 }
 
 struct Setting {

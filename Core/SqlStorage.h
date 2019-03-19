@@ -52,9 +52,6 @@ public:
 
     virtual QSqlDatabase &database() = 0;
 
-    // application:
-    void stateChanged(State previous);
-
     // task database functions:
     TaskList getAllTasks();
     bool setAllTasks(const TaskList &tasks);

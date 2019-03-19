@@ -174,11 +174,6 @@ bool SqLiteStorage::connect(Configuration &configuration)
         return false;
     }
 
-    const QDir oldDatabaseDirectory(QDir::homePath() + QDir::separator()
-                                    + QStringLiteral(".Charm"));
-    if (oldDatabaseDirectory.exists())
-        migrateDatabaseDirectory(oldDatabaseDirectory, fileInfo.dir());
-
     m_database.setHostName(QStringLiteral("localhost"));
     const QString databaseName = fileInfo.absoluteFilePath();
     m_database.setDatabaseName(databaseName);
@@ -216,22 +211,6 @@ bool SqLiteStorage::connect(Configuration &configuration)
 
     configuration.failure = false;
     return true;
-}
-
-bool SqLiteStorage::migrateDatabaseDirectory(QDir oldDirectory, const QDir &newDirectory) const
-{
-    if (oldDirectory == newDirectory)
-        return true;
-    qDebug() << "Application::configure: migrating Charm database directory contents from"
-             << oldDirectory.absolutePath() << "to" << newDirectory.absolutePath();
-
-    oldDirectory.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
-    Q_FOREACH (const QString &entry, oldDirectory.entryList())
-        oldDirectory.rename(entry, newDirectory.path() + QDir::separator() + entry);
-
-    QDir oldDirectoryParent(oldDirectory);
-    oldDirectoryParent.cdUp();
-    return oldDirectoryParent.rmpath(oldDirectory.dirName());
 }
 
 bool SqLiteStorage::disconnect()

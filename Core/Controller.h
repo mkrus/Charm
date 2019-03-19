@@ -129,8 +129,6 @@ Q_SIGNALS:
         the signal. */
     void readyToQuit();
 
-    void currentBackendStatus(const QString &text);
-
     /** A command has been completed from the controller's point of view. */
     void commandCompleted(CharmCommand *);
 

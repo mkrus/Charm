@@ -693,20 +693,6 @@ QString ApplicationCore::titleString(const QString &text) const
     }
 }
 
-void ApplicationCore::slotCurrentBackendStatusChanged(const QString &text)
-{
-    const QString title = titleString(text);
-
-    // FIXME why can't this be done on stateChanged()? and if not, is
-    // maybe an app-wide metadataChanged() or configurationChanged()
-    // missing? (the latter exists)
-    // MIRKO_TEMP_REM
-    /*
-    m_mainWindow.setWindowTitle( title );
-    */
-    m_trayIcon.setToolTip(title);
-}
-
 void ApplicationCore::slotStopAllTasks()
 {
     DATAMODEL->endAllEventsRequested();

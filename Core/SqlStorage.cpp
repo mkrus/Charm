@@ -124,10 +124,6 @@ bool SqlStorage::setAllTasks(const TaskList &tasks)
     Q_FOREACH (Task task, tasks) {
         addTask(task, transactor);
     }
-    // try to restore subscriptions where possible
-    Q_FOREACH (const Task &oldTask, oldTasks) {
-        const Task task = getTask(oldTask.id());
-    }
     transactor.commit();
     return true;
 }
@@ -406,12 +402,6 @@ bool SqlStorage::migrateDB(const QString &queryString, int oldVersion)
     setMetaData(CHARM_DATABASE_VERSION_DESCRIPTOR, QString::number(oldVersion + 1), transactor);
     transactor.commit();
     return verifyDatabase();
-}
-
-void SqlStorage::stateChanged(State previous)
-{
-    Q_UNUSED(previous)
-    // atm, SqlStorage does not care about state
 }
 
 bool SqlStorage::setMetaData(const QString &key, const QString &value)
