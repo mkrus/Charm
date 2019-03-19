@@ -26,7 +26,6 @@
 #ifndef MODELCONNECTOR_H
 #define MODELCONNECTOR_H
 
-#include "ViewFilter.h"
 #include "Core/CharmDataModel.h"
 #include "EventModelFilter.h"
 
@@ -39,8 +38,6 @@ public:
 
     /** The charm data model. */
     CharmDataModel *charmDataModel();
-    /** The item model the task view uses. */
-    ViewFilter *taskModel();
     /** The item model the event view uses. */
     EventModelFilter *eventModel();
 
@@ -56,8 +53,6 @@ public Q_SLOTS:
 
 private:
     CharmDataModel m_dataModel;
-
-    ViewFilter m_viewFilter; // this is the filtered task model adapter
 
     EventModelFilter m_eventModelFilter; // owns the event model adapter
 

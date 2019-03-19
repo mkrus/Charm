@@ -62,7 +62,7 @@ public:
         ShowAndRaise
     };
     explicit ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *parent = nullptr);
-    ~ApplicationCore() override;
+    ~ApplicationCore();
 
     static ApplicationCore &instance();
     static bool hasInstance();
@@ -158,7 +158,7 @@ private:
     QAction m_actionMonthlyTimesheetReport;
     QList<QAction *> m_taskActions;
     EventView m_eventView;
-    TasksView m_tasksView;
+    TasksView *m_tasksView = nullptr;
     QVector<UIStateInterface *> m_uiElements;
     IdleDetector *m_idleDetector = nullptr;
     CharmCommandInterface *m_cmdInterface = nullptr;

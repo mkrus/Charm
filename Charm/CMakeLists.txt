@@ -50,6 +50,7 @@ SET(
     Widgets/ReportPreviewWindow.cpp
     Widgets/SelectTaskDialog.cpp
     Widgets/TasksView.cpp
+    Widgets/TasksViewWidget.cpp
     Widgets/TimeTrackingView.cpp
     Widgets/TimeTrackingWindow.cpp
     Widgets/TimeTrackingTaskSelector.cpp
@@ -130,6 +131,7 @@ QT5_WRAP_UI(
     Widgets/WeeklyTimesheetConfigurationDialog.ui
     Widgets/MonthlyTimesheetConfigurationDialog.ui
     Widgets/ReportPreviewWindow.ui
+    Widgets/TasksViewWidget.ui
     Widgets/NotificationPopup.ui
     Widgets/FindAndReplaceEventsDialog.ui
 )

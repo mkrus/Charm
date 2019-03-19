@@ -24,21 +24,12 @@
 #ifndef TASKSVIEW_H
 #define TASKSVIEW_H
 
-#include <QWidget>
-#include <QAction>
-
-#include <Core/Event.h>
 #include <Core/State.h>
-#include <Core/CommandEmitterInterface.h>
 #include <Core/UIStateInterface.h>
 
 #include <QDialog>
 
-class QMenu;
-class QToolBar;
-class QTreeView;
-
-class TasksView : public QDialog, public UIStateInterface
+class TasksView : public QDialog
 {
     Q_OBJECT
 
@@ -46,37 +37,8 @@ public:
     explicit TasksView (QWidget *parent = nullptr);
     ~TasksView() override;
 
-    void populateEditMenu(QMenu *);
-
-public Q_SLOTS:
-    void commitCommand(CharmCommand *) override;
-
-    void stateChanged(State previous) override;
-    void configurationChanged() override;
-
-    void restoreGuiState() override;
-    void saveGuiState() override;
-
-Q_SIGNALS:
-    // FIXME connect to MainWindow
-    void saveConfiguration();
-    void emitCommand(CharmCommand *) override;
-
-private Q_SLOTS:
-    void slotFiltertextChanged(const QString &filtertext);
-    void taskPrefilteringChanged();
-    void slotContextMenuRequested(const QPoint &);
-
-private:
-
-    // helper to retrieve selected task:
-    Task selectedTask();
-
-    QToolBar *m_toolBar;
-    QAction m_actionExpandTree;
-    QAction m_actionCollapseTree;
-    QAction *m_showCurrentOnly;
-    QTreeView *m_treeView;
+protected:
+    void hideEvent(QHideEvent *event) override;
 };
 
 #endif

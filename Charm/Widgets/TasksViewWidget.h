@@ -1,5 +1,5 @@
 /*
-  SelectTaskDialog.h
+  TasksViewWidget.h
 
   This file is part of Charm, a task-based time tracking application.
 
@@ -21,48 +21,51 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SELECTTASKDIALOG_H
-#define SELECTTASKDIALOG_H
+#ifndef TASKSVIEWWIDGET_H
+#define TASKSVIEWWIDGET_H
 
-#include <QDialog>
-#include <QScopedPointer>
+#include <QWidget>
 
-#include "ViewFilter.h"
-
-class ViewFilter;
-class CharmDataModel;
+#include "Core/Task.h"
 
 namespace Ui {
-class SelectTaskDialog;
+class TasksViewWidget;
 }
 
-class SelectTaskDialog : public QDialog
+class ViewFilter;
+
+class TasksViewWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit SelectTaskDialog(QWidget *parent = nullptr);
-    ~SelectTaskDialog() override;
+    explicit TasksViewWidget(QWidget *parent = nullptr);
+    ~TasksViewWidget();
 
     TaskId selectedTask() const;
-    void setNonValidSelectable();
+    void selectTask(TaskId);
 
-protected:
-    void showEvent(QShowEvent *event) override;
-    void hideEvent(QHideEvent *event) override;
+    TaskIdList expandedTasks() const;
+    void expandTasks(const TaskIdList &tasks);
+
+    bool isExpiredVisible() const;
+    void setExpiredVisible(bool visible);
+
+Q_SIGNALS:
+    void taskSelected(TaskId);
+    void taskDoubleClicked(TaskId);
 
 private Q_SLOTS:
-    void slotAccepted();
-    void slotResetState();
-    void slotTaskSelected(TaskId id);
-    void slotTaskDoubleClicked(TaskId id);
+    void slotCurrentItemChanged(const QModelIndex &, const QModelIndex &);
+    void slotDoubleClicked(const QModelIndex &);
+    void slotFilterTextChanged(const QString &);
+    void slotPrefilteringChanged();
+    void slotSelectTask(const QString &);
 
 private:
-    bool isValid(TaskId id) const;
-
-private:
-    QScopedPointer<Ui::SelectTaskDialog> m_ui;
-    bool m_nonValidSelectable = false;
+    QScopedPointer<Ui::TasksViewWidget> m_ui;
+    TaskId m_selectedTask = {};
+    ViewFilter *m_proxy;
 };
 
-#endif
+#endif // TASKSVIEWWIDGET_H

@@ -19,18 +19,11 @@
   <property name="windowTitle">
    <string>Select Task...</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="2" column="0">
-    <widget class="QTreeView" name="treeView">
-     <property name="alternatingRowColors">
-      <bool>true</bool>
-     </property>
-     <property name="textElideMode">
-      <enum>Qt::ElideMiddle</enum>
-     </property>
-    </widget>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="TasksViewWidget" name="view" native="true"/>
    </item>
-   <item row="4" column="0">
+   <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -40,48 +33,18 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="0">
-    <widget class="QLineEdit" name="filter"/>
-   </item>
-   <item row="1" column="0">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="showExpired">
-       <property name="text">
-        <string>Show expired</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="taskStatusLB">
-     <property name="text">
-      <string/>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>TasksViewWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">Charm/Widgets/TasksViewWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>buttonBox</tabstop>
-  <tabstop>treeView</tabstop>
  </tabstops>
  <resources/>
  <connections>
@@ -92,8 +55,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>300</x>
-     <y>26</y>
+     <x>315</x>
+     <y>240</y>
     </hint>
     <hint type="destinationlabel">
      <x>285</x>
@@ -108,8 +71,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>320</x>
-     <y>58</y>
+     <x>335</x>
+     <y>240</y>
     </hint>
     <hint type="destinationlabel">
      <x>318</x>

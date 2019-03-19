@@ -36,6 +36,8 @@ ViewFilter::ViewFilter(CharmDataModel *model, QObject *parent)
     setFilterKeyColumn(Column_TaskId);
     // setFilterKeyColumn( -1 );
     setFilterCaseSensitivity(Qt::CaseInsensitive);
+    setFilterRole(TasksViewRole_Filter);
+    setRecursiveFilteringEnabled(true);
 
     // relay signals to the view:
     connect(&m_model, &TaskModelAdapter::eventActivationNotice,
@@ -75,40 +77,19 @@ void ViewFilter::prefilteringModeChanged()
     invalidate();
 }
 
-bool ViewFilter::filterAcceptsRow(int source_row, const QModelIndex &parent) const
+bool ViewFilter::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
 {
-    // by default, QSortFilterProxyModel only accepts row where already the parents where accepted
-    bool acceptedByFilter = QSortFilterProxyModel::filterAcceptsRow(source_row, parent);
-    // in our case, this is not what we want, we want parents to be
-    // accepted if any of their children are accepted (this is a
-    // recursive call, and could possibly be slow):
-    const QModelIndex index(m_model.index(source_row, 0, parent));
-    if (!index.isValid()) return acceptedByFilter;
-
-    int rowCount = m_model.rowCount(index);
-    for (int i = 0; i < rowCount; ++i) {
-        if (filterAcceptsRow(i, index)) {
-            acceptedByFilter = true;
-            break;
-        }
+    // Check if the task is currently valid
+    if (Configuration::instance().taskPrefilteringMode == Configuration::TaskPrefilter_CurrentOnly) {
+        const QModelIndex source_index = m_model.index(source_row, 0, source_parent);
+        if (!source_index.isValid())
+            return false;
+        const Task task = m_model.taskForIndex(source_index);
+        if (!task.isCurrentlyValid())
+            return false;
     }
 
-    bool accepted = acceptedByFilter;
-    const Task task = m_model.taskForIndex(index);
-    switch (Configuration::instance().taskPrefilteringMode) {
-    case Configuration::TaskPrefilter_ShowAll:
-        break;
-    case Configuration::TaskPrefilter_CurrentOnly:
-    {
-        const bool ok = (task.isCurrentlyValid() || checkChildren(task, HaveValidChild));
-        accepted &= ok;
-        break;
-    }
-    default:
-        break;
-    }
-
-    return accepted;
+    return QSortFilterProxyModel::filterAcceptsRow(source_row, source_parent);
 }
 
 bool ViewFilter::filterAcceptsColumn(int, const QModelIndex &) const
@@ -119,22 +100,4 @@ bool ViewFilter::filterAcceptsColumn(int, const QModelIndex &) const
 bool ViewFilter::taskIdExists(TaskId taskId) const
 {
     return m_model.taskIdExists(taskId);
-}
-
-bool ViewFilter::checkChildren(Task task, CheckFor checkFor) const
-{
-    if (taskHasChildren(task)) {
-        const TaskList taskList = m_model.children(task);
-        for (const Task &taskChild : taskList) {
-            if (checkFor == HaveValidChild && taskChild.isCurrentlyValid()) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-void ViewFilter::commitCommand(CharmCommand *command)
-{   // we do not emit signals, we are the relay (since we are a proxy):
-    m_model.commitCommand(command);
 }

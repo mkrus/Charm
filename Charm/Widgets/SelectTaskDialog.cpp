@@ -31,76 +31,39 @@
 
 #include "ui_SelectTaskDialog.h"
 
-SelectTaskDialogProxy::SelectTaskDialogProxy(CharmDataModel *model, QObject *parent)
-    : ViewFilter(model, parent)
-{
-    // we filter for the task name column
-    setFilterKeyColumn(Column_TaskId);
-    setFilterCaseSensitivity(Qt::CaseInsensitive);
-    setFilterRole(TasksViewRole_Filter);
-    prefilteringModeChanged();
-}
-
-bool SelectTaskDialogProxy::filterAcceptsColumn(int column, const QModelIndex &) const
-{
-    return column == Column_TaskId;
-}
-
-Qt::ItemFlags SelectTaskDialogProxy::flags(const QModelIndex &index) const
-{
-    if (index.isValid()) {
-        return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
-    } else {
-        return Qt::NoItemFlags;
-    }
-}
-
-QVariant SelectTaskDialogProxy::data(const QModelIndex &index, int role) const
-{
-    if (index.isValid() && role == Qt::CheckStateRole) {
-        return QVariant();
-    } else {
-        return ViewFilter::data(index, role);
-    }
-}
 
 SelectTaskDialog::SelectTaskDialog(QWidget *parent)
     : QDialog(parent)
     , m_ui(new Ui::SelectTaskDialog())
-    , m_proxy(MODEL.charmDataModel())
 {
     m_ui->setupUi(this);
-    m_ui->treeView->setModel(&m_proxy);
-    m_ui->treeView->header()->hide();
     m_ui->buttonBox->button(QDialogButtonBox::Cancel)->setEnabled(true);
     m_ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
-    connect(m_ui->treeView->selectionModel(), &QItemSelectionModel::currentChanged,
-            this, &SelectTaskDialog::slotCurrentItemChanged);
-    connect(m_ui->treeView, &QTreeView::doubleClicked,
-            this, &SelectTaskDialog::slotDoubleClicked);
 
-    connect(m_ui->filter, &QLineEdit::textChanged,
-            this, &SelectTaskDialog::slotFilterTextChanged);
-    connect(m_ui->showExpired, &QCheckBox::toggled,
-            this, &SelectTaskDialog::slotPrefilteringChanged);
     connect(this, &SelectTaskDialog::accepted,
             this, &SelectTaskDialog::slotAccepted);
     connect(MODEL.charmDataModel(), &CharmDataModel::resetGUIState,
             this, &SelectTaskDialog::slotResetState);
-    connect(m_ui->filter, &QLineEdit::textChanged,
-            this, &SelectTaskDialog::slotSelectTask);
+    connect(m_ui->view, &TasksViewWidget::taskSelected,
+            this, &SelectTaskDialog::slotTaskSelected);
+    connect(m_ui->view, &TasksViewWidget::taskDoubleClicked,
+            this, &SelectTaskDialog::slotTaskDoubleClicked);
 
     QSettings settings;
     settings.beginGroup(QString::fromUtf8(staticMetaObject.className()));
     if (settings.contains(MetaKey_MainWindowGeometry))
         resize(settings.value(MetaKey_MainWindowGeometry).toSize());
     // initialize prefiltering
-    slotPrefilteringChanged();
-    m_ui->filter->setFocus();
+    m_ui->view->setFocus();
 }
 
 SelectTaskDialog::~SelectTaskDialog()
 {
+}
+
+TaskId SelectTaskDialog::selectedTask() const
+{
+    return m_ui->view->selectedTask();
 }
 
 void SelectTaskDialog::slotResetState()
@@ -109,17 +72,32 @@ void SelectTaskDialog::slotResetState()
     settings.beginGroup(QString::fromUtf8(staticMetaObject.className()));
     GUIState state;
     state.loadFrom(settings);
-    QModelIndex index(m_proxy.indexForTaskId(state.selectedTask()));
-    if (index.isValid())
-        m_ui->treeView->setCurrentIndex(index);
+    const TaskId id = state.selectedTask();
+    if (id != 0)
+        m_ui->view->selectTask(id);
+    m_ui->view->expandTasks(state.expandedTasks());
+    m_ui->view->setExpiredVisible(state.showExpired());
+}
 
-    for (const TaskId id : state.expandedTasks()) {
-        QModelIndex indexForId(m_proxy.indexForTaskId(id));
-        if (indexForId.isValid())
-            m_ui->treeView->expand(indexForId);
-    }
+void SelectTaskDialog::slotTaskSelected(TaskId id)
+{
+    m_ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(isValid(id));
 
-    m_ui->showExpired->setChecked(state.showExpired());
+}
+
+void SelectTaskDialog::slotTaskDoubleClicked(TaskId id)
+{
+    if (isValid(id))
+        accept();
+}
+
+bool SelectTaskDialog::isValid(TaskId id) const
+{
+    const Task &task = MODEL.charmDataModel()->getTask(id);
+    if (!task.isValid() || !task.trackable())
+        return false;
+
+    return m_nonValidSelectable || task.isCurrentlyValid();
 }
 
 void SelectTaskDialog::showEvent(QShowEvent *event)
@@ -136,78 +114,6 @@ void SelectTaskDialog::hideEvent(QHideEvent *event)
     QDialog::hideEvent(event);
 }
 
-TaskId SelectTaskDialog::selectedTask() const
-{
-    return m_selectedTask;
-}
-
-void SelectTaskDialog::selectTask(TaskId task)
-{
-    m_selectedTask = task;
-    QModelIndex index(m_proxy.indexForTaskId(m_selectedTask));
-    if (index.isValid())
-        m_ui->treeView->setCurrentIndex(index);
-    else
-        m_ui->treeView->setCurrentIndex(QModelIndex());
-}
-
-void SelectTaskDialog::slotCurrentItemChanged(const QModelIndex &first, const QModelIndex &)
-{
-    const Task task = m_proxy.taskForIndex(first);
-    if (isValidAndTrackable(first)) {
-        m_selectedTask = task.id();
-        m_ui->taskStatusLB->clear();
-    } else {
-        m_selectedTask = 0;
-        const bool expired = !task.isCurrentlyValid();
-        const bool trackable = task.trackable();
-        const bool notTrackableAndExpired = (!trackable && expired);
-        const QString expirationDate = QLocale::system().toString(
-            task.validUntil(), QLocale::ShortFormat);
-        const QString info = notTrackableAndExpired ? tr(
-            "The selected task is not trackable and expired since %1").arg(expirationDate)
-                             : expired ? tr("The selected task is expired since %1").arg(
-            expirationDate)
-                             : tr("The selected task is not trackable");
-        m_ui->taskStatusLB->setText(info);
-    }
-
-    m_ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(m_selectedTask != 0);
-}
-
-bool SelectTaskDialog::isValidAndTrackable(const QModelIndex &index) const
-{
-    if (!index.isValid())
-        return false;
-    const Task task = m_proxy.taskForIndex(index);
-
-    const bool taskValid = m_nonValidSelectable || (task.isValid() && task.isCurrentlyValid());
-
-    if (m_nonTrackableSelectable)
-        return taskValid;
-    return taskValid && task.trackable();
-}
-
-void SelectTaskDialog::slotDoubleClicked(const QModelIndex &index)
-{
-    if (isValidAndTrackable(index))
-        accept();
-}
-
-void SelectTaskDialog::slotFilterTextChanged(const QString &text)
-{
-    QString filtertext = text.simplified();
-    filtertext.replace(QLatin1Char(' '), QLatin1Char('*'));
-
-    Charm::saveExpandStates(m_ui->treeView, &m_expansionStates);
-    m_proxy.setFilterWildcard(filtertext);
-    if (!filtertext.isEmpty()) {
-        m_ui->treeView->expandAll();
-    } else {
-        Charm::restoreExpandStates(m_ui->treeView, &m_expansionStates);
-    }
-}
-
 void SelectTaskDialog::slotAccepted()
 {
     QSettings settings;
@@ -219,37 +125,11 @@ void SelectTaskDialog::slotAccepted()
         // selected task
         state.setSelectedTask(selectedTask());
         // expanded tasks
-        TaskList tasks = MODEL.charmDataModel()->getAllTasks();
-        TaskIdList expandedTasks;
-        for (const Task &task : tasks) {
-            QModelIndex index(m_proxy.indexForTaskId(task.id()));
-            if (m_ui->treeView->isExpanded(index))
-                expandedTasks << task.id();
-        }
-        state.setExpandedTasks(expandedTasks);
-        state.setShowExpired(m_ui->showExpired->isChecked());
+        state.setExpandedTasks(m_ui->view->expandedTasks());
+        state.setShowExpired(m_ui->view->isExpiredVisible());
         settings.beginGroup(QString::fromUtf8(staticMetaObject.className()));
         state.saveTo(settings);
     }
-}
-
-void SelectTaskDialog::slotPrefilteringChanged()
-{
-    // find out about the selected mode:
-    const bool showCurrentOnly = !m_ui->showExpired->isChecked();
-    const auto mode = showCurrentOnly ? Configuration::TaskPrefilter_CurrentOnly
-                                      : Configuration::TaskPrefilter_ShowAll;
-
-    CONFIGURATION.taskPrefilteringMode = mode;
-    Charm::saveExpandStates(m_ui->treeView, &m_expansionStates);
-    m_proxy.prefilteringModeChanged();
-    Charm::restoreExpandStates(m_ui->treeView, &m_expansionStates);
-    emit saveConfiguration();
-}
-
-void SelectTaskDialog::setNonTrackableSelectable()
-{
-    m_nonTrackableSelectable = true;
 }
 
 void SelectTaskDialog::setNonValidSelectable()
@@ -257,16 +137,3 @@ void SelectTaskDialog::setNonValidSelectable()
     m_nonValidSelectable = true;
 }
 
-void SelectTaskDialog::slotSelectTask(const QString &filter)
-{
-    const QString filterText = filter.simplified().toUpper().replace(QLatin1Char('*'), QLatin1Char(' '));
-    const int filterTaskId = filterText.toInt();
-    const TaskList tasks = MODEL.charmDataModel()->getAllTasks();
-
-    for (const auto task : tasks) {
-        if (!task.isValid())
-            continue;
-        if (task.name().toUpper().contains(filterText) || task.id() == filterTaskId)
-            selectTask(task.id());
-    }
-}

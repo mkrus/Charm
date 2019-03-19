@@ -85,7 +85,7 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
     , m_actionMonthlyTimesheetReport(this)
     , m_uiElements(
 {
-    &m_timeTracker, &m_tasksView, &m_eventView
+    &m_timeTracker, &m_eventView
 }),
     m_startupTask(startupTask)
   , m_hideAtStart(hideAtStart)
@@ -163,12 +163,7 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
     connect(&m_timeTracker, &TimeTrackingWindow::taskMenuChanged,
             this, &ApplicationCore::slotPopulateTrayIconMenu);
 
-    // save the configuration (configuration is managed by the application)
-    connect(&m_tasksView, &TasksView::saveConfiguration,
-            this, &ApplicationCore::slotSaveConfiguration);
     // due to multiple inheritence we can't use the new style connects here
-    connect(&m_tasksView, SIGNAL(emitCommand(CharmCommand*)),
-            &m_timeTracker, SLOT(sendCommand(CharmCommand*)));
     connect(&m_eventView, SIGNAL(emitCommand(CharmCommand*)),
             &m_timeTracker, SLOT(sendCommand(CharmCommand*)));
 
@@ -263,6 +258,7 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
 ApplicationCore::~ApplicationCore()
 {
     m_instance = nullptr;
+    delete m_tasksView;
 }
 
 void ApplicationCore::slotPopulateTrayIconMenu()
@@ -809,7 +805,9 @@ void ApplicationCore::slotShowNotification(const QString &title, const QString &
 
 void ApplicationCore::slotShowTasksEditor()
 {
-    CharmWindow::showView(&m_tasksView);
+    if (!m_tasksView)
+        m_tasksView = new TasksView;
+    CharmWindow::showView(m_tasksView);
 }
 
 void ApplicationCore::slotShowEventEditor()

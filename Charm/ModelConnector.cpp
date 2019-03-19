@@ -36,7 +36,6 @@
 ModelConnector::ModelConnector()
     : QObject()
     , m_dataModel()
-    , m_viewFilter(&m_dataModel)
     , m_eventModelFilter(&m_dataModel)
     , m_findEventModelFilter(&m_dataModel)
 {
@@ -51,11 +50,6 @@ ModelConnector::ModelConnector()
 CharmDataModel *ModelConnector::charmDataModel()
 {
     return &m_dataModel;
-}
-
-ViewFilter *ModelConnector::taskModel()
-{
-    return &m_viewFilter;
 }
 
 EventModelFilter *ModelConnector::eventModel()
