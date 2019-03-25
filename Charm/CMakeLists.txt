@@ -12,7 +12,6 @@ SET(
     TaskModelAdapter.cpp
     ViewHelpers.cpp
     WeeklySummary.cpp
-    UndoCharmCommandWrapper.cpp
     Commands/CommandRelayCommand.cpp
     Commands/CommandModifyEvent.cpp
     Commands/CommandDeleteEvent.cpp

@@ -43,7 +43,6 @@ public:
 
     bool prepare() override;
     bool execute(Controller *) override;
-    bool rollback(Controller *) override;
     bool finalize() override;
 
 private:

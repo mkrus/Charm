@@ -39,7 +39,6 @@ public:
     virtual void stateChanged(State previous) = 0;
     virtual void configurationChanged() = 0;
     virtual void emitCommand(CharmCommand *) = 0;
-    virtual void emitCommandRollback(CharmCommand *) = 0;
 
     // CommandEmitterInterface
     virtual void commitCommand(CharmCommand *) override = 0;

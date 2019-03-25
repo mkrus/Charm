@@ -69,7 +69,6 @@ public:
 
     virtual bool prepare() = 0;
     virtual bool execute(Controller *controller) = 0;
-    virtual bool rollback(Controller *controller);
     virtual bool finalize() = 0;
 
     CommandEmitterInterface *owner() const;
@@ -77,7 +76,6 @@ public:
     //used by UndoCharmCommandWrapper to forward signal firing
     //forwards to emitExecute/emitRollback/emitRequestSlotEventIdChanged
     void requestExecute();
-    void requestRollback();
     void requestSlotEventIdChanged(int oldId, int newId);
 
     //notify CharmCommands in a QUndoStack that an event ID has changed

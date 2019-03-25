@@ -87,7 +87,8 @@ void ModelConnector::slotMakeAndActivateEvent(const Task &task)
 
 void ModelConnector::slotRequestEventModification(const Event &newEvent, const Event &oldEvent)
 {
-    auto command = new CommandModifyEvent(newEvent, oldEvent, this);
+    Q_UNUSED(oldEvent);
+    auto command = new CommandModifyEvent(newEvent, this);
     VIEW.sendCommand(command);
 }
 

@@ -169,12 +169,8 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
     // due to multiple inheritence we can't use the new style connects here
     connect(&m_tasksView, SIGNAL(emitCommand(CharmCommand*)),
             &m_timeTracker, SLOT(sendCommand(CharmCommand*)));
-    connect(&m_tasksView, SIGNAL(emitCommandRollback(CharmCommand*)),
-            &m_timeTracker, SLOT(sendCommandRollback(CharmCommand*)));
     connect(&m_eventView, SIGNAL(emitCommand(CharmCommand*)),
             &m_timeTracker, SLOT(sendCommand(CharmCommand*)));
-    connect(&m_eventView, SIGNAL(emitCommandRollback(CharmCommand*)),
-            &m_timeTracker, SLOT(sendCommandRollback(CharmCommand*)));
 
     // my own signals:
     connect(this, &ApplicationCore::goToState,

@@ -35,7 +35,6 @@
 #include "Core/CommandEmitterInterface.h"
 
 #include "Charm/ModelConnector.h"
-#include "Charm/UndoCharmCommandWrapper.h"
 
 class QModelIndex;
 
@@ -62,7 +61,6 @@ public:
 
 Q_SIGNALS:
     void emitCommand(CharmCommand *) override;
-    void emitCommandRollback(CharmCommand *) override;
 
 public Q_SLOTS:
     void commitCommand(CharmCommand *) override;
@@ -91,9 +89,6 @@ private Q_SLOTS:
     void slotEventDeactivated(EventId);
     void slotUpdateTotal();
     void slotUpdateCurrent();
-    void slotUndoTextChanged(const QString &);
-    void slotRedoTextChanged(const QString &);
-    void slotEventIdChanged(int oldId, int newId);
     void slotFindAndReplace();
     void slotReset();
 
@@ -102,12 +97,9 @@ private:
     void stageCommand(CharmCommand *);
 
     QToolBar *m_toolBar;
-    QUndoStack *m_undoStack;
     QList<NamedTimeSpan> m_timeSpans;
     Event m_event;
     EventModelFilter *m_model = nullptr;
-    QAction m_actionUndo;
-    QAction m_actionRedo;
     QAction m_actionNewEvent;
     QAction m_actionEditEvent;
     QAction m_actionDeleteEvent;

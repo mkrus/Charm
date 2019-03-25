@@ -93,9 +93,6 @@ public Q_SLOTS:
     /** Receive a command from the view. */
     void executeCommand(CharmCommand *);
 
-    /** Receive an undo command from the view. */
-    void rollbackCommand(CharmCommand *);
-
 Q_SIGNALS:
     /** Added an event. */
     void eventAdded(const Event &event);

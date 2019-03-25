@@ -58,8 +58,6 @@
 EventView::EventView(QWidget *parent)
     : QDialog(parent)
     , m_toolBar(new QToolBar(this))
-    , m_actionUndo(this)
-    , m_actionRedo(this)
     , m_actionNewEvent(this)
     , m_actionEditEvent(this)
     , m_actionDeleteEvent(this)
@@ -91,27 +89,6 @@ EventView::EventView(QWidget *parent)
 //     connect( &m_commitTimer, SIGNAL(timeout()),
 //              SLOT(slotCommitTimeout()) );
 //     m_commitTimer.setSingleShot( true );
-
-    m_actionUndo.setText(tr("Undo"));
-    m_actionUndo.setToolTip(tr("Undo the latest change"));
-    m_actionUndo.setShortcut(QKeySequence::Undo);
-    m_actionUndo.setEnabled(false);
-
-    m_actionRedo.setText(tr("Redo"));
-    m_actionRedo.setToolTip(tr("Redo the last undone change."));
-    m_actionRedo.setShortcut(QKeySequence::Redo);
-    m_actionRedo.setEnabled(false);
-
-    m_undoStack = new QUndoStack(this);
-    connect(m_undoStack, &QUndoStack::canUndoChanged,
-            &m_actionUndo, &QAction::setEnabled);
-    connect(m_undoStack, &QUndoStack::undoTextChanged,
-            this, &EventView::slotUndoTextChanged);
-    connect(&m_actionUndo, &QAction::triggered, m_undoStack, &QUndoStack::undo);
-
-    connect(m_undoStack, &QUndoStack::canRedoChanged, &m_actionRedo, &QAction::setEnabled);
-    connect(m_undoStack, &QUndoStack::redoTextChanged, this, &EventView::slotRedoTextChanged);
-    connect(&m_actionRedo, &QAction::triggered, m_undoStack, &QUndoStack::redo);
 
     m_actionNewEvent.setText(tr("New Event..."));
     m_actionNewEvent.setToolTip(tr("Create a new Event"));
@@ -167,8 +144,6 @@ EventView::EventView(QWidget *parent)
 
 EventView::~EventView()
 {
-    // Prevents a crash on exit, with the stack emitting undoTextChanged on destruction
-    m_undoStack->disconnect(this);
 }
 
 void EventView::delayedInitialization()
@@ -180,9 +155,6 @@ void EventView::delayedInitialization()
 
 void EventView::populateEditMenu(QMenu *menu)
 {
-    menu->addAction(&m_actionUndo);
-    menu->addAction(&m_actionRedo);
-    menu->addSeparator();
     menu->addAction(&m_actionNewEvent);
     menu->addAction(&m_actionEditEvent);
     menu->addAction(&m_actionDeleteEvent);
@@ -240,11 +212,8 @@ void EventView::setCurrentEvent(const Event &event)
 
 void EventView::stageCommand(CharmCommand *command)
 {
-    auto undoCommand = new UndoCharmCommandWrapper(command);
     connect(command, &CharmCommand::emitExecute, this, &EventView::emitCommand);
-    connect(command, &CharmCommand::emitRollback, this, &EventView::emitCommandRollback);
-    connect(command, &CharmCommand::emitSlotEventIdChanged, this, &EventView::slotEventIdChanged);
-    m_undoStack->push(undoCommand);
+    command->requestExecute();
 }
 
 void EventView::slotNewEvent()
@@ -407,25 +376,6 @@ void EventView::slotUpdateCurrent()
     slotUpdateTotal();
 }
 
-void EventView::slotUndoTextChanged(const QString &text)
-{
-    m_actionUndo.setText(tr("Undo %1").arg(text));
-}
-
-void EventView::slotRedoTextChanged(const QString &text)
-{
-    m_actionRedo.setText(tr("Redo %1").arg(text));
-}
-
-void EventView::slotEventIdChanged(int oldId, int newId)
-{
-    foreach (QObject *o, m_undoStack->children()) {
-        UndoCharmCommandWrapper *wrapper = dynamic_cast<UndoCharmCommandWrapper *>(o);
-        Q_ASSERT(wrapper);
-        wrapper->command()->eventIdChanged(oldId, newId);
-    }
-}
-
 void EventView::slotUpdateTotal()
 {   // what matching signal does the proxy emit?
     int seconds = m_model->totalDuration();
@@ -556,7 +506,7 @@ void EventView::slotEditEvent(const Event &event)
             stageCommand(command);
             return;
         } else {
-            auto command = new CommandModifyEvent(newEvent, event, this);
+            auto command = new CommandModifyEvent(newEvent, this);
             stageCommand(command);
         }
     }
@@ -566,7 +516,7 @@ void EventView::slotEventChangesCompleted(const Event &event)
 {
     // make event editor finished, bypass the undo stack to set its contents
     // undo will just target CommandMakeEvent instead
-    auto command = new CommandModifyEvent(event, event, this);
+    auto command = new CommandModifyEvent(event, this);
     emitCommand(command);
     delete command;
 }

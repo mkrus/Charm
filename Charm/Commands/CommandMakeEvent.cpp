@@ -51,8 +51,6 @@ bool CommandMakeEvent::prepare()
 
 bool CommandMakeEvent::execute(Controller *controller)
 {
-    m_rollback = false;
-
     if (m_event.id()) { //if it already has an id, this is a redo operation
         int oid = m_event.id();
         m_event = controller->cloneEvent(m_event);
@@ -87,16 +85,8 @@ bool CommandMakeEvent::execute(Controller *controller)
     }
 }
 
-bool CommandMakeEvent::rollback(Controller *controller)
-{
-    m_rollback = true;
-    return controller->deleteEvent(m_event);
-}
-
 bool CommandMakeEvent::finalize()
 {
-    if (m_rollback)
-        return false;
     if (m_event.isValid()) {
         EventView *view = dynamic_cast<EventView *>(owner());
         if (view)

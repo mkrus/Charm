@@ -50,11 +50,6 @@ QString CharmCommand::description() const
     return m_description;
 }
 
-bool CharmCommand::rollback(Controller *)
-{
-    return false;
-}
-
 CommandEmitterInterface *CharmCommand::owner() const
 {
     return m_owner;
@@ -63,11 +58,6 @@ CommandEmitterInterface *CharmCommand::owner() const
 void CharmCommand::requestExecute()
 {
     Q_EMIT emitExecute(this);
-}
-
-void CharmCommand::requestRollback()
-{
-    Q_EMIT emitRollback(this);
 }
 
 void CharmCommand::requestSlotEventIdChanged(int oldId, int newId)

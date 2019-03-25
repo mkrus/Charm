@@ -84,7 +84,6 @@ Q_SIGNALS:
     void saveConfiguration();
 
 public Q_SLOTS:
-    void sendCommandRollback(CharmCommand *);
     void sendCommand(CharmCommand *);
     void commitCommand(CharmCommand *) override;
     virtual void restore();

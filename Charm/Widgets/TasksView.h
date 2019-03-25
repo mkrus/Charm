@@ -61,7 +61,6 @@ Q_SIGNALS:
     // FIXME connect to MainWindow
     void saveConfiguration();
     void emitCommand(CharmCommand *) override;
-    void emitCommandRollback(CharmCommand *) override;
 
 private Q_SLOTS:
     void slotFiltertextChanged(const QString &filtertext);

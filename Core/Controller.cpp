@@ -269,13 +269,6 @@ void Controller::executeCommand(CharmCommand *command)
     emit commandCompleted(command);
 }
 
-void Controller::rollbackCommand(CharmCommand *command)
-{
-    command->rollback(this);
-    // send it back to the view:
-    emit commandCompleted(command);
-}
-
 SqlStorage *Controller::storage()
 {
     return m_storage;

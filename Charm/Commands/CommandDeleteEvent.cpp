@@ -44,16 +44,6 @@ bool CommandDeleteEvent::execute(Controller *controller)
     return controller->deleteEvent(m_event);
 }
 
-bool CommandDeleteEvent::rollback(Controller *controller)
-{
-    int oldId = m_event.id();
-    m_event = controller->cloneEvent(m_event);
-    int newId = m_event.id();
-    if (oldId != newId)
-        Q_EMIT emitSlotEventIdChanged(oldId, newId);
-    return m_event.isValid();
-}
-
 bool CommandDeleteEvent::finalize()
 {
     return true;

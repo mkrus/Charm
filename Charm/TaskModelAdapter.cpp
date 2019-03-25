@@ -187,11 +187,9 @@ bool TaskModelAdapter::setData(const QModelIndex &index, const QVariant &value, 
     if (role == Qt::EditRole) {
         Q_ASSERT(m_dataModel->isTaskActive(task.id()));
 
-        const Event &old = m_dataModel->activeEventFor(task.id());
-        QString comment = value.toString();
-        Event event(old);
-        event.setComment(comment);
-        auto command = new CommandModifyEvent(event, old, this);
+        Event event = m_dataModel->activeEventFor(task.id());
+        event.setComment(value.toString());
+        auto command = new CommandModifyEvent(event, this);
         VIEW.sendCommand(command);
         return true;
     }

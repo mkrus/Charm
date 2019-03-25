@@ -174,14 +174,6 @@ void CharmWindow::sendCommand(CharmCommand *cmd)
     emit emitCommand(relay);
 }
 
-void CharmWindow::sendCommandRollback(CharmCommand *cmd)
-{
-    cmd->prepare();
-    auto relay = new CommandRelayCommand(this);
-    relay->setCommand(cmd);
-    emit emitCommandRollback(relay);
-}
-
 void CharmWindow::handleShow(bool visible)
 {
     const QString text = tr("Show %1").arg(m_windowName);
