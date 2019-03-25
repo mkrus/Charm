@@ -42,9 +42,6 @@ private Q_SLOTS:
 
     void checkForTreenessTest_data();
     void checkForTreenessTest();
-
-    void mergeTaskListsTest_data();
-    void mergeTaskListsTest();
 };
 
 #endif

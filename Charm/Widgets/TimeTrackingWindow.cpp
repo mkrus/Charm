@@ -43,7 +43,6 @@
 #include "Commands/CommandModifyEvent.h"
 #include "Commands/CommandSetAllTasks.h"
 
-#include "Core/TaskListMerger.h"
 #include "Core/TimeSpans.h"
 #include "Core/XmlSerialization.h"
 
@@ -620,36 +619,24 @@ void TimeTrackingWindow::importTasksFromDeviceOrFile(QIODevice *device, const QS
     Q_UNUSED(m);
 
     TaskExport exporter;
-    TaskListMerger merger;
     try {
         if (device) {
             exporter.readFrom(device);
         } else {
             exporter.readFrom(filename);
         }
-        merger.setOldTasks(DATAMODEL->getAllTasks());
-        merger.setNewTasks(exporter.tasks());
-        if (merger.modifiedTasks().isEmpty() && merger.addedTasks().isEmpty()) {
-            const QString title = tr("Tasks Import");
-            const QString message = tr("The selected task file does not contain any updates.");
-            if (verbose) {
-                QMessageBox::information(this, title, message);
-            } else {
-                emit showNotification(title, message);
-            }
-        } else {
-            auto cmd = new CommandSetAllTasks(merger.mergedTaskList(), this);
-            sendCommand(cmd);
-            // At this point the command was finalized and we have a result.
-            const bool success = cmd->finalize();
-            const QString detailsText = success ? tr("The task list has been updated.") : tr(
-                "Setting the new tasks failed.");
-            const QString title = success ? tr("Tasks Import") : tr("Failure setting new tasks");
-            if (verbose) {
-                QMessageBox::information(this, title, detailsText);
-            } else if (!success) {
-                emit showNotification(title, detailsText);
-            }
+
+        auto cmd = new CommandSetAllTasks(exporter.tasks(), this);
+        sendCommand(cmd);
+        // At this point the command was finalized and we have a result.
+        const bool success = cmd->finalize();
+        const QString detailsText = success ? tr("The task list has been updated.") : tr(
+            "Setting the new tasks failed.");
+        const QString title = success ? tr("Tasks Import") : tr("Failure setting new tasks");
+        if (verbose) {
+            QMessageBox::information(this, title, detailsText);
+        } else if (!success) {
+            emit showNotification(title, detailsText);
         }
 
         Lotsofcake::Configuration lotsofcakeConfig;

@@ -25,7 +25,6 @@
 #include "TestHelpers.h"
 
 #include "Core/Task.h"
-#include "Core/TaskListMerger.h"
 #include "Core/CharmConstants.h"
 
 #include <QtDebug>
@@ -88,72 +87,6 @@ void TaskStructureTests::checkForTreenessTest()
     QFETCH(bool, directed);
 
     QCOMPARE(Task::checkForTreeness(tasks), directed);
-}
-
-void TaskStructureTests::mergeTaskListsTest_data()
-{
-    QTest::addColumn<TaskList>("old");
-    QTest::addColumn<TaskList>("newTasks");
-    QTest::addColumn<TaskList>("merged");
-
-    Q_FOREACH (const QDomElement &testcase,
-               TestHelpers::retrieveTestCases(QLatin1String(":/mergeTaskListsTest/Data"),
-                                              QLatin1String("mergeTaskListsTest"))) {
-        QString name = testcase.attribute(QStringLiteral("name"));
-
-        QList<QDomElement> elements;
-        elements << testcase.firstChildElement(Task::taskListTagName());
-        elements << (elements.first()).nextSiblingElement(Task::taskListTagName());
-        elements << (elements.at(1)).nextSiblingElement(Task::taskListTagName());
-        bool oldFound = false, newFound = false, mergedFound = false;
-        TaskList old, newTasks, merged;
-        Q_FOREACH (const QDomElement &element, elements) {
-            QString arg = element.attribute(QStringLiteral("arg"));
-            TaskList tasks = Task::readTasksElement(element, CHARM_DATABASE_VERSION);
-            if (arg == QLatin1String("old")) {
-                old = tasks;
-                oldFound = true;
-            } else if (arg == QLatin1String("new")) {
-                newTasks = tasks;
-                newFound = true;
-            } else if (arg == QLatin1String("merged")) {
-                merged = tasks;
-                std::sort(merged.begin(), merged.end(), Task::lowerTaskId);
-                mergedFound = true;
-            } else {
-                QFAIL("invalid XML structure in input data");
-            }
-        }
-        QVERIFY(oldFound);
-        QVERIFY(newFound);
-        QVERIFY(mergedFound);
-
-        QTest::newRow(name.toLocal8Bit().constData()) << old << newTasks << merged;
-        qDebug() << "Added test case" << name;
-    }
-}
-
-void TaskStructureTests::mergeTaskListsTest()
-{
-    QFETCH(TaskList, old);
-    QFETCH(TaskList, newTasks);
-    QFETCH(TaskList, merged);
-
-    TaskListMerger merger;
-    merger.setOldTasks(old);
-    merger.setNewTasks(newTasks);
-
-    TaskList result = merger.mergedTaskList();
-    std::sort(result.begin(), result.end(), Task::lowerTaskId);
-    if (result != merged) {
-        qDebug() << "Test failed";
-        qDebug() << "Merge Result:";
-        dumpTaskList(result);
-        qDebug() << "Expected Merge Result:";
-        dumpTaskList(merged);
-    }
-
-    QCOMPARE(result, merged);
 }
 
 QTEST_MAIN(TaskStructureTests)
