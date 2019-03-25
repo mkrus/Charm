@@ -598,7 +598,8 @@ void ApplicationCore::slotGoToConnectedState()
 
 static QString charmDataDir()
 {
-    return QStandardPaths::writableLocation(QStandardPaths::DataLocation) + QLatin1Char('/');
+    return QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)
+        + QDir::separator() + QStringLiteral("Charm") + QDir::separator();
 }
 
 bool ApplicationCore::configure()
