@@ -57,7 +57,7 @@ CharmDataModel::~CharmDataModel()
 void CharmDataModel::stateChanged(State previous, State next)
 {
     if (previous == Connected && next == Disconnecting) {
-        Q_FOREACH (EventId id, m_activeEventIds) {
+        for (EventId id : m_activeEventIds) {
             const Event &event = findEvent(id);
             const Task &task = findTask(event.taskId());
             Q_ASSERT(task.isValid());
@@ -120,7 +120,7 @@ void CharmDataModel::addTask(const Task &task)
     if (task.isValid() && !taskExists(task.id())) {
         const TaskTreeItem &parent = taskTreeItem(task.parent());
 
-        Q_FOREACH (auto adapter, m_adapters)
+        for (auto adapter : m_adapters)
             adapter->taskAboutToBeAdded(parent.task().id(),
                                         parent.childCount());
 
@@ -136,7 +136,7 @@ void CharmDataModel::addTask(const Task &task)
         determineTaskPaddingLength();
 //        regenerateSmartNames();
 
-        Q_FOREACH (auto adapter, m_adapters)
+        for (auto adapter : m_adapters)
             adapter->taskAdded(task.id());
     } else {
         qCCritical(CHARM_CORE_LOG) << "CharmDataModel::addTask: duplicate task id"
@@ -156,7 +156,7 @@ void CharmDataModel::modifyTask(const Task &task)
     const bool parentChanged = task.parent() != oldParentId;
 
     if (parentChanged) {
-        Q_FOREACH (auto adapter, m_adapters)
+        for (auto adapter : m_adapters)
             adapter->taskParentChanged(task.id(), oldParentId, task.parent());
         m_tasks[ task.id() ].makeChildOf(parentItem(task));
     }
@@ -165,10 +165,10 @@ void CharmDataModel::modifyTask(const Task &task)
     m_nameCache.modifyTask(task);
 
     if (parentChanged) {
-        Q_FOREACH (auto adapter, m_adapters)
+        for (auto adapter : m_adapters)
             adapter->resetTasks();
     } else {
-        Q_FOREACH (auto adapter, m_adapters)
+        for (auto adapter : m_adapters)
             adapter->taskModified(task.id());
     }
 }
@@ -181,7 +181,7 @@ void CharmDataModel::deleteTask(const Task &task)
                Q_FUNC_INFO,
                "Cannot delete a task that has children");
 
-    Q_FOREACH (auto adapter, m_adapters)
+    for (auto adapter : m_adapters)
         adapter->taskAboutToBeDeleted(task.id());
 
     const auto it = m_tasks.find(task.id());
@@ -193,7 +193,7 @@ void CharmDataModel::deleteTask(const Task &task)
 
     m_nameCache.deleteTask(task);
 
-    Q_FOREACH (auto adapter, m_adapters)
+    for (auto adapter : m_adapters)
         adapter->taskDeleted(task.id());
 }
 
@@ -207,7 +207,7 @@ void CharmDataModel::clearTasks()
     m_nameCache.clearTasks();
     m_rootItem = TaskTreeItem();
 
-    Q_FOREACH (auto adapter, m_adapters)
+    for (auto adapter : m_adapters)
         adapter->resetTasks();
 }
 
@@ -224,7 +224,7 @@ void CharmDataModel::setAllEvents(const EventList &events)
         }
     }
 
-    Q_FOREACH (auto adapter, m_adapters)
+    for (auto adapter : m_adapters)
         adapter->resetEvents();
 }
 
@@ -233,12 +233,12 @@ void CharmDataModel::addEvent(const Event &event)
     Q_ASSERT_X(!eventExists(event.id()), Q_FUNC_INFO,
                "New event must have a unique id");
 
-    Q_FOREACH (auto adapter, m_adapters)
+    for (auto adapter : m_adapters)
         adapter->eventAboutToBeAdded(event.id());
 
     m_events[ event.id() ] = event;
 
-    Q_FOREACH (auto adapter, m_adapters)
+    for (auto adapter : m_adapters)
         adapter->eventAdded(event.id());
 }
 
@@ -251,7 +251,7 @@ void CharmDataModel::modifyEvent(const Event &newEvent)
 
     m_events[ newEvent.id() ] = newEvent;
 
-    Q_FOREACH (auto adapter, m_adapters)
+    for (auto adapter : m_adapters)
         adapter->eventModified(newEvent.id(), oldEvent);
 }
 
@@ -262,14 +262,14 @@ void CharmDataModel::deleteEvent(const Event &event)
     Q_ASSERT_X(!m_activeEventIds.contains(event.id()), Q_FUNC_INFO,
                "Cannot delete an active event");
 
-    Q_FOREACH (auto adapter, m_adapters)
+    for (auto adapter : m_adapters)
         adapter->eventAboutToBeDeleted(event.id());
 
     const auto it = m_events.find(event.id());
     if (it != m_events.end())
         m_events.erase(it);
 
-    Q_FOREACH (auto adapter, m_adapters)
+    for (auto adapter : m_adapters)
         adapter->eventDeleted(event.id());
 }
 
@@ -277,7 +277,7 @@ void CharmDataModel::clearEvents()
 {
     m_events.clear();
 
-    Q_FOREACH (auto adapter, m_adapters)
+    for (auto adapter : m_adapters)
         adapter->resetEvents();
 }
 
@@ -352,7 +352,7 @@ bool CharmDataModel::activateEvent(const Event &activeEvent)
     }
 
     m_activeEventIds << activeEvent.id();
-    Q_FOREACH (auto adapter, m_adapters)
+    for (auto adapter : m_adapters)
         adapter->eventActivated(activeEvent.id());
     m_timer.start(10000);
     return true;
@@ -439,7 +439,7 @@ void CharmDataModel::endEventRequested(const Task &task)
         if (eventForId(m_activeEventIds[i]).taskId() == task.id()) {
             eventId = m_activeEventIds[i];
             m_activeEventIds.removeAt(i);
-            Q_FOREACH (auto adapter, m_adapters)
+            for (auto adapter : m_adapters)
                 adapter->eventDeactivated(eventId);
             break;
         }
@@ -462,7 +462,7 @@ void CharmDataModel::endAllEventsRequested()
     while (!m_activeEventIds.isEmpty()) {
         EventId eventId = m_activeEventIds.first();
         m_activeEventIds.pop_front();
-        Q_FOREACH (auto adapter, m_adapters)
+        for (auto adapter : m_adapters)
             adapter->eventDeactivated(eventId);
 
         Q_ASSERT(eventId != 0);
@@ -479,7 +479,7 @@ void CharmDataModel::endAllEventsRequested()
 
 void CharmDataModel::eventUpdateTimerEvent()
 {
-    Q_FOREACH (EventId id, m_activeEventIds) {
+    for (EventId id : m_activeEventIds) {
         // Not a ref (Event &), since we want to diff "old event"
         // and "new event" in *Adapter::eventModified
         Event event = findEvent(id);
@@ -517,7 +517,7 @@ QString CharmDataModel::smartTaskName(const Task &task) const
 QString CharmDataModel::eventsString() const
 {
     QStringList eStrList;
-    Q_FOREACH (EventId eventId, activeEvents()) {
+    for (EventId eventId : activeEvents()) {
         Event event = eventForId(eventId);
         if (event.isValid()) {
             const Task &task = getTask(event.taskId());
@@ -556,7 +556,7 @@ QString CharmDataModel::taskIdAndNameString(TaskId id) const
 int CharmDataModel::totalDuration() const
 {
     int totalDuration = 0;
-    Q_FOREACH (EventId eventId, activeEvents()) {
+    for (EventId eventId : activeEvents()) {
         Event event = eventForId(eventId);
         if (event.isValid())
             totalDuration += event.duration();

@@ -121,7 +121,7 @@ void SmartNameCache::regenerateSmartNames()
 
     QMap<QString, QVector<TaskParentPair> > byName;
 
-    Q_FOREACH (const Task &task, m_tasks)
+    for (const Task &task : m_tasks)
         byName[makeCombined(task)].append(qMakePair(task.id(), task.parent()));
 
     QSet<QString> cannotMakeUnique;
@@ -135,10 +135,10 @@ void SmartNameCache::regenerateSmartNames()
             const auto &taskPairs = it.value();
             Q_ASSERT(!taskPairs.isEmpty());
             if (taskPairs.size() == 1 || cannotMakeUnique.contains(currentName)) {
-                Q_FOREACH (const TaskParentPair &i, taskPairs)
+                for (const TaskParentPair &i : taskPairs)
                     m_smartTaskNamesById.insert(i.first, currentName);
             } else {
-                Q_FOREACH (const TaskParentPair &taskPair, taskPairs) {
+                for (const TaskParentPair &taskPair : taskPairs) {
                     const Task parent = findTask(taskPair.second);
                     if (parent.isValid()) {
                         const QString newName = parent.name() + QLatin1Char('/') + currentName;

@@ -267,7 +267,7 @@ void WeeklyTimeSheetReport::update()
     // for every task, make a vector that includes a number of seconds
     // for every day of the week ( int seconds[7]), and store those in
     // a map by their task id
-    Q_FOREACH (EventId id, matchingEvents) {
+    for (EventId id : matchingEvents) {
         const Event &event = DATAMODEL->eventForId(id);
         QVector<int> seconds(DaysInWeek);
         if (m_secondsMap.contains(event.taskId()))
@@ -459,7 +459,7 @@ QByteArray WeeklyTimeSheetReport::saveToXml(SaveToXmlMode mode)
             startDate(), endDate());
         EventList events;
         events.reserve(matchingEventIds.size());
-        Q_FOREACH (const EventId &id, matchingEventIds)
+        for (const EventId &id : matchingEventIds)
             events.append(DATAMODEL->eventForId(id));
         timesheet.setEvents(events);
 

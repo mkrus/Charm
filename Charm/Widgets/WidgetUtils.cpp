@@ -47,6 +47,6 @@ void WidgetUtils::saveGeometry(QWidget *widget, const QString &metaKey)
 void WidgetUtils::updateToolButtonStyle(QWidget *widget)
 {
     const QList<QToolButton *> buttons = widget->findChildren<QToolButton *>();
-    Q_FOREACH (auto button, buttons)
+    for (auto button : buttons)
         button->setToolButtonStyle(CONFIGURATION.toolButtonStyle);
 }

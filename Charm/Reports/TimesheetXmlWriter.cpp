@@ -108,7 +108,7 @@ QByteArray TimesheetXmlWriter::saveToXml() const
     if (m_includeTaskList) {   // tasks
         QDomElement tasks = document.createElement(QStringLiteral("tasks"));
         report.appendChild(tasks);
-        Q_FOREACH (const TimeSheetInfo &info, timeSheetInfo) {
+        for (const TimeSheetInfo &info : timeSheetInfo) {
             if (info.taskId == 0)   // the root task
                 continue;
             const Task &modelTask = m_dataModel->getTask(info.taskId);
@@ -123,7 +123,7 @@ QByteArray TimesheetXmlWriter::saveToXml() const
         // aggregate (group by task and day):
         typedef QPair<TaskId, QDate> Key;
         QMap< Key, Event> events;
-        Q_FOREACH (const Event &event, m_events) {
+        for (const Event &event : m_events) {
             TimeSheetInfoList::iterator it;
             for (it = timeSheetInfo.begin(); it != timeSheetInfo.end(); ++it)
                 if ((*it).taskId == event.taskId()) break;
@@ -164,7 +164,7 @@ QByteArray TimesheetXmlWriter::saveToXml() const
             }
         }
         // create elements:
-        Q_FOREACH (const Event &event, events)
+        for (const Event &event : events)
             effort.appendChild(event.toXml(document));
     }
 

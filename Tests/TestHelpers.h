@@ -43,7 +43,7 @@ QList<QDomElement> retrieveTestCases(const QString &path, const QString &type)
     QFileInfoList dataSets = dataDir.entryInfoList(filenamePatterns, QDir::Files, QDir::Name);
 
     QList<QDomElement> result;
-    Q_FOREACH (const QFileInfo &fileinfo, dataSets) {
+    for (const QFileInfo &fileinfo : dataSets) {
         QDomDocument doc(QStringLiteral("charmtests"));
         QFile file(fileinfo.filePath());
         if (!file.open(QIODevice::ReadOnly))

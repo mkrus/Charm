@@ -41,7 +41,7 @@ QVector<WeeklySummary> WeeklySummary::summariesForTimespan(CharmDataModel *dataM
     // prepare a list of unique task ids used within the time span:
     TaskIdList taskIds, uniqueTaskIds; // the list of tasks to show
     EventList events;
-    Q_FOREACH (EventId id, eventIds) {
+    for (EventId id : eventIds) {
         Event event = dataModel->eventForId(id);
         events << event;
         taskIds << event.taskId();
@@ -57,7 +57,7 @@ QVector<WeeklySummary> WeeklySummary::summariesForTimespan(CharmDataModel *dataM
         summaries[i].taskname = dataModel->fullTaskName(task);
     }
     // now add the times to the tasks:
-    Q_FOREACH (const Event &event, events) {
+    for (const Event &event : events) {
         // find the index for this event:
         auto it = std::find(uniqueTaskIds.begin(), uniqueTaskIds.end(), event.taskId());
         if (it != uniqueTaskIds.end()) {

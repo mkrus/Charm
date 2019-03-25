@@ -155,7 +155,7 @@ void TasksView::saveGuiState()
         // expanded tasks
         TaskList tasks = MODEL.charmDataModel()->getAllTasks();
         TaskIdList expandedTasks;
-        Q_FOREACH (const Task &task, tasks) {
+        for (const Task &task : tasks) {
             QModelIndex index(filter->indexForTaskId(task.id()));
             if (m_treeView->isExpanded(index))
                 expandedTasks << task.id();
@@ -181,7 +181,7 @@ void TasksView::restoreGuiState()
         if (index.isValid())
             m_treeView->setCurrentIndex(index);
 
-        Q_FOREACH (const TaskId &id, state.expandedTasks()) {
+        for (const TaskId &id : state.expandedTasks()) {
             QModelIndex indexForId(filter->indexForTaskId(id));
             if (indexForId.isValid())
                 m_treeView->expand(indexForId);

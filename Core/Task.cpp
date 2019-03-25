@@ -252,7 +252,7 @@ TaskList Task::readTasksElement(const QDomElement &element, int databaseSchemaVe
 QDomElement Task::makeTasksElement(QDomDocument document, const TaskList &tasks)
 {
     QDomElement element = document.createElement(taskListTagName());
-    Q_FOREACH (const Task &task, tasks)
+    for (const Task &task : tasks)
         element.appendChild(task.toXml(document));
     return element;
 }
@@ -317,7 +317,7 @@ bool collectTaskIds(std::set<TaskId> &visitedIds, TaskId id, const TaskList &tas
     if (!foundSelf)
         return false;
 
-    Q_FOREACH (const TaskId i, children)
+    for (const TaskId i : children)
         collectTaskIds(visitedIds, i, tasks);
 
     return true;
@@ -349,7 +349,7 @@ bool Task::checkForTreeness(const TaskList &tasks)
     // of toplevel elements
     if (ids.size() != static_cast<unsigned>(tasks.size())) {
 #ifndef NDEBUG
-        Q_FOREACH (const Task &task, tasks) {
+        for (const Task &task : tasks) {
             if (find(ids.begin(), ids.end(), task.id()) == ids.end()) {
                 qCDebug(CHARM_CORE_LOG) << "Orphan task:";
                 task.dump();

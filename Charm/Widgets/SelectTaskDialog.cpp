@@ -113,7 +113,7 @@ void SelectTaskDialog::slotResetState()
     if (index.isValid())
         m_ui->treeView->setCurrentIndex(index);
 
-    Q_FOREACH (const TaskId id, state.expandedTasks()) {
+    for (const TaskId id : state.expandedTasks()) {
         QModelIndex indexForId(m_proxy.indexForTaskId(id));
         if (indexForId.isValid())
             m_ui->treeView->expand(indexForId);
@@ -221,7 +221,7 @@ void SelectTaskDialog::slotAccepted()
         // expanded tasks
         TaskList tasks = MODEL.charmDataModel()->getAllTasks();
         TaskIdList expandedTasks;
-        Q_FOREACH (const Task &task, tasks) {
+        for (const Task &task : tasks) {
             QModelIndex index(m_proxy.indexForTaskId(task.id()));
             if (m_ui->treeView->isExpanded(index))
                 expandedTasks << task.id();

@@ -71,7 +71,7 @@ void XmlSerializationTests::testEventSerialization()
     eventsToTest << Event() << testEvent;
 
     QDomDocument document(QStringLiteral("testdocument"));
-    Q_FOREACH (const Event &event, eventsToTest) {
+    for (const Event &event : eventsToTest) {
         QDomElement element = event.toXml(document);
 
         try {
@@ -92,7 +92,7 @@ void XmlSerializationTests::testEventSerialization()
 void XmlSerializationTests::testTaskSerialization()
 {
     QDomDocument document(QStringLiteral("testdocument"));
-    Q_FOREACH (Task task, tasksToTest()) {
+    for (Task task : tasksToTest()) {
         QDomElement element = task.toXml(document);
         try {
             Task readTask = Task::fromXml(element, CHARM_DATABASE_VERSION);
@@ -150,7 +150,7 @@ void XmlSerializationTests::testTaskListSerialization()
     // FIXME the data to test needs to be retrieved from resources
     //
     // just making sure:
-    Q_FOREACH (const Task &task, tasks)
+    for (const Task &task : tasks)
         QVERIFY(task.isValid());
 
     // the next test fails because tasks contains orphan elements (the

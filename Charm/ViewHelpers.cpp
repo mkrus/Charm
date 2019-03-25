@@ -136,7 +136,7 @@ EventIdList Charm::filteredBySubtree(EventIdList ids, TaskId parent, bool exclud
 {
     EventIdList result;
     bool isParent = false;
-    Q_FOREACH (EventId id, ids) {
+    for (EventId id : ids) {
         const Event &event = DATAMODEL->eventForId(id);
         isParent = (parent == event.taskId() || DATAMODEL->isParentOf(parent, event.taskId()));
         if (isParent != exclude)

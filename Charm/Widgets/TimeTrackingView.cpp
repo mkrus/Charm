@@ -283,12 +283,12 @@ void TimeTrackingView::data(DataField &field, int column, int row) const
             // field.text = tr( "Total" );
         } else if (column == TotalsColumn) {
             int total = 0;
-            Q_FOREACH (const WeeklySummary &s, m_summaries)
+            for (const WeeklySummary &s : m_summaries)
                 total += std::accumulate(s.durations.begin(), s.durations.end(), 0);
             field.text = hoursAndMinutes(total);
         } else {
             int total = 0;
-            Q_FOREACH (const WeeklySummary &s, m_summaries)
+            for (const WeeklySummary &s : m_summaries)
                 total += s.durations[Day];
             field.text = hoursAndMinutes(total);
             field.background = (Day % 2)

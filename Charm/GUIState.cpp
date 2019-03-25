@@ -78,7 +78,7 @@ void GUIState::saveTo(QSettings &settings)
     settings.setValue(MetaKey_MainWindowGUIStateSelectedTask, selectedTask());
     // workaround for not getting QVariant serialization of TaskIdLists to work:
     QList<QVariant> variants;
-    Q_FOREACH (TaskId v, expandedTasks())
+    for (TaskId v : expandedTasks())
         variants << v;
     settings.setValue(MetaKey_MainWindowGUIStateExpandedTasks, variants);
     settings.setValue(MetaKey_MainWindowGUIStateShowExpiredTasks, showExpired());
@@ -94,7 +94,7 @@ void GUIState::loadFrom(const QSettings &settings)
         QList<QVariant> values(settings.value(
                                    MetaKey_MainWindowGUIStateExpandedTasks).value<QList<QVariant> >());
         TaskIdList ids;
-        Q_FOREACH (const QVariant &variant, values)
+        for (const QVariant &variant : values)
             ids << variant.value<TaskId>();
         setExpandedTasks(ids);
         setShowExpired(settings.value(MetaKey_MainWindowGUIStateShowExpiredTasks).toBool());

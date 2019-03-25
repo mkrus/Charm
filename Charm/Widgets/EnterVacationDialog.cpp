@@ -154,7 +154,7 @@ void EnterVacationDialog::createEvents()
     html += QStringLiteral("<h3>%1</h3>").arg(tr("From %1 to %2").arg(htmlStartDate, htmlEndDate));
     html += QStringLiteral("<h4>%1</h4>").arg(tr("Task used: %1").arg(htmlTaskName));
     html += QLatin1String("<p>");
-    Q_FOREACH (const Event &event, events) {
+    for (const Event &event : events) {
         const QDate eventStart = event.startDateTime().date();
         const QDate eventEnd = event.endDateTime().date();
         Q_ASSERT(eventStart == eventEnd);

@@ -144,7 +144,7 @@ TaskIdList TaskTreeItem::childIds() const
 {
     TaskIdList idList;
     // get the list of children, and sort by task id:
-    Q_FOREACH (const TaskTreeItem *item, m_children)
+    for (const TaskTreeItem *item : m_children)
         idList.append(item->task().id());
     return idList;
 }

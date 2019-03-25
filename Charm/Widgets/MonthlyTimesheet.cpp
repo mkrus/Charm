@@ -167,7 +167,7 @@ void MonthlyTimeSheetReport::update()
     // for every task, make a vector that includes a number of seconds
     // for every week of a month ( int seconds[m_numberOfWeeks]), and store those in
     // a map by their task id
-    Q_FOREACH (EventId id, matchingEvents) {
+    for (EventId id : matchingEvents) {
         const Event &event = DATAMODEL->eventForId(id);
         QVector<int> seconds(m_numberOfWeeks);
         if (m_secondsMap.contains(event.taskId()))

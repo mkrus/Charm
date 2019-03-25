@@ -324,7 +324,7 @@ void TimeTrackingWindow::slotEnterVacation()
     if (dialog.exec() != QDialog::Accepted)
         return;
     const EventList events = dialog.events();
-    Q_FOREACH (const Event &event, events) {
+    for (const Event &event : events) {
         auto command = new CommandMakeEvent(event, this);
         sendCommand(command);
     }
@@ -559,7 +559,7 @@ void TimeTrackingWindow::handleIdleEvents(IdleDetector *detector, bool restart)
     const auto periods = detector->idlePeriods();
     const IdleDetector::IdlePeriod period = periods.last();
 
-    Q_FOREACH (EventId eventId, activeEvents) {
+    for (EventId eventId : activeEvents) {
         Event event = DATAMODEL->eventForId(eventId);
         if (event.isValid()) {
             Event old = event;
@@ -701,7 +701,7 @@ void TimeTrackingWindow::uploadStagedTimesheet()
         const auto matchingEventIds = DATAMODEL->eventsThatStartInTimeFrame(weekStart, yesterday);
         EventList events;
         events.reserve(matchingEventIds.size());
-        Q_FOREACH (const EventId &id, matchingEventIds)
+        for (const EventId &id : matchingEventIds)
             events.append(DATAMODEL->eventForId(id));
         timesheet.setEvents(events);
 

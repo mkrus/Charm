@@ -121,7 +121,7 @@ bool SqlStorage::setAllTasks(const TaskList &tasks)
     // clear tasks
     deleteAllTasks(transactor);
     // add tasks
-    Q_FOREACH (Task task, tasks) {
+    for (Task task : tasks) {
         addTask(task, transactor);
     }
     transactor.commit();
@@ -509,14 +509,14 @@ QString SqlStorage::setAllTasksAndEvents(const TaskList &tasks, const EventList 
     Q_ASSERT(getAllTasks().isEmpty());
 
     // now import Events and Tasks from the XML document:
-    Q_FOREACH (const Task &task, tasks) {
+    for (const Task &task : tasks) {
         // don't use our own addTask method, it emits signals and that
         // confuses the model, because the task tree is not inserted depth-first:
         if (!addTask(task, transactor)) {
             return QObject::tr("Cannot add imported tasks.");
         }
     }
-    Q_FOREACH (const Event &event, events) {
+    for (const Event &event : events) {
         if (!event.isValid()) continue;
         Task task = getTask(event.taskId());
         if (!task.isValid()) {

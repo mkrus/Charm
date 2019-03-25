@@ -425,7 +425,7 @@ void ApplicationCore::setState(State state)
         }
 
         m_state = state;
-        Q_FOREACH (auto e, m_uiElements)
+        for (auto e : m_uiElements)
             e->stateChanged(m_state);
 
         switch (m_state) {
@@ -716,7 +716,7 @@ void ApplicationCore::slotSaveConfiguration()
     if (state() == Connected) {
         m_controller.persistMetaData(CONFIGURATION);
     }
-    Q_FOREACH (auto e, m_uiElements)
+    for (auto e : m_uiElements)
         e->configurationChanged();
 }
 
@@ -774,7 +774,7 @@ void ApplicationCore::updateTaskList()
     auto recentJumpList = m_windowsJumpList->recent();
     recentJumpList->clear();
     int count = 0;
-    Q_FOREACH (const auto &id, recentData) {
+    for (const auto &id : recentData) {
         if (count++ > 5)
             break;
         recentJumpList->addLink(Data::goIcon(), DATAMODEL->getTask(
@@ -796,7 +796,7 @@ void ApplicationCore::commitData(QSessionManager &manager)
     // Before QApplication closes all windows, save their state.
     // Doing this in saveState is too late because then we would store that they are all hidden.
     if (m_state == Connected) {
-        Q_FOREACH (auto e, m_uiElements)
+        for (auto e : m_uiElements)
             e->saveGuiState();
     }
 }

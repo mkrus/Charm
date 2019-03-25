@@ -40,7 +40,7 @@ void TaskStructureTests::checkForUniqueTaskIdsTest_data()
     QTest::addColumn<TaskList>("tasks");
     QTest::addColumn<bool>("unique");
 
-    Q_FOREACH (const QDomElement &testcase,
+    for (const QDomElement &testcase :
                TestHelpers::retrieveTestCases(QLatin1String(":/checkForUniqueTaskIdsTest/Data"),
                                               QLatin1String("checkForUniqueTaskIdsTest"))) {
         QString name = testcase.attribute(QStringLiteral("name"));
@@ -67,7 +67,7 @@ void TaskStructureTests::checkForTreenessTest_data()
     QTest::addColumn<TaskList>("tasks");
     QTest::addColumn<bool>("directed");
 
-    Q_FOREACH (const QDomElement &testcase,
+    for (const QDomElement &testcase :
                TestHelpers::retrieveTestCases(QLatin1String(":/checkForTreenessTest/Data"),
                                               QLatin1String("checkForTreenessTest"))) {
         QString name = testcase.attribute(QStringLiteral("name"));
