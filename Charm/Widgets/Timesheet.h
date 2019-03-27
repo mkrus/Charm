@@ -48,6 +48,8 @@ protected:
 
     virtual QString suggestedFileName() const = 0;
     virtual void update() = 0;
+    virtual QByteArray saveToText() = 0;
+    virtual QByteArray saveToXml(SaveToXmlMode mode) = 0;
 
 protected:
 
@@ -79,6 +81,8 @@ protected:
     QString getFileName(const QString &filter);
 
     void slotUpdate() override;
+    void slotSaveToText() override;
+    void slotSaveToXml() override;
 
 protected:
     SecondsMap m_secondsMap;

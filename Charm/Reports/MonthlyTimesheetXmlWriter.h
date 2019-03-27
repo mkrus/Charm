@@ -1,5 +1,5 @@
 /*
-  MonthlyTimesheet.h
+  MonthlyTimesheetXmlWriter.h
 
   This file is part of Charm, a task-based time tracking application.
 
@@ -21,42 +21,28 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MONTHLYTIMESHEET3_H
-#define MONTHLYTIMESHEET3_H
+#ifndef MONTHLYTIMESHEETXMLWRITER_H
+#define MONTHLYTIMESHEETXMLWRITER_H
 
-#include <Core/Task.h>
+#include "TimesheetXmlWriter.h"
 
-#include "Timesheet.h"
-
-class QUrl;
-
-class MonthlyTimeSheetReport : public TimeSheetReport
+class MonthlyTimesheetXmlWriter : public TimesheetXmlWriter
 {
-    Q_OBJECT
-
 public:
-    explicit MonthlyTimeSheetReport(QWidget *parent = nullptr);
-    ~MonthlyTimeSheetReport() override;
+    MonthlyTimesheetXmlWriter();
 
-    void setReportProperties(const QDate &start, const QDate &end, TaskId rootTask,
-                             bool activeTasksOnly) override;
+    void setYearOfMonth(int yearOfMonth);
+    void setMonthNumber(int monthNumber);
+    void setNumberOfWeeks(int numberOfWeeks);
 
-private Q_SLOTS:
-    void slotLinkClicked(const QUrl &which);
-
-private:
-    QString suggestedFileName() const override;
-    void update() override;
-    QByteArray saveToText() override;
-    QByteArray saveToXml(SaveToXmlMode mode) override;
+protected:
+    void writeMetadata(QDomDocument &document, QDomElement &metadata) const override;
+    QList<TimeSheetInfo> createTimeSheetInfo() const override;
 
 private:
-    // properties of the report:
-    int m_numberOfWeeks = 0;
-    int m_monthNumber = 0;
     int m_yearOfMonth = 0;
-    QString m_weeklyhours;
-    float m_dailyhours;
+    int m_monthNumber = 0;
+    int m_numberOfWeeks = 0;
 };
 
 #endif

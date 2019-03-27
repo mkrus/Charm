@@ -471,6 +471,38 @@ QByteArray WeeklyTimeSheetReport::saveToXml(SaveToXmlMode mode)
     return QByteArray();
 }
 
+QByteArray WeeklyTimeSheetReport::saveToText()
+{
+    QByteArray output;
+    QTextStream stream(&output);
+    QString content = tr("Report for %1, Week %2 (%3 to %4)")
+                      .arg(CONFIGURATION.userName)
+                      .arg(m_weekNumber, 2, 10, QLatin1Char('0'))
+                      .arg(startDate().toString(Qt::TextDate))
+                      .arg(endDate().addDays(-1).toString(Qt::TextDate));
+    stream << content << '\n';
+    stream << '\n';
+    TimeSheetInfoList timeSheetInfo = TimeSheetInfo::filteredTaskWithSubTasks(
+        TimeSheetInfo::taskWithSubTasks(DATAMODEL, DaysInWeek, rootTask(), secondsMap()),
+        activeTasksOnly());
+
+    TimeSheetInfo totalsLine(DaysInWeek);
+    if (!timeSheetInfo.isEmpty()) {
+        totalsLine = timeSheetInfo.first();
+        if (rootTask() == 0)
+            timeSheetInfo.removeAt(0);   // there is always one, because there is always the root item
+    }
+
+    for (int i = 0; i < timeSheetInfo.size(); ++i)
+        stream << timeSheetInfo[i].formattedTaskIdAndName(CONFIGURATION.taskPaddingLength)
+               << "\t" << hoursAndMinutes(timeSheetInfo[i].total()) << '\n';
+    stream << '\n';
+    stream << "Week total: " << hoursAndMinutes(totalsLine.total()) << '\n';
+    stream.flush();
+
+    return output;
+}
+
 void WeeklyTimeSheetReport::slotLinkClicked(const QUrl &which)
 {
     QDate start = which.toString()

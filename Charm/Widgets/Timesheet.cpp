@@ -55,6 +55,48 @@ void TimeSheetReport::slotUpdate()
     update();
 }
 
+void TimeSheetReport::slotSaveToXml()
+{
+    // first, ask for a file name:
+    QString filename = getFileName(tr("Charm reports (*.charmreport)"));
+    if (filename.isEmpty())
+        return;
+
+    QFileInfo fileinfo(filename);
+    if (fileinfo.suffix().isEmpty())
+        filename += QLatin1String(".charmreport");
+
+    QByteArray payload = saveToXml(IncludeTaskList);
+    if (payload.isEmpty())
+        return; // Error should have been already displayed by saveToXml()
+
+    QFile file(filename);
+    if (file.open(QIODevice::WriteOnly)) {
+        file.write(payload);
+    } else {
+        QMessageBox::critical(this, tr("Error saving report"),
+                              tr("Cannot write to selected location:\n%1").arg(file.errorString()));
+    }
+}
+
+void TimeSheetReport::slotSaveToText()
+{
+    // first, ask for a file name:
+    const QString filename = getFileName(QStringLiteral("Text files (*.txt)"));
+    if (filename.isEmpty())
+        return;
+
+    QFile file(filename);
+    if (!file.open(QIODevice::WriteOnly)) {
+        QMessageBox::critical(this, tr("Error saving report"),
+                              tr("Cannot write to selected location:\n%1")
+                              .arg(file.errorString()));
+        return;
+    }
+    file.write(saveToText());
+    file.close();
+}
+
 QString TimeSheetReport::getFileName(const QString &filter)
 {
     QSettings settings;

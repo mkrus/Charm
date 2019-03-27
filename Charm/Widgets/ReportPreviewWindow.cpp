@@ -41,6 +41,10 @@ ReportPreviewWindow::ReportPreviewWindow(QWidget *parent)
             this, &ReportPreviewWindow::slotClose);
     connect(m_ui->pushButtonUpdate, &QPushButton::clicked,
             this, &ReportPreviewWindow::slotUpdate);
+    connect(m_ui->pushButtonSave, &QPushButton::clicked,
+            this, &ReportPreviewWindow::slotSaveToXml);
+    connect(m_ui->pushButtonSaveTotals, &QPushButton::clicked,
+            this, &ReportPreviewWindow::slotSaveToText);
     connect(m_ui->textBrowser, &QTextBrowser::anchorClicked,
             this, &ReportPreviewWindow::anchorClicked);
 #ifndef QT_NO_PRINTER
@@ -95,9 +99,27 @@ QDomDocument ReportPreviewWindow::createReportTemplate() const
     return doc;
 }
 
+QPushButton *ReportPreviewWindow::saveToXmlButton() const
+{
+    return m_ui->pushButtonSave;
+}
+
+QPushButton *ReportPreviewWindow::saveToTextButton() const
+{
+    return m_ui->pushButtonSaveTotals;
+}
+
 QPushButton *ReportPreviewWindow::uploadButton() const
 {
     return m_ui->pushButtonUpload;
+}
+
+void ReportPreviewWindow::slotSaveToXml()
+{
+}
+
+void ReportPreviewWindow::slotSaveToText()
+{
 }
 
 void ReportPreviewWindow::slotPrint()
