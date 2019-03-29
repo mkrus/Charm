@@ -26,7 +26,7 @@
 
 #include <map>
 
-#include <QList>
+#include <QVector>
 #include <QString>
 #include <QMetaType>
 #include <QDomElement>
@@ -39,8 +39,8 @@ Q_DECLARE_METATYPE(TaskId)
 class Task;
 /** A task list is a list of tasks that belong together.
     Example: All tasks for one user. */
-typedef QList<Task> TaskList;
-typedef QList<TaskId> TaskIdList;
+typedef QVector<Task> TaskList;
+typedef QVector<TaskId> TaskIdList;
 
 /** A task is a category under which events are filed.
     It has a unique identifier and a name. */
@@ -57,6 +57,10 @@ public:
     bool operator !=(const Task &other) const
     {
         return !operator==(other);
+    }
+    bool operator <(const Task &other) const
+    {
+        return m_id < other.id();
     }
 
     TaskId id() const;

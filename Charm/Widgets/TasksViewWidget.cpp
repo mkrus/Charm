@@ -24,22 +24,23 @@
 #include "TasksViewWidget.h"
 #include "ui_TasksViewWidget.h"
 
-#include "ViewFilter.h"
 #include "ViewHelpers.h"
-#include "ExpandStatesHelper.h"
+#include "TaskFilterProxyModel.h"
 
 #include <QHeaderView>
 
 TasksViewWidget::TasksViewWidget(QWidget *parent) :
     QWidget(parent)
     , m_ui(new Ui::TasksViewWidget())
-    , m_proxy(new ViewFilter(MODEL.charmDataModel()))
 {
     m_ui->setupUi(this);
     setFocusProxy(m_ui->filter);
 
+    m_proxy = new TaskFilterProxyModel(this);
+    m_proxy->setSourceModel(MODEL.charmDataModel()->taskModel());
     m_ui->treeView->setModel(m_proxy);
     m_ui->treeView->header()->hide();
+
     connect(m_ui->treeView->selectionModel(), &QItemSelectionModel::currentChanged,
             this, &TasksViewWidget::slotCurrentItemChanged);
     connect(m_ui->treeView, &QTreeView::doubleClicked,
@@ -47,7 +48,7 @@ TasksViewWidget::TasksViewWidget(QWidget *parent) :
     connect(m_ui->filter, &QLineEdit::textChanged,
             this, &TasksViewWidget::slotFilterTextChanged);
     connect(m_ui->showExpired, &QCheckBox::toggled,
-            this, &TasksViewWidget::slotPrefilteringChanged);
+            this, &TasksViewWidget::slotFilterModeChanged);
     connect(m_ui->filter, &QLineEdit::textChanged,
             this, &TasksViewWidget::slotSelectTask);
 
@@ -109,7 +110,7 @@ void TasksViewWidget::setExpiredVisible(bool visible)
 
 void TasksViewWidget::slotCurrentItemChanged(const QModelIndex &first, const QModelIndex &)
 {
-    const Task task = m_proxy->taskForIndex(first);
+    const Task task = first.data(TaskModel::TaskRole).value<Task>();
     m_selectedTask = task.id();
 
     if (m_selectedTask != 0) {
@@ -144,29 +145,20 @@ void TasksViewWidget::slotFilterTextChanged(const QString &text)
 {
     QString filtertext = text.simplified();
     filtertext.replace(QLatin1Char(' '), QLatin1Char('*'));
-
-    QHash<TaskId, bool> expansionStates;
-    Charm::saveExpandStates(m_ui->treeView, &expansionStates);
     m_proxy->setFilterWildcard(filtertext);
-    if (!filtertext.isEmpty()) {
+    if (!filtertext.isEmpty())
         m_ui->treeView->expandAll();
-    } else {
-        Charm::restoreExpandStates(m_ui->treeView, &expansionStates);
-    }
 }
 
-void TasksViewWidget::slotPrefilteringChanged()
+void TasksViewWidget::slotFilterModeChanged()
 {
     // find out about the selected mode:
     const bool showCurrentOnly = !m_ui->showExpired->isChecked();
-    const auto mode = showCurrentOnly ? Configuration::TaskPrefilter_CurrentOnly
-                                      : Configuration::TaskPrefilter_ShowAll;
+    const auto filter = showCurrentOnly ? TaskFilterProxyModel::FilterMode::Current
+                                        : TaskFilterProxyModel::FilterMode::All;
 
-    CONFIGURATION.taskPrefilteringMode = mode;
     QHash<TaskId, bool> expansionStates;
-    Charm::saveExpandStates(m_ui->treeView, &expansionStates);
-    m_proxy->prefilteringModeChanged();
-    Charm::restoreExpandStates(m_ui->treeView, &expansionStates);
+    m_proxy->setFilterMode(filter);
 }
 
 void TasksViewWidget::slotSelectTask(const QString &filter)

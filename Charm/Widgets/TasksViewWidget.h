@@ -32,7 +32,7 @@ namespace Ui {
 class TasksViewWidget;
 }
 
-class ViewFilter;
+class TaskFilterProxyModel;
 
 class TasksViewWidget : public QWidget
 {
@@ -59,13 +59,13 @@ private Q_SLOTS:
     void slotCurrentItemChanged(const QModelIndex &, const QModelIndex &);
     void slotDoubleClicked(const QModelIndex &);
     void slotFilterTextChanged(const QString &);
-    void slotPrefilteringChanged();
+    void slotFilterModeChanged();
     void slotSelectTask(const QString &);
 
 private:
     QScopedPointer<Ui::TasksViewWidget> m_ui;
-    TaskId m_selectedTask = {};
-    ViewFilter *m_proxy;
+    TaskId m_selectedTask = 0;
+    TaskFilterProxyModel *m_proxy = nullptr;
 };
 
 #endif // TASKSVIEWWIDGET_H

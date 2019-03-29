@@ -14,6 +14,7 @@ SET(
     SqlStorage.cpp
     Event.cpp
     Task.cpp
+    TaskModel.cpp
     State.cpp
     CharmDataModel.cpp
     TaskTreeItem.cpp

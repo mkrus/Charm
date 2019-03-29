@@ -37,6 +37,7 @@
 #include "TaskTreeItem.h"
 #include "CharmDataModelAdapterInterface.h"
 #include "SmartNameCache.h"
+#include "TaskModel.h"
 
 class QAbstractItemModel;
 
@@ -63,6 +64,7 @@ public:
     /** Unregister a CharmDataModelAdapterInterface. */
     void unregisterAdapter(CharmDataModelAdapterInterface *);
 
+    TaskModel *taskModel() const;
     /** Retrieve a task for the given task id.
         If called with Zero as the task id, it will return the
         imaginary root that has all top-levels as it's children.
@@ -175,6 +177,8 @@ private:
     // event update timer:
     QTimer m_timer;
     SmartNameCache m_nameCache;
+
+    TaskModel *m_taskModel = nullptr;
 
 private Q_SLOTS:
     void eventUpdateTimerEvent();

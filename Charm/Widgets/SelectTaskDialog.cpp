@@ -22,7 +22,6 @@
 */
 
 #include "SelectTaskDialog.h"
-#include "ExpandStatesHelper.h"
 #include "GUIState.h"
 #include "ViewHelpers.h"
 
@@ -82,7 +81,6 @@ void SelectTaskDialog::slotResetState()
 void SelectTaskDialog::slotTaskSelected(TaskId id)
 {
     m_ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(isValid(id));
-
 }
 
 void SelectTaskDialog::slotTaskDoubleClicked(TaskId id)

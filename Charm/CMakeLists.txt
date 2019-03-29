@@ -8,8 +8,7 @@ SET(
     EventModelFilter.cpp
     GUIState.cpp
     ModelConnector.cpp
-    ViewFilter.cpp
-    TaskModelAdapter.cpp
+    TaskFilterProxyModel.cpp
     ViewHelpers.cpp
     WeeklySummary.cpp
     Commands/CommandRelayCommand.cpp
@@ -41,7 +40,6 @@ SET(
     Widgets/EventEditor.cpp
     Widgets/EventEditorDelegate.cpp
     Widgets/EventView.cpp
-    Widgets/ExpandStatesHelper.cpp
     Widgets/HttpJobProgressDialog.cpp
     Widgets/IdleCorrectionDialog.cpp
     Widgets/MonthlyTimesheet.cpp

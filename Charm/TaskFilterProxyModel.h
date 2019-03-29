@@ -28,40 +28,36 @@
 #include <QSortFilterProxyModel>
 
 #include "Core/Configuration.h"
-#include "TaskModelAdapter.h"
-#include "Core/TaskModelInterface.h"
+#include "Core/Task.h"
 
 class CharmDataModel;
 class CharmCommand;
 
 // ViewFilter is implemented as a decorator to avoid accidental direct
 // access to the task model with indexes of the proxy
-class ViewFilter : public QSortFilterProxyModel, public TaskModelInterface
+class TaskFilterProxyModel : public QSortFilterProxyModel
 {
     Q_OBJECT
+
 public:
-    explicit ViewFilter(CharmDataModel *, QObject *parent = nullptr);
-    ~ViewFilter() override;
+    enum class FilterMode {
+        All,
+        Current
+    };
 
-    // implement TaskModelInterface
-    Task taskForIndex(const QModelIndex &) const override;
-    QModelIndex indexForTaskId(TaskId) const override;
-    bool taskIsActive(const Task &task) const override;
-    bool taskHasChildren(const Task &task) const override;
+public:
+    explicit TaskFilterProxyModel(QObject *parent = nullptr);
+    ~TaskFilterProxyModel() override;
 
-    // filter for subscriptions:
-    void prefilteringModeChanged();
+    void setFilterMode(FilterMode filter);
 
-    bool taskIdExists(TaskId taskId) const override;
     bool filterAcceptsColumn(int source_column, const QModelIndex &source_parent) const override;
     bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
 
-Q_SIGNALS:
-    void eventActivationNotice(EventId id) override;
-    void eventDeactivationNotice(EventId id) override;
+    QModelIndex indexForTaskId(TaskId id) const;
 
 private:
-    TaskModelAdapter m_model;
+    FilterMode m_filterMode = FilterMode::Current;
 };
 
 #endif

@@ -24,12 +24,12 @@
 #ifndef SELECTTASKDIALOG_H
 #define SELECTTASKDIALOG_H
 
+#include <Core/Task.h>
+
 #include <QDialog>
 #include <QScopedPointer>
 
-#include "ViewFilter.h"
-
-class ViewFilter;
+class TaskFilterProxyModel;
 class CharmDataModel;
 
 namespace Ui {

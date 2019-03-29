@@ -44,6 +44,7 @@
 
 CharmDataModel::CharmDataModel()
     : QObject()
+      , m_taskModel(new TaskModel(this))
 {
     connect(&m_timer, SIGNAL(timeout()), SLOT(eventUpdateTimerEvent()));
 }
@@ -79,8 +80,16 @@ void CharmDataModel::unregisterAdapter(CharmDataModelAdapterInterface *adapter)
     m_adapters.removeAll(adapter);
 }
 
+TaskModel *CharmDataModel::taskModel() const
+{
+    return m_taskModel;
+}
+
 void CharmDataModel::setAllTasks(const TaskList &tasks)
 {
+    if (!tasks.isEmpty())
+        m_taskModel->setTasks(tasks);
+
     clearTasks();
 
     Q_ASSERT(Task::checkForTreeness(tasks));
