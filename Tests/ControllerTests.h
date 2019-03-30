@@ -41,10 +41,6 @@ public Q_SLOTS: // not test cases
 
     void slotDefinedTasks(const TaskList &);
 
-    void slotTaskAdded(const Task &);
-    void slotTaskUpdated(const Task &);
-    void slotTaskDeleted(const Task &);
-
 private Q_SLOTS:
     void initTestCase();
 
@@ -54,7 +50,7 @@ private Q_SLOTS:
 
     void getDefinedTasksTest();
 
-    void addModifyDeleteTaskTest();
+    void addTaskTest();
 
     void toAndFromXmlTest();
 

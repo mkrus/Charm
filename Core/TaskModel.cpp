@@ -24,14 +24,17 @@ void TaskModel::setTasks(const TaskList &tasks)
 
     m_tasks = tasks;
     m_taskMap.clear();
+    m_items.clear();
 
     std::sort(m_tasks.begin(), m_tasks.end());
     const auto bigId = m_tasks.last().id();
+
+    // Copmute how many digits do we need to display all task ids
+    // For example, should return 4 if bigId is 9999.
     m_idPadding = static_cast<int>(ceil(log10(static_cast<double>(bigId))));
 
     // We assume that a task id is always lower than the ids of its children
     // This allow to construct the tree in one pass only
-    m_items.clear();
     m_items.resize(bigId + 1);
     m_taskMap[0] = 0;
 
@@ -46,6 +49,17 @@ void TaskModel::setTasks(const TaskList &tasks)
         item.parent = &parent;
         parent.children.push_back(&item);
     }
+
+    endResetModel();
+}
+
+void TaskModel::clearTasks()
+{
+    beginResetModel();
+
+    m_tasks = {};
+    m_taskMap.clear();
+    m_items.clear();
 
     endResetModel();
 }
@@ -148,6 +162,17 @@ QString TaskModel::fullTaskName(const Task &task) const
         item = item->parent;
     }
     return name;
+}
+
+TaskIdList TaskModel::childrenIds(const Task &task) const
+{
+    auto item = m_items.at(task.id());
+
+    TaskIdList ids;
+    for (auto child : item.children)
+        ids.push_back(child->id);
+
+    return ids;
 }
 
 QModelIndex TaskModel::indexForTreeItem(TreeItem *item) const

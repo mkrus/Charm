@@ -81,9 +81,6 @@ public:
     /** Delete an event. */
     bool deleteEvent(const Event &);
 
-    /** Add a task, and send the result to the view as a signal. */
-    bool addTask(const Task &parent);
-
     /** Set all tasks. Updates the view, after. */
     bool setAllTasks(const TaskList &);
 
@@ -107,15 +104,6 @@ Q_SIGNALS:
 
     /** This sends out the current task list. */
     void definedTasks(const TaskList &);
-
-    /** Add a task. */
-    void taskAdded(const Task &);
-
-    /** Update a task in the view. */
-    void taskUpdated(const Task &);
-
-    /** Delete a task from the view completely. */
-    void taskDeleted(const Task &);
 
     /** This tells the application that the controller is ready to quit.
         When the user quits the application, the application will tell

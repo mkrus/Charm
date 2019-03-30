@@ -49,7 +49,7 @@ class Task
 public:
     Task();
     /** Convenience constructor. */
-    Task(TaskId id, const QString &name, TaskId parent = 0, bool subscribed = false);
+    Task(TaskId id, const QString &name, TaskId parent = 0);
 
     bool isValid() const;
 

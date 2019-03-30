@@ -50,9 +50,6 @@ void connectControllerAndView(Controller *, CharmWindow *);
 int collatorCompare(const QString &left, const QString &right);
 EventIdList eventIdsSortedBy(EventIdList, const SortOrderList &orders);
 EventIdList eventIdsSortedBy(EventIdList, SortOrder order);
-/** Return those ids in the input list that elements of the subtree
- * under the parent task, which includes the parent task. */
-EventIdList filteredBySubtree(EventIdList, TaskId parent, bool exclude = false);
 QString elidedTaskName(const QString &text, const QFont &font, int width);
 QString reportStylesheet(const QPalette &palette);
 }

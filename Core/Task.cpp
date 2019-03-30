@@ -36,7 +36,7 @@ Task::Task()
 {
 }
 
-Task::Task(TaskId id, const QString &name, TaskId parent, bool subscribed)
+Task::Task(TaskId id, const QString &name, TaskId parent)
     : m_id(id)
     , m_parent(parent)
     , m_name(name)

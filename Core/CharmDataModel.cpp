@@ -60,11 +60,10 @@ void CharmDataModel::stateChanged(State previous, State next)
     if (previous == Connected && next == Disconnecting) {
         for (EventId id : m_activeEventIds) {
             const Event &event = findEvent(id);
-            const Task &task = findTask(event.taskId());
+            const Task &task = m_taskModel->taskForId(event.taskId());
             Q_ASSERT(task.isValid());
             endEventRequested(task);
         }
-        setAllTasks(TaskList());
     }
 }
 
@@ -87,30 +86,15 @@ TaskModel *CharmDataModel::taskModel() const
 
 void CharmDataModel::setAllTasks(const TaskList &tasks)
 {
-    if (!tasks.isEmpty())
-        m_taskModel->setTasks(tasks);
-
-    clearTasks();
-
     Q_ASSERT(Task::checkForTreeness(tasks));
     Q_ASSERT(Task::checkForUniqueTaskIds(tasks));
 
-    // fill the tasks into the map to TaskTreeItems
-    for (int i = 0; i < tasks.size(); ++i) {
-        const TaskTreeItem item(tasks[i], &m_rootItem);
-        Q_ASSERT(!taskExists(tasks[i].id()));      // the tasks form a tree and have unique task ids
-        m_tasks[ tasks[i].id() ] = item;
-    }
+    m_nameCache.clearTasks();
 
-    // create parent-child-relationships:
-    for (TaskTreeItem::Map::iterator it = m_tasks.begin(); it != m_tasks.end(); ++it) {
-        const Task &task = it->second.task();
-        TaskTreeItem &parent = parentItem(task);
-        it->second.makeChildOf(parent);
-    }
-
-    // store task id length:
-    determineTaskPaddingLength();
+    if (!tasks.isEmpty())
+        m_taskModel->setTasks(tasks);
+    else
+        m_taskModel->clearTasks();
 
     m_nameCache.setAllTasks(tasks);
 
@@ -121,100 +105,10 @@ void CharmDataModel::setAllTasks(const TaskList &tasks)
     emit resetGUIState();
 }
 
-void CharmDataModel::addTask(const Task &task)
-{
-    Q_ASSERT_X(!taskExists(task.id()), Q_FUNC_INFO,
-               "New tasks need to have a unique task id");
-
-    if (task.isValid() && !taskExists(task.id())) {
-        const TaskTreeItem &parent = taskTreeItem(task.parent());
-
-        for (auto adapter : m_adapters)
-            adapter->taskAboutToBeAdded(parent.task().id(),
-                                        parent.childCount());
-
-        const TaskTreeItem item(task);
-        m_tasks[ task.id() ] = item;
-        m_nameCache.addTask(task);
-
-        // the item in the map has a different address, let's find it:
-        Q_ASSERT(taskExists(task.id()));     // we just put it in
-        const auto it = m_tasks.find(task.id());
-        it->second.makeChildOf(parentItem(task));
-
-        determineTaskPaddingLength();
-//        regenerateSmartNames();
-
-        for (auto adapter : m_adapters)
-            adapter->taskAdded(task.id());
-    } else {
-        qCCritical(CHARM_CORE_LOG) << "CharmDataModel::addTask: duplicate task id"
-                    << task.id() << "ignored. THIS IS A BUG";
-    }
-}
-
-void CharmDataModel::modifyTask(const Task &task)
-{
-    const auto it = m_tasks.find(task.id());
-    Q_ASSERT_X(it != m_tasks.end(), Q_FUNC_INFO,
-               "Task to modify has to exist");
-
-    if (it == m_tasks.end())
-        return;
-    const TaskId oldParentId = it->second.task().parent();
-    const bool parentChanged = task.parent() != oldParentId;
-
-    if (parentChanged) {
-        for (auto adapter : m_adapters)
-            adapter->taskParentChanged(task.id(), oldParentId, task.parent());
-        m_tasks[ task.id() ].makeChildOf(parentItem(task));
-    }
-
-    m_tasks[ task.id() ].task() = task;
-    m_nameCache.modifyTask(task);
-
-    if (parentChanged) {
-        for (auto adapter : m_adapters)
-            adapter->resetTasks();
-    } else {
-        for (auto adapter : m_adapters)
-            adapter->taskModified(task.id());
-    }
-}
-
-void CharmDataModel::deleteTask(const Task &task)
-{
-    Q_ASSERT_X(taskExists(task.id()), Q_FUNC_INFO,
-               "Task to delete has to exist");
-    Q_ASSERT_X(taskTreeItem(task.id()).childCount() == 0,
-               Q_FUNC_INFO,
-               "Cannot delete a task that has children");
-
-    for (auto adapter : m_adapters)
-        adapter->taskAboutToBeDeleted(task.id());
-
-    const auto it = m_tasks.find(task.id());
-    if (it != m_tasks.end()) {
-        TaskTreeItem tmpParent;
-        it->second.makeChildOf(tmpParent);
-        m_tasks.erase(it);
-    }
-
-    m_nameCache.deleteTask(task);
-
-    for (auto adapter : m_adapters)
-        adapter->taskDeleted(task.id());
-}
-
 void CharmDataModel::clearTasks()
 {
-    // to clear the task list, all tasks have first to be changed to be children of the root item:
-    for (TaskTreeItem::Map::iterator it = m_tasks.begin(); it != m_tasks.end(); ++it)
-        it->second.makeChildOf(m_rootItem);
-
-    m_tasks.clear();
     m_nameCache.clearTasks();
-    m_rootItem = TaskTreeItem();
+    m_taskModel->clearTasks();
 
     for (auto adapter : m_adapters)
         adapter->resetTasks();
@@ -228,8 +122,8 @@ void CharmDataModel::setAllEvents(const EventList &events)
         if (!eventExists(events[i].id())) {
             m_events[ events[i].id() ] = events[i];
         } else {
-            qCCritical(CHARM_CORE_LOG) << "CharmDataModel::addTask: duplicate task id"
-                        << m_tasks[i].task().id() << "ignored. THIS IS A BUG";
+            qCCritical(CHARM_CORE_LOG) <<  "CharmDataModel::setAllEvents: event with id "
+                        << events[i].id() << " ignored. THIS IS A BUG";
         }
     }
 
@@ -290,34 +184,19 @@ void CharmDataModel::clearEvents()
         adapter->resetEvents();
 }
 
-const TaskTreeItem &CharmDataModel::taskTreeItem(TaskId id) const
-{
-    if (id <= 0) return m_rootItem;
-
-    const auto it = m_tasks.find(id);
-    if (it == m_tasks.end()) {
-        return m_rootItem;
-    } else {
-        return it->second;
-    }
-}
-
 const Task &CharmDataModel::getTask(TaskId id) const
 {
-    const TaskTreeItem &item = taskTreeItem(id);
-    return item.task();
+    return m_taskModel->taskForId(id);
 }
 
 TaskList CharmDataModel::getAllTasks() const
 {
-    return m_rootItem.children();
+    return m_taskModel->tasks();
 }
 
-Task &CharmDataModel::findTask(TaskId id)
-{   // in this (private) method, the task has to exist
-    const TaskTreeItem::Map::iterator it = m_tasks.find(id);
-    Q_ASSERT(it != m_tasks.end());
-    return it->second.task();
+TaskIdList CharmDataModel::childrenTaskIds(TaskId id) const
+{
+    return m_taskModel->childrenIds(getTask(id));
 }
 
 const Event &CharmDataModel::eventForId(EventId id) const
@@ -365,33 +244,6 @@ bool CharmDataModel::activateEvent(const Event &activeEvent)
         adapter->eventActivated(activeEvent.id());
     m_timer.start(10000);
     return true;
-}
-
-void CharmDataModel::determineTaskPaddingLength()
-{
-    int maxTaskId = 0;
-
-    for (TaskTreeItem::Map::iterator it = m_tasks.begin(); it != m_tasks.end(); ++it)
-        maxTaskId = qMax(maxTaskId, it->second.task().id());
-
-    QString temp;
-    temp.setNum(maxTaskId);
-    CONFIGURATION.taskPaddingLength = temp.length();
-}
-
-TaskTreeItem &CharmDataModel::parentItem(const Task &task)
-{
-    TaskTreeItem &parent = m_tasks[ task.parent() ];
-    if (parent.isValid()) {
-        return parent;
-    } else {
-        return m_rootItem;
-    }
-}
-
-bool CharmDataModel::taskExists(TaskId id)
-{
-    return m_tasks.find(id) != m_tasks.end();
 }
 
 bool CharmDataModel::eventExists(EventId id)
@@ -541,25 +393,11 @@ QString CharmDataModel::eventsString() const
     return eStrList.join(QLatin1Char('\n'));
 }
 
-QString CharmDataModel::taskIdAndFullNameString(TaskId id) const
-{
-    return QStringLiteral("%1 %2")
-           .arg(id, CONFIGURATION.taskPaddingLength, 10, QLatin1Char('0'))
-           .arg(fullTaskName(getTask(id)));
-}
-
 QString CharmDataModel::taskIdAndSmartNameString(TaskId id) const
 {
     return QStringLiteral("%1 %2")
            .arg(id, CONFIGURATION.taskPaddingLength, 10, QLatin1Char('0'))
            .arg(smartTaskName(getTask(id)));
-}
-
-QString CharmDataModel::taskIdAndNameString(TaskId id) const
-{
-    return QStringLiteral("%1 %2")
-           .arg(id, CONFIGURATION.taskPaddingLength, 10, QLatin1Char('0'))
-           .arg(getTask(id).name());
 }
 
 int CharmDataModel::totalDuration() const
@@ -634,23 +472,6 @@ EventIdList CharmDataModel::eventsThatStartInTimeFrame(const QDate &start, const
 EventIdList CharmDataModel::eventsThatStartInTimeFrame(const TimeSpan &timeSpan) const
 {
     return eventsThatStartInTimeFrame(timeSpan.first, timeSpan.second);
-}
-
-bool CharmDataModel::isParentOf(TaskId parent, TaskId id) const
-{
-    Q_ASSERT_X(parent != 0, Q_FUNC_INFO, "parent is invalid (0)");
-
-    if (id == parent) return false;   // a task is not it's own child
-    // get the item, make sure it is valid
-    const TaskTreeItem &item(taskTreeItem(id));
-    Q_ASSERT_X(item.isValid(), Q_FUNC_INFO, "No such task");
-    if (!item.isValid()) return false;
-
-    TaskId parentId = item.task().parent();
-
-    if (parentId == parent) return true;   // found it on the path
-    if (parentId == 0) return false;   // the task has no parent
-    return isParentOf(parent, parentId);
 }
 
 EventIdList CharmDataModel::activeEvents() const

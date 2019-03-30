@@ -96,17 +96,6 @@ bool Controller::deleteEvent(const Event &e)
     }
 }
 
-bool Controller::addTask(const Task &task)
-{
-    if (m_storage->addTask(task)) {
-        emit taskAdded(task);
-        return true;
-    } else {
-        Q_ASSERT(false);   // impossible
-        return false;
-    }
-}
-
 bool Controller::setAllTasks(const TaskList &tasks)
 {
     if (m_storage->setAllTasks(tasks)) {

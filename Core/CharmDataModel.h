@@ -64,17 +64,16 @@ public:
     /** Unregister a CharmDataModelAdapterInterface. */
     void unregisterAdapter(CharmDataModelAdapterInterface *);
 
+    // Tasks
+    // =====
     TaskModel *taskModel() const;
-    /** Retrieve a task for the given task id.
-        If called with Zero as the task id, it will return the
-        imaginary root that has all top-levels as it's children.
-    */
-    const TaskTreeItem &taskTreeItem(TaskId id) const;
     /** Convenience method: retrieve the task directly. */
     const Task &getTask(TaskId id) const;
-    /** Get all tasks as a TaskList.
-        Warning: this might be slow. */
+    /** Get all tasks as a TaskList. */
     TaskList getAllTasks() const;
+    /** Return the list of child ids for a given task. */
+    TaskIdList childrenTaskIds(TaskId id) const;
+
     /** Retrieve an event for the given event id. */
     const Event &eventForId(EventId id) const;
     /** Constant access to the map of events. */
@@ -89,11 +88,6 @@ public:
     const Event &activeEventFor(TaskId id) const;
     EventIdList activeEvents() const;
     int activeEventCount() const;
-    TaskTreeItem &parentItem(const Task &task);   // FIXME const???
-    bool taskExists(TaskId id);
-    /** True if task is in the subtree below parent.
-     * parent is not element of the subtree, and thus not it's own child. */
-    bool isParentOf(TaskId parent, TaskId task) const;
 
     // handling of active events:
     /** Is an event active for the task with this id? */
@@ -122,12 +116,6 @@ public:
     /** Create a "smart" task name (name and shortest path that makes the name unique) from the specified TaskId. */
     QString smartTaskName(const Task &) const;
 
-    /** Get the task id and full name as a single string. */
-    QString taskIdAndFullNameString(TaskId id) const;
-
-    /** Get the task id and name as a single string. */
-    QString taskIdAndNameString(TaskId id) const;
-
     /** Get the task id and smart name as a single string. */
     QString taskIdAndSmartNameString(TaskId id) const;
 
@@ -143,9 +131,6 @@ Q_SIGNALS:
 
 public Q_SLOTS:
     void setAllTasks(const TaskList &tasks);
-    void addTask(const Task &);
-    void modifyTask(const Task &);
-    void deleteTask(const Task &);
     void clearTasks();
 
     void setAllEvents(const EventList &events);
@@ -155,19 +140,14 @@ public Q_SLOTS:
     void clearEvents();
 
 private:
-    void determineTaskPaddingLength();
     bool eventExists(EventId id);
 
-    Task &findTask(TaskId id);
     Event &findEvent(EventId id);
 
     int totalDuration() const;
     QString eventsString() const;
     QString totalDurationString() const;
     void updateToolTip();
-
-    TaskTreeItem::Map m_tasks;
-    TaskTreeItem m_rootItem;
 
     EventMap m_events;
     EventIdList m_activeEventIds;

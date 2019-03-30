@@ -54,7 +54,6 @@ private:
     EventModelFilter *m_model;
     mutable QSize m_cachedSizeHint;
 
-    QString taskName(const TaskTreeItem &item) const;
     QString dateAndDuration(const Event &event) const;
 
     QRect paint(QPainter *, const QStyleOptionViewItem &option, const QString &taskName,

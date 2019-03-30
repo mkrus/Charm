@@ -61,12 +61,6 @@ void ControllerTests::initTestCase()
 //             SLOT(slotCurrentEvents(EventList)) );
     connect(controller, SIGNAL(definedTasks(TaskList)),
             SLOT(slotDefinedTasks(TaskList)));
-    connect(controller, SIGNAL(taskAdded(Task)),
-            SLOT(slotTaskAdded(Task)));
-    connect(controller, SIGNAL(taskUpdated(Task)),
-            SLOT(slotTaskUpdated(Task)));
-    connect(controller, SIGNAL(taskDeleted(Task)),
-            SLOT(slotTaskDeleted(Task)));
 }
 
 void ControllerTests::initializeConnectBackendTest()
@@ -111,39 +105,6 @@ void ControllerTests::slotDefinedTasks(const TaskList &tasks)
     m_taskListReceived = true;
 }
 
-void ControllerTests::slotTaskAdded(const Task &task)
-{
-    m_definedTasks << task;
-}
-
-void ControllerTests::slotTaskUpdated(const Task &task)
-{
-    int i;
-    for (i = 0; i < m_definedTasks.size(); ++i) {
-        if (m_definedTasks[i].id() == task.id()) {
-            m_definedTasks[i] = task;
-            break;
-        }
-    }
-    // it is a failure if we receive the signal for nonexisting tasks
-    QVERIFY(i != m_definedTasks.size());
-}
-
-void ControllerTests::slotTaskDeleted(const Task &task)
-{
-    // task.dump();
-    int i;
-    for (i = 0; i < m_definedTasks.size(); ++i) {
-        if (m_definedTasks[i].id() == task.id()) {
-            m_definedTasks.removeAt(i);
-            return;
-        }
-    }
-    // it is a failure if we receive the signal for nonexisting tasks
-    QVERIFY(i != m_definedTasks.size());   // always true, give more
-                                           // feedback
-}
-
 void ControllerTests::getDefinedTasksTest()
 {
     // get the controller to load the initial task list, which
@@ -160,7 +121,7 @@ void ControllerTests::getDefinedTasksTest()
     m_taskListReceived = false;
 }
 
-void ControllerTests::addModifyDeleteTaskTest()
+void ControllerTests::addTaskTest()
 {
     // make two tasks, add them, and verify the expected results:
     const int Task1Id = 1000;
@@ -176,12 +137,12 @@ void ControllerTests::addModifyDeleteTaskTest()
     task2.setName(Task1Name);
     task2.setParent(task1.id());
     task2.setValidUntil(QDateTime::currentDateTime());
-    m_controller->addTask(task1);
-    // QTest::qWait( 1 ); // only necessary if we do this in threads
+
+    m_controller->setAllTasks({task1, task2});
+
     QVERIFY(m_currentEvents.isEmpty() && m_eventListReceived == false);
-    QVERIFY(m_definedTasks.size() == 1 && m_definedTasks[0] == task1);
-    m_controller->addTask(task2);
     QVERIFY(m_definedTasks.size() == 2);
+
     // both tasks must be in the list, but the order is unspecified:
     int task1Position, task2Position;
     if (m_definedTasks[0].id() == task1.id()) {
@@ -194,8 +155,6 @@ void ControllerTests::addModifyDeleteTaskTest()
     QVERIFY(m_definedTasks[task1Position] == task1);
     QVERIFY(m_definedTasks[task2Position] == task2);
     QVERIFY(m_definedTasks.size() == 2);
-    QVERIFY(m_definedTasks[task1Position] == task1);
-    QVERIFY(m_definedTasks[task2Position] == task2);
 }
 
 void ControllerTests::toAndFromXmlTest()

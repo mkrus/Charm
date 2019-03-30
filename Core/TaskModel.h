@@ -22,6 +22,7 @@ public:
 
     const TaskList &tasks() const;
     void setTasks(const TaskList &tasks);
+    void clearTasks();
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -34,7 +35,9 @@ public:
     Task taskForIndex(const QModelIndex &index) const;
 
     const Task &taskForId(TaskId id) const;
+
     QString fullTaskName(const Task &task) const;
+    TaskIdList childrenIds(const Task &task) const;
 
 private:
     struct TreeItem {
@@ -51,6 +54,7 @@ private:
     QHash<TaskId, int> m_taskMap;
 
     // The first item is the hidden root item
+    // The vector is bigger than the number of tasks, but it allows very fast lookup
     QVector<TreeItem> m_items;
 
     int m_idPadding = 4;

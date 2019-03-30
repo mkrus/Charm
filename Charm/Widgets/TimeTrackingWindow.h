@@ -63,12 +63,6 @@ public:
     QMenu *menu() const;
     // model adapter:
     void resetTasks() override;
-    void taskAboutToBeAdded(TaskId parent, int pos) override;
-    void taskAdded(TaskId id) override;
-    void taskModified(TaskId id) override;
-    void taskParentChanged(TaskId task, TaskId oldParent, TaskId newParent) override;
-    void taskAboutToBeDeleted(TaskId) override;
-    void taskDeleted(TaskId id) override;
     void resetEvents() override;
     void eventAboutToBeAdded(EventId id) override;
     void eventAdded(EventId id) override;

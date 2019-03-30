@@ -39,7 +39,7 @@ private Q_SLOTS:
 
     void initialValuesTest();
 
-    void simpleCreateModifyDeleteTaskTest();
+    void simpleCreateTaskTest();
 
     void biggerCreateModifyDeleteTaskTest();
 

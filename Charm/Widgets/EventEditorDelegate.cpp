@@ -47,12 +47,11 @@ QSize EventEditorDelegate::sizeHint(const QStyleOptionViewItem &option,
     if (!m_cachedSizeHint.isValid()) {
         const Event &event = m_model->eventForIndex(index);
         Q_ASSERT(event.isValid());
-        const TaskTreeItem &item = DATAMODEL->taskTreeItem(event.taskId());
 
         QPixmap pixmap(option.rect.size());   // temp
         QPainter painter(&pixmap);
         m_cachedSizeHint = paint(&painter, option,
-                                 taskName(item),
+                                 DATAMODEL->taskIdAndSmartNameString(event.taskId()),
                                  dateAndDuration(event),
                                  42, EventState_Locked).size();
     }
@@ -64,28 +63,16 @@ void EventEditorDelegate::paint(QPainter *painter, const QStyleOptionViewItem &o
 {
     const Event &event = m_model->eventForIndex(index);
     Q_ASSERT(event.isValid());
-    const TaskTreeItem &item = DATAMODEL->taskTreeItem(event.taskId());
 
     if (event.isValid()) {
         bool locked = DATAMODEL->isEventActive(event.id());
 
         paint(painter, option,
-              taskName(item),
+              DATAMODEL->taskIdAndSmartNameString(event.taskId()),
               dateAndDuration(event),
               logDuration(event.duration()),
               locked ? EventState_Locked : EventState_Default);
     }
-}
-
-QString EventEditorDelegate::taskName(const TaskTreeItem &item) const
-{
-    QString taskName;
-    QTextStream taskStream(&taskName);
-    // print leading zeroes for the TaskId
-    const int taskIdLength = CONFIGURATION.taskPaddingLength;
-    taskStream << QStringLiteral("%1").arg(item.task().id(), taskIdLength, 10, QLatin1Char('0'))
-               << " " << DATAMODEL->smartTaskName(item.task());
-    return taskName;
 }
 
 QString EventEditorDelegate::dateAndDuration(const Event &event) const

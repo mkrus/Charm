@@ -86,12 +86,6 @@ void connectControllerAndModel(Controller *controller, CharmDataModel *model)
                      model, SLOT(setAllEvents(EventList)));
     QObject::connect(controller, SIGNAL(definedTasks(TaskList)),
                      model, SLOT(setAllTasks(TaskList)));
-    QObject::connect(controller, SIGNAL(taskAdded(Task)),
-                     model, SLOT(addTask(Task)));
-    QObject::connect(controller, SIGNAL(taskUpdated(Task)),
-                     model, SLOT(modifyTask(Task)));
-    QObject::connect(controller, SIGNAL(taskDeleted(Task)),
-                     model, SLOT(deleteTask(Task)));
 }
 
 static QString formatDecimal(double d)

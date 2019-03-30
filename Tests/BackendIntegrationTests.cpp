@@ -51,19 +51,18 @@ void BackendIntegrationTests::initialValuesTest()
     QVERIFY(controller()->storage()->getAllTasks().isEmpty());
     QVERIFY(controller()->storage()->getAllEvents().isEmpty());
     // model:
-    QVERIFY(model()->taskTreeItem(0).childCount() == 0);
+    QVERIFY(model()->getAllTasks().size() == 0);
 }
 
-void BackendIntegrationTests::simpleCreateModifyDeleteTaskTest()
+void BackendIntegrationTests::simpleCreateTaskTest()
 {
     Task task1(1000, QStringLiteral("Task 1"));
-    Task task1b(task1);
-    task1b.setName(QStringLiteral("Task 1, modified"));
+    Task task1b(10001, QStringLiteral("Task 1, modified"));
     // add:
-    controller()->addTask(task1);
-    QVERIFY(controller()->storage()->getAllTasks().size() == 1);
+    controller()->setAllTasks({task1, task1b});
+    QVERIFY(controller()->storage()->getAllTasks().size() == 2);
     QVERIFY(controller()->storage()->getAllTasks().first() == task1);
-    QVERIFY(model()->taskTreeItem(task1.id()).task() == task1);
+    QVERIFY(model()->getTask(task1.id()) == task1);
 }
 
 void BackendIntegrationTests::biggerCreateModifyDeleteTaskTest()
@@ -73,17 +72,10 @@ void BackendIntegrationTests::biggerCreateModifyDeleteTaskTest()
     controller()->storage()->deleteAllTasks();
     model()->clearTasks();
     QVERIFY(controller()->storage()->getAllTasks().isEmpty());
-    QVERIFY(model()->taskTreeItem(0).childCount() == 0);
+    QVERIFY(model()->getAllTasks().size() == 0);
 
-    // add one task after the other, and compare the lists in storage
-    // and in the model:
-    TaskList currentTasks;
-    for (int i = 0; i < tasks.size(); ++i) {
-        currentTasks.append(tasks[i]);
-        controller()->addTask(tasks[i]);
-        QVERIFY(contentsEqual(controller()->storage()->getAllTasks(), currentTasks));
-        QVERIFY(contentsEqual(model()->getAllTasks(), currentTasks));
-    }
+    controller()->setAllTasks(tasks);
+    QVERIFY(controller()->storage()->getAllTasks() == tasks);
 }
 
 void BackendIntegrationTests::cleanupTestCase()

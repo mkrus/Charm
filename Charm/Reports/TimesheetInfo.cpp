@@ -61,17 +61,17 @@ TimeSheetInfoList TimeSheetInfo::taskWithSubTasks(const CharmDataModel *dataMode
     TimeSheetInfoList children;
 
     TimeSheetInfo myInformation(segments);
-    const TaskTreeItem &item = dataModel->taskTreeItem(id);
+    const Task &task= dataModel->getTask(id);
     // real task or virtual root item
-    Q_ASSERT(item.task().isValid() || id == 0);
+    Q_ASSERT(task.isValid() || id == 0);
 
     if (id != 0) {
         // add totals for task itself:
         if (secondsMap.contains(id))
             myInformation.seconds = secondsMap.value(id);
         // add name and id:
-        myInformation.taskId = item.task().id();
-        myInformation.taskName = item.task().name();
+        myInformation.taskId = task.id();
+        myInformation.taskName = task.name();
 
         if (addTo != 0)
             myInformation.indentation = addTo->indentation + 1;
@@ -80,7 +80,7 @@ TimeSheetInfoList TimeSheetInfo::taskWithSubTasks(const CharmDataModel *dataMode
         myInformation.indentation = -1;
     }
 
-    TaskIdList childIds = item.childIds();
+    TaskIdList childIds = dataModel->childrenTaskIds(id);
     // sort by task id
     std::sort(childIds.begin(), childIds.end());
     // recursively add those to myself:

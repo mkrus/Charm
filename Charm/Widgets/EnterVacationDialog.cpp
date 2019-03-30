@@ -108,9 +108,6 @@ EnterVacationDialog::EnterVacationDialog(QWidget *parent)
     m_ui->hoursSpinBox->setValue(settings.value(QStringLiteral("workHours"), 8).toInt());
     m_ui->minutesSpinBox->setValue(settings.value(QStringLiteral("workMinutes"), 0).toInt());
     m_selectedTaskId = settings.value(QStringLiteral("selectedTaskId"), -1).toInt();
-    //reset stored ID if task does not exist anymore:
-    if (!DATAMODEL->taskExists(m_selectedTaskId))
-        m_selectedTaskId = -1;
     updateButtonStates();
     updateTaskLabel();
 }
@@ -192,11 +189,10 @@ void EnterVacationDialog::okClicked()
 
 void EnterVacationDialog::updateButtonStates()
 {
-    const bool validTask = DATAMODEL->taskExists(m_selectedTaskId);
     const bool validDates = m_ui->startDate->date() <= m_ui->endDate->date();
     const bool validDuration = m_ui->hoursSpinBox->value() > 0 || m_ui->minutesSpinBox->value() > 0;
     m_ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(
-        validTask && validDates && validDuration);
+        validDates && validDuration);
 }
 
 void EnterVacationDialog::updateTaskLabel()

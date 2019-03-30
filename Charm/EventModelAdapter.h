@@ -53,30 +53,6 @@ public:
     {
     }
 
-    void taskAboutToBeAdded(TaskId, int) override
-    {
-    }
-
-    void taskAdded(TaskId) override
-    {
-    }
-
-    void taskModified(TaskId) override
-    {
-    }
-
-    void taskParentChanged(TaskId, TaskId, TaskId) override
-    {
-    }
-
-    void taskAboutToBeDeleted(TaskId) override
-    {
-    }
-
-    void taskDeleted(TaskId) override
-    {
-    }
-
     void resetEvents() override;
     void eventAboutToBeAdded(EventId id) override;
     void eventAdded(EventId id) override;

@@ -165,34 +165,6 @@ void TimeTrackingWindow::resetTasks()
     slotSelectTasksToShow();
 }
 
-void TimeTrackingWindow::taskAboutToBeAdded(TaskId, int)
-{
-}
-
-void TimeTrackingWindow::taskAdded(TaskId)
-{
-    slotSelectTasksToShow();
-}
-
-void TimeTrackingWindow::taskModified(TaskId)
-{
-    slotSelectTasksToShow();
-}
-
-void TimeTrackingWindow::taskParentChanged(TaskId, TaskId, TaskId)
-{
-    slotSelectTasksToShow();
-}
-
-void TimeTrackingWindow::taskAboutToBeDeleted(TaskId)
-{
-}
-
-void TimeTrackingWindow::taskDeleted(TaskId)
-{
-    slotSelectTasksToShow();
-}
-
 void TimeTrackingWindow::resetEvents()
 {
     slotSelectTasksToShow();
@@ -269,13 +241,13 @@ void TimeTrackingWindow::insertEditMenu()
 
 void TimeTrackingWindow::slotStartEvent(TaskId id)
 {
-    const TaskTreeItem &item = DATAMODEL->taskTreeItem(id);
+    const Task &task = DATAMODEL->getTask(id);
 
-    if (item.task().isCurrentlyValid()) {
-        DATAMODEL->startEventRequested(item.task());
+    if (task.isCurrentlyValid()) {
+        DATAMODEL->startEventRequested(task);
     } else {
         QString nm = DATAMODEL->taskIdAndSmartNameString(id);
-        if (item.task().isValid())
+        if (task.isValid())
             QMessageBox::critical(this, tr("Invalid task"),
                               tr("Task '%1' is no longer valid, so can't be started").arg(nm));
         else if (id > 0)

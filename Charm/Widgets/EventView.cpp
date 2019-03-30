@@ -220,11 +220,10 @@ void EventView::slotNewEvent()
 {
     SelectTaskDialog dialog(this);
     if (dialog.exec()) {
-        const TaskTreeItem &item
-            = MODEL.charmDataModel()->taskTreeItem(dialog.selectedTask());
-        if (item.task().isValid()) {
+        const Task &task = MODEL.charmDataModel()->getTask(dialog.selectedTask());
+        if (task.isValid()) {
             Event e;
-            e.setTaskId(dialog.selectedTask());
+            e.setTaskId(task.id());
             slotEditEvent(e);
         }
     }
@@ -232,9 +231,7 @@ void EventView::slotNewEvent()
 
 void EventView::slotDeleteEvent()
 {
-    const TaskTreeItem &taskTreeItem
-        = MODEL.charmDataModel()->taskTreeItem(m_event.taskId());
-    const QString name = MODEL.charmDataModel()->fullTaskName(taskTreeItem.task());
+    const QString name = MODEL.charmDataModel()->taskIdAndSmartNameString(m_event.taskId());
     const QDate startDate = m_event.startDateTime().date();
     const QTime startTime = m_event.startDateTime().time();
     const QDate endDate = m_event.endDateTime().date();

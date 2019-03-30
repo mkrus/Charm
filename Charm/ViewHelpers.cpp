@@ -130,19 +130,6 @@ EventIdList Charm::eventIdsSortedBy(EventIdList ids, SortOrder order)
     return eventIdsSortedBy(ids, SortOrderList(1) << order);
 }
 
-EventIdList Charm::filteredBySubtree(EventIdList ids, TaskId parent, bool exclude)
-{
-    EventIdList result;
-    bool isParent = false;
-    for (EventId id : ids) {
-        const Event &event = DATAMODEL->eventForId(id);
-        isParent = (parent == event.taskId() || DATAMODEL->isParentOf(parent, event.taskId()));
-        if (isParent != exclude)
-            result << id;
-    }
-    return result;
-}
-
 QString Charm::elidedTaskName(const QString &text, const QFont &font, int width)
 {
     QFontMetrics metrics(font);

@@ -223,8 +223,6 @@ void EventEditor::updateValues(bool all)
 
     m_ui->buttonBox->button(QDialogButtonBox::Ok)
     ->setEnabled(m_event.endDateTime() >= m_event.startDateTime());
-    const TaskTreeItem &taskTreeItem
-        = MODEL.charmDataModel()->taskTreeItem(m_event.taskId());
 
     m_ui->dateEditStart->setDate(m_event.startDateTime().date());
     m_ui->timeEditStart->setTime(m_event.startDateTime().time());
@@ -257,7 +255,7 @@ void EventEditor::updateValues(bool all)
         m_ui->spinBoxMinutes->setValue(durationMinutes);
     }
 
-    QString name = MODEL.charmDataModel()->fullTaskName(taskTreeItem.task());
+    QString name = MODEL.charmDataModel()->taskIdAndSmartNameString(m_event.taskId());
     m_ui->labelTaskName->setText(name);
 
     QString format = m_ui->dateEditStart->displayFormat()
