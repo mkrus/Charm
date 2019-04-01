@@ -35,7 +35,7 @@
 #include "SqlStorage.h"
 #include "Task.h"
 
-#include <QtDebug>
+#include <QDebug>
 
 Controller::Controller(QObject *parent_)
     : QObject(parent_)

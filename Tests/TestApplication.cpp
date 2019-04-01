@@ -31,7 +31,7 @@
 
 #include <QString>
 #include <QFileInfo>
-#include <QtDebug>
+#include <QDebug>
 #include <QDir>
 #include <QTest>
 

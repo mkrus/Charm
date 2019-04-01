@@ -26,7 +26,7 @@
 #include "Configuration.h"
 #include "CharmConstants.h"
 
-#include <QtDebug>
+#include <QDebug>
 #include <QSettings>
 
 #ifdef NDEBUG

@@ -24,7 +24,7 @@
 #include "SqlRaiiTransactor.h"
 #include "CharmExceptions.h"
 
-#include <QtDebug>
+#include <QDebug>
 #include <QSqlDatabase>
 #include <QSqlDriver>
 #include <QSqlError>

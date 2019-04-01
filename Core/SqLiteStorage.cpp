@@ -30,7 +30,7 @@
 #include "Event.h"
 
 #include <QDir>
-#include <QtDebug>
+#include <QDebug>
 #include <QFileInfo>
 #include <QSqlDatabase>
 #include <QSqlQuery>

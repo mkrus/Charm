@@ -31,7 +31,7 @@
 #include "Configuration.h"
 
 #include <QList>
-#include <QtDebug>
+#include <QDebug>
 #include <QDateTime>
 #include <QSettings>
 #include <QStringList>

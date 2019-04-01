@@ -28,8 +28,8 @@
 #include "Core/TaskTreeItem.h"
 #include "Core/CharmDataModel.h"
 
-#include <QtDebug>
 #include <QTest>
+#include <QDebug>
 
 CharmDataModelTests::CharmDataModelTests()
     : QObject()

@@ -24,7 +24,7 @@
 
 #include "TimeSpans.h"
 
-#include <QtDebug>
+#include <QDebug>
 #include <QTime>
 
 TimeSpans::TimeSpans(const QDate &today)

@@ -27,8 +27,8 @@
 #include "Core/Task.h"
 #include "Core/CharmConstants.h"
 
-#include <QtDebug>
 #include <QTest>
+#include <QDebug>
 
 TaskStructureTests::TaskStructureTests()
     : QObject()

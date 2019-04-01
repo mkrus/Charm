@@ -31,8 +31,8 @@
 #include "Core/XmlSerialization.h"
 
 #include <QDateTime>
-#include <QtDebug>
 #include <QTest>
+#include <QDebug>
 
 XmlSerializationTests::XmlSerializationTests()
     : QObject()

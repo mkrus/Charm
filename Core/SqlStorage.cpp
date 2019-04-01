@@ -40,7 +40,7 @@
 #include <QSqlRecord>
 #include <QStringList>
 #include <QTextStream>
-#include <QtDebug>
+#include <QDebug>
 
 // SqlStorage class
 

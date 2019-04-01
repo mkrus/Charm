@@ -24,7 +24,7 @@
 
 #include "TaskTreeItem.h"
 
-#include <QtDebug>
+#include <QDebug>
 
 TaskTreeItem::TaskTreeItem()
 {

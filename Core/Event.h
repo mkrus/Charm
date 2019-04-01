@@ -27,7 +27,7 @@
 #include <map>
 
 #include <QList>
-#include <QtDebug>
+#include <QDebug>
 #include <QDateTime>
 #include <QDomElement>
 #include <QDomDocument>

@@ -27,7 +27,7 @@
 #include "CharmConstants.h"
 #include "CharmExceptions.h"
 
-#include <QtDebug>
+#include <QDebug>
 
 #include <set>
 #include <algorithm>

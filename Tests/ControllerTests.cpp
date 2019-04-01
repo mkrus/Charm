@@ -32,8 +32,8 @@
 
 #include <QDir>
 #include <QFileInfo>
-#include <QtDebug>
 #include <QTest>
+#include <QDebug>
 
 ControllerTests::ControllerTests()
     : QObject()

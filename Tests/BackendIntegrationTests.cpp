@@ -32,7 +32,7 @@
 
 #include <QDir>
 #include <QFileInfo>
-#include <QtDebug>
+#include <QDebug>
 #include <QTest>
 
 BackendIntegrationTests::BackendIntegrationTests()
