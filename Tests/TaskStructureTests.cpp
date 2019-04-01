@@ -29,7 +29,7 @@
 #include "Core/CharmConstants.h"
 
 #include <QtDebug>
-#include <QtTest/QtTest>
+#include <QTest>
 
 TaskStructureTests::TaskStructureTests()
     : QObject()

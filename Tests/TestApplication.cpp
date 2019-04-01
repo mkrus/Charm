@@ -33,7 +33,7 @@
 #include <QFileInfo>
 #include <QtDebug>
 #include <QDir>
-#include <QtTest/QtTest>
+#include <QTest>
 
 const int UserId = 1;
 const int InstallationId = 1;

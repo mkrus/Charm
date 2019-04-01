@@ -24,7 +24,7 @@
 #include "SmartNameCacheTests.h"
 #include "Core/SmartNameCache.h"
 
-#include <QtTest/QtTest>
+#include <QTest>
 
 void SmartNameCacheTests::testCache()
 {

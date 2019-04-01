@@ -25,7 +25,7 @@
 
 #include "Core/SqlRaiiTransactor.h"
 
-#include <QtTest/QtTest>
+#include <QTest>
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlDriver>

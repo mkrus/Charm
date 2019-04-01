@@ -28,7 +28,7 @@
 #include "Core/Task.h"
 
 #include <QDateTime>
-#include <QtTest/QtTest>
+#include <QTest>
 
 EventModelFilterTests::EventModelFilterTests()
     : QObject()

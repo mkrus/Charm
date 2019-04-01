@@ -23,7 +23,7 @@
 
 #include "TimeSpanTests.h"
 #include "Core/TimeSpans.h"
-#include <QtTest/QtTest>
+#include <QTest>
 
 void TimeSpanTests::testTimeSpans()
 {

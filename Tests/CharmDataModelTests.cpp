@@ -29,7 +29,7 @@
 #include "Core/CharmDataModel.h"
 
 #include <QtDebug>
-#include <QtTest/QtTest>
+#include <QTest>
 
 CharmDataModelTests::CharmDataModelTests()
     : QObject()

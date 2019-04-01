@@ -33,7 +33,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QtDebug>
-#include <QtTest/QtTest>
+#include <QTest>
 
 ControllerTests::ControllerTests()
     : QObject()

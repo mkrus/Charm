@@ -24,7 +24,7 @@
 #include "UpdateCheckerTests.h"
 #include "Charm/HttpClient/CheckForUpdatesJob.h"
 
-#include <QtTest/QtTest>
+#include <QTest>
 
 void UpdateCheckerTests::testVersionComparison()
 {

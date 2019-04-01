@@ -25,7 +25,7 @@
 #include "DatesTests.h"
 #include "Core/Dates.h"
 
-#include <QtTest/QtTest>
+#include <QTest>
 
 void DatesTests::testDateByWeekNumberAndWorkDay()
 {

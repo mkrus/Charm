@@ -29,7 +29,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QDateTime>
-#include <QtTest/QtTest>
+#include <QTest>
 
 SqLiteStorageTests::SqLiteStorageTests()
     : QObject()

@@ -32,7 +32,7 @@
 
 #include <QDateTime>
 #include <QtDebug>
-#include <QtTest/QtTest>
+#include <QTest>
 
 XmlSerializationTests::XmlSerializationTests()
     : QObject()
