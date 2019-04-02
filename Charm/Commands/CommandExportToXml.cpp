@@ -31,7 +31,7 @@
 #include <QFile>
 #include <QTextStream>
 
-CommandExportToXml::CommandExportToXml(QString filename, QObject *parent)
+CommandExportToXml::CommandExportToXml(const QString &filename, QObject *parent)
     : CharmCommand(tr("Export to XML"), parent)
     , m_filename(filename)
 {

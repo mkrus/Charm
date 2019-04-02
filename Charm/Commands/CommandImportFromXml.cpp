@@ -28,7 +28,7 @@
 #include <QDomDocument>
 #include <QFile>
 
-CommandImportFromXml::CommandImportFromXml(QString filename, QObject *parent)
+CommandImportFromXml::CommandImportFromXml(const QString &filename, QObject *parent)
     : CharmCommand(tr("Import from XML"), parent)
     , m_filename(filename)
 {
