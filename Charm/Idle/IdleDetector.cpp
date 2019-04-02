@@ -27,18 +27,18 @@
 #include "IdleDetector.h"
 #include "CharmCMake.h"
 #include "MacIdleDetector.h"
+#include "ViewHelpers.h"
 #include "WindowsIdleDetector.h"
 #include "X11IdleDetector.h"
-#include "ViewHelpers.h"
 
 #include "Core/Configuration.h"
 
-#include <QtAlgorithms>
 #include "charm_application_debug.h"
+#include <QtAlgorithms>
 
 IdleDetector::IdleDetector(QObject *parent)
     : QObject(parent)
-    , m_idlenessDuration(CharmIdleTime)   // from CharmCMake.h
+    , m_idlenessDuration(CharmIdleTime) // from CharmCMake.h
 {
 }
 
@@ -107,12 +107,12 @@ void IdleDetector::maybeIdle(IdlePeriod period)
     // merge overlapping idle periods
     IdlePeriods periods(idlePeriods());
     periods << period;
-//     // TEMP (this was used to test the overlapping-idle-period compression below, leave it in
-//     {
-//         IdlePeriod i2( period.first.addSecs( 1 ), period.second.addSecs( 1 ) ); // should be merged
-//         IdlePeriod i3( period.second.addSecs( 2 ), period.second.addSecs( 5 ) ); // should not be merged
-//         periods << i2 << i3;
-//     }
+    //     // TEMP (this was used to test the overlapping-idle-period compression below, leave it in
+    //     {
+    //         IdlePeriod i2( period.first.addSecs( 1 ), period.second.addSecs( 1 ) ); // should be
+    //         merged IdlePeriod i3( period.second.addSecs( 2 ), period.second.addSecs( 5 ) ); //
+    //         should not be merged periods << i2 << i3;
+    //     }
 
     std::sort(periods.begin(), periods.end());
     m_idlePeriods.clear();
@@ -137,7 +137,7 @@ void IdleDetector::maybeIdle(IdlePeriod period)
     // notify application
     if (!idlePeriods().isEmpty()) {
         qCDebug(CHARM_APPLICATION_LOG) << "IdleDetector::maybeIdle: Found idleness";
-        QTimer::singleShot(0, this, [=](){ emit maybeIdle(); });
+        QTimer::singleShot(0, this, [=]() { emit maybeIdle(); });
     }
 }
 

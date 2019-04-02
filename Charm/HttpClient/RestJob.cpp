@@ -31,9 +31,7 @@ RestJob::RestJob(QObject *parent)
 {
 }
 
-RestJob::~RestJob()
-{
-}
+RestJob::~RestJob() {}
 
 QByteArray RestJob::resultData() const
 {
@@ -53,7 +51,7 @@ void RestJob::executeRequest(QNetworkAccessManager *manager)
 
 void RestJob::handleResult()
 {
-    auto reply = qobject_cast<QNetworkReply*>(sender());
+    auto reply = qobject_cast<QNetworkReply *>(sender());
     reply->deleteLater();
 
     if (reply->error() != QNetworkReply::NoError) {

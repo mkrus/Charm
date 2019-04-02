@@ -26,10 +26,10 @@
 
 #include <map>
 
-#include <QList>
 #include <QDateTime>
-#include <QDomElement>
 #include <QDomDocument>
+#include <QDomElement>
+#include <QList>
 
 #include "Task.h"
 
@@ -43,12 +43,9 @@ class Event
 public:
     Event();
 
-    bool operator ==(const Event &other) const;
+    bool operator==(const Event &other) const;
 
-    bool operator !=(const Event &other) const
-    {
-        return !operator==(other);
-    }
+    bool operator!=(const Event &other) const { return !operator==(other); }
 
     EventId id() const;
 

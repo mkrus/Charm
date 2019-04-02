@@ -34,12 +34,14 @@
 #include <QString>
 
 #include "ApplicationCore.h"
-#include "MacApplicationCore.h"
-#include "Core/CharmExceptions.h"
 #include "CharmCMake.h"
+#include "Core/CharmExceptions.h"
+#include "MacApplicationCore.h"
 
-struct StartupOptions {
-    static std::shared_ptr<ApplicationCore> createApplicationCore(TaskId startupTask, bool hideAtStart)
+struct StartupOptions
+{
+    static std::shared_ptr<ApplicationCore> createApplicationCore(TaskId startupTask,
+                                                                  bool hideAtStart)
     {
 #ifdef Q_OS_OSX
         return std::make_shared<MacApplicationCore>(startupTask, hideAtStart);
@@ -95,13 +97,13 @@ int main(int argc, char **argv)
         QApplication app(argc, argv);
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
-        //Now we can use more command line arguments:
-        //charmtimetracker --hide-at-start --start-task 8714
+        // Now we can use more command line arguments:
+        // charmtimetracker --hide-at-start --start-task 8714
         const QCommandLineOption startTaskOption(QLatin1String("start-task"),
                                                  QLatin1String("Start up the task with <task-id>"),
                                                  QLatin1String("task-id"));
-        const QCommandLineOption hideAtStartOption(QLatin1String("hide-at-start"),
-                                                   QLatin1String("Hide Timetracker window at start"));
+        const QCommandLineOption hideAtStartOption(
+            QLatin1String("hide-at-start"), QLatin1String("Hide Timetracker window at start"));
 
         QCommandLineParser parser;
         parser.addHelpOption();
@@ -124,7 +126,8 @@ int main(int argc, char **argv)
             hideAtStart = true;
 #endif
 
-        const std::shared_ptr<ApplicationCore> core(StartupOptions::createApplicationCore(startupTask, hideAtStart));
+        const std::shared_ptr<ApplicationCore> core(
+            StartupOptions::createApplicationCore(startupTask, hideAtStart));
         QObject::connect(&app, &QGuiApplication::commitDataRequest, core.get(),
                          &ApplicationCore::commitData);
         QObject::connect(&app, &QGuiApplication::saveStateRequest, core.get(),
@@ -135,16 +138,19 @@ int main(int argc, char **argv)
         cout << "Charm already running, exiting..." << endl;
         return 0;
     } catch (const CharmException &e) {
-        const QString msg(QObject::tr("An application exception has occurred. Charm will be terminated. The error message was:\n"
-                                      "%1\n"
-                                      "Please report this as a bug at https://quality.kdab.com/browse/CHM.").arg(
-                              e.what()));
+        const QString msg(
+            QObject::tr("An application exception has occurred. Charm will be terminated. The "
+                        "error message was:\n"
+                        "%1\n"
+                        "Please report this as a bug at https://quality.kdab.com/browse/CHM.")
+                .arg(e.what()));
         showCriticalError(msg);
         return 1;
     } catch (...) {
-        const QString msg(QObject::tr("The application terminated with an unexpected exception.\n"
-                                      "No other information is available to debug this problem.\n"
-                                      "Please report this as a bug at https://quality.kdab.com/browse/CHM."));
+        const QString msg(
+            QObject::tr("The application terminated with an unexpected exception.\n"
+                        "No other information is available to debug this problem.\n"
+                        "Please report this as a bug at https://quality.kdab.com/browse/CHM."));
         showCriticalError(msg);
         return 1;
     }

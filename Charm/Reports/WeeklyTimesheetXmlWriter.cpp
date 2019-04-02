@@ -59,6 +59,6 @@ QList<TimeSheetInfo> WeeklyTimesheetXmlWriter::createTimeSheetInfo() const
 {
     static const int DaysInWeek = 7;
     return TimeSheetInfo::filteredTaskWithSubTasks(
-            TimeSheetInfo::taskWithSubTasks(dataModel(), DaysInWeek, rootTask(), SecondsMap()),
-            false);  // here, we don't care about active or not, because we only report on the tasks
+        TimeSheetInfo::taskWithSubTasks(dataModel(), DaysInWeek, rootTask(), SecondsMap()),
+        false); // here, we don't care about active or not, because we only report on the tasks
 }

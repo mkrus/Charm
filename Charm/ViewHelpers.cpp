@@ -24,9 +24,9 @@
 #include "ViewHelpers.h"
 #include "charm_application_debug.h"
 
-#include <QtAlgorithms>
-#include <QFile>
 #include <QCollator>
+#include <QFile>
+#include <QtAlgorithms>
 
 namespace {
 static QCollator collator()
@@ -42,11 +42,11 @@ void Charm::connectControllerAndView(Controller *controller, CharmWindow *view)
 {
     // connect view and controller:
     // make controller process commands send by the view:
-    QObject::connect(view, SIGNAL(emitCommand(CharmCommand*)),
-                     controller, SLOT(executeCommand(CharmCommand*)));
+    QObject::connect(view, SIGNAL(emitCommand(CharmCommand *)), controller,
+                     SLOT(executeCommand(CharmCommand *)));
     // make view receive done commands from the controller:
-    QObject::connect(controller, SIGNAL(commandCompleted(CharmCommand*)),
-                     view, SLOT(commitCommand(CharmCommand*)));
+    QObject::connect(controller, SIGNAL(commandCompleted(CharmCommand *)), view,
+                     SLOT(commitCommand(CharmCommand *)));
 }
 
 class EventSorter
@@ -59,7 +59,7 @@ public:
         Q_ASSERT(!m_orders.isEmpty());
     }
 
-    template<typename T>
+    template <typename T>
     int compare(const T &left, const T &right) const
     {
         if (left < right) {
@@ -133,14 +133,13 @@ EventIdList Charm::eventIdsSortedBy(EventIdList ids, SortOrder order)
 QString Charm::elidedTaskName(const QString &text, const QFont &font, int width)
 {
     QFontMetrics metrics(font);
-    const QString &projectCode
-        = text.section(QLatin1Char(' '), 0, 0, QString::SectionIncludeTrailingSep);
+    const QString &projectCode =
+        text.section(QLatin1Char(' '), 0, 0, QString::SectionIncludeTrailingSep);
     const int projectCodeWidth = metrics.width(projectCode);
     if (width > projectCodeWidth) {
         const QString &taskName = text.section(QLatin1Char(' '), 1);
         const int taskNameWidth = width - projectCodeWidth;
-        const QString &taskNameElided
-            = metrics.elidedText(taskName, Qt::ElideLeft, taskNameWidth);
+        const QString &taskNameElided = metrics.elidedText(taskName, Qt::ElideLeft, taskNameWidth);
         return projectCode + taskNameElided;
     }
 
@@ -162,10 +161,11 @@ QString Charm::reportStylesheet(const QPalette &palette)
         style.replace(QLatin1String("@event_attributes_row_background_color@"),
                       palette.midlight().color().name());
         if (style.isEmpty())
-            qCWarning(CHARM_APPLICATION_LOG) << "reportStylesheet: default style sheet is empty, too bad";
+            qCWarning(CHARM_APPLICATION_LOG)
+                << "reportStylesheet: default style sheet is empty, too bad";
     } else {
-        qCCritical(CHARM_APPLICATION_LOG) << "reportStylesheet: cannot load report style sheet:"
-                    << stylesheet.errorString();
+        qCCritical(CHARM_APPLICATION_LOG)
+            << "reportStylesheet: cannot load report style sheet:" << stylesheet.errorString();
     }
     return style;
 }

@@ -43,17 +43,17 @@
 #include "Core/Event.h"
 #include "Core/TaskTreeItem.h"
 
+#include <QAbstractButton>
 #include <QCloseEvent>
 #include <QComboBox>
 #include <QDateTimeEdit>
 #include <QLabel>
 #include <QListView>
 #include <QMenu>
+#include <QMessageBox>
 #include <QTimer>
 #include <QToolBar>
 #include <QVBoxLayout>
-#include <QMessageBox>
-#include <QAbstractButton>
 
 EventView::EventView(QWidget *parent)
     : QDialog(parent)
@@ -76,19 +76,15 @@ EventView::EventView(QWidget *parent)
 
     m_listView->setAlternatingRowColors(true);
     m_listView->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(m_listView, &QListView::customContextMenuRequested,
-            this, &EventView::slotContextMenuRequested);
-    connect(m_listView, &QListView::doubleClicked,
-            this, &EventView::slotEventDoubleClicked);
-    connect(&m_actionNewEvent, &QAction::triggered,
-            this, &EventView::slotNewEvent);
-    connect(&m_actionEditEvent, SIGNAL(triggered()),
-            SLOT(slotEditEvent()));
-    connect(&m_actionDeleteEvent,  &QAction::triggered,
-             this, &EventView::slotDeleteEvent);
-//     connect( &m_commitTimer, SIGNAL(timeout()),
-//              SLOT(slotCommitTimeout()) );
-//     m_commitTimer.setSingleShot( true );
+    connect(m_listView, &QListView::customContextMenuRequested, this,
+            &EventView::slotContextMenuRequested);
+    connect(m_listView, &QListView::doubleClicked, this, &EventView::slotEventDoubleClicked);
+    connect(&m_actionNewEvent, &QAction::triggered, this, &EventView::slotNewEvent);
+    connect(&m_actionEditEvent, SIGNAL(triggered()), SLOT(slotEditEvent()));
+    connect(&m_actionDeleteEvent, &QAction::triggered, this, &EventView::slotDeleteEvent);
+    //     connect( &m_commitTimer, SIGNAL(timeout()),
+    //              SLOT(slotCommitTimeout()) );
+    //     m_commitTimer.setSingleShot( true );
 
     m_actionNewEvent.setText(tr("New Event..."));
     m_actionNewEvent.setToolTip(tr("Create a new Event"));
@@ -120,13 +116,12 @@ EventView::EventView(QWidget *parent)
 
     // disable all actions, action state will be set when the current
     // item changes:
-    m_actionNewEvent.setEnabled(true);   // always on
+    m_actionNewEvent.setEnabled(true); // always on
     m_actionEditEvent.setEnabled(false);
     m_actionDeleteEvent.setEnabled(false);
 
     m_toolBar->addWidget(m_comboBox);
-    connect(m_comboBox, SIGNAL(currentIndexChanged(int)),
-            SLOT(timeFrameChanged(int)));
+    connect(m_comboBox, SIGNAL(currentIndexChanged(int)), SLOT(timeFrameChanged(int)));
 
     auto spacer = new QWidget(this);
     QSizePolicy spacerSizePolicy = spacer->sizePolicy();
@@ -142,15 +137,13 @@ EventView::EventView(QWidget *parent)
     setMinimumHeight(200);
 }
 
-EventView::~EventView()
-{
-}
+EventView::~EventView() {}
 
 void EventView::delayedInitialization()
 {
     timeSpansChanged();
-    connect(ApplicationCore::instance().dateChangeWatcher(), &DateChangeWatcher::dateChanged,
-            this, &EventView::timeSpansChanged);
+    connect(ApplicationCore::instance().dateChangeWatcher(), &DateChangeWatcher::dateChanged, this,
+            &EventView::timeSpansChanged);
 }
 
 void EventView::populateEditMenu(QMenu *menu)
@@ -166,10 +159,7 @@ void EventView::timeSpansChanged()
     // close enough to "ever" for our purposes:
     NamedTimeSpan allEvents = {
         tr("Ever"),
-        TimeSpan(QDate::currentDate().addYears(-200),
-                 QDate::currentDate().addYears(+200)),
-        Range
-    };
+        TimeSpan(QDate::currentDate().addYears(-200), QDate::currentDate().addYears(+200)), Range};
     m_timeSpans << allEvents;
 
     const int currentIndex = m_comboBox->currentIndex();
@@ -198,7 +188,7 @@ void EventView::slotCurrentItemChanged(const QModelIndex &start, const QModelInd
         m_actionDeleteEvent.setEnabled(true);
         m_actionEditEvent.setEnabled(true);
         Event event = m_model->eventForIndex(start);
-        Q_ASSERT(event.isValid());   // index is valid,  so...
+        Q_ASSERT(event.isValid()); // index is valid,  so...
         setCurrentEvent(event);
     }
 
@@ -241,26 +231,23 @@ void EventView::slotDeleteEvent()
 
     if (sameDates) {
         message = tr("<html><b>%1</b>%2: %3 - %4 (Duration: %5)</html>")
-                  .arg(name,
-                       QLocale::system().toString(startDate, QLocale::ShortFormat),
-                       QLocale::system().toString(startTime, QLocale::ShortFormat),
-                       QLocale::system().toString(endTime, QLocale::ShortFormat),
-                       hoursAndMinutes(m_event.duration()));
+                      .arg(name, QLocale::system().toString(startDate, QLocale::ShortFormat),
+                           QLocale::system().toString(startTime, QLocale::ShortFormat),
+                           QLocale::system().toString(endTime, QLocale::ShortFormat),
+                           hoursAndMinutes(m_event.duration()));
     } else {
         message = tr("<html><b>%1</b><table><tr><td>Starting:</td><td>%2 at %3</td></tr>"
-                     "<tr><td>Ending:</td><td>%4 at %5</td></tr><tr><td>Duration:</td><td>%6.</td></tr></html>")
-                  .arg(name,
-                       QLocale::system().toString(startDate, QLocale::ShortFormat),
-                       QLocale::system().toString(startTime, QLocale::ShortFormat),
-                       QLocale::system().toString(endDate, QLocale::ShortFormat),
-                       QLocale::system().toString(endTime, QLocale::ShortFormat),
-                       hoursAndMinutes(m_event.duration()));
+                     "<tr><td>Ending:</td><td>%4 at "
+                     "%5</td></tr><tr><td>Duration:</td><td>%6.</td></tr></html>")
+                      .arg(name, QLocale::system().toString(startDate, QLocale::ShortFormat),
+                           QLocale::system().toString(startTime, QLocale::ShortFormat),
+                           QLocale::system().toString(endDate, QLocale::ShortFormat),
+                           QLocale::system().toString(endTime, QLocale::ShortFormat),
+                           hoursAndMinutes(m_event.duration()));
     }
 
-    QMessageBox mbox(QMessageBox::Question,
-                     tr("Delete Event?"),
-                     message,
-                     QMessageBox::Yes|QMessageBox::Cancel);
+    QMessageBox mbox(QMessageBox::Question, tr("Delete Event?"), message,
+                     QMessageBox::Yes | QMessageBox::Cancel);
     auto buttonYes = mbox.button(QMessageBox::Yes);
     buttonYes->setText(tr("Delete"));
 
@@ -276,8 +263,8 @@ void EventView::slotPreviousEvent()
     const QModelIndex &index = m_model->indexForEvent(m_event);
     Q_ASSERT(index.isValid() && index.row() > 0 && index.row() < m_model->rowCount());
     const QModelIndex &previousIndex = m_model->index(index.row() - 1, 0, QModelIndex());
-    m_listView->selectionModel()->setCurrentIndex
-        (previousIndex, QItemSelectionModel::ClearAndSelect);
+    m_listView->selectionModel()->setCurrentIndex(previousIndex,
+                                                  QItemSelectionModel::ClearAndSelect);
 }
 
 void EventView::slotNextEvent()
@@ -285,8 +272,7 @@ void EventView::slotNextEvent()
     const QModelIndex &index = m_model->indexForEvent(m_event);
     Q_ASSERT(index.isValid() && index.row() >= 0 && index.row() < m_model->rowCount() - 1);
     const QModelIndex &nextIndex = m_model->index(index.row() + 1, 0, QModelIndex());
-    m_listView->selectionModel()->setCurrentIndex
-        (nextIndex, QItemSelectionModel::ClearAndSelect);
+    m_listView->selectionModel()->setCurrentIndex(nextIndex, QItemSelectionModel::ClearAndSelect);
 }
 
 void EventView::slotContextMenuRequested(const QPoint &point)
@@ -320,15 +306,16 @@ void EventView::makeVisibleAndCurrent(const Event &event)
     // get an index for the event, and make it the current index:
     const QModelIndex &index = m_model->indexForEvent(event);
     Q_ASSERT(index.isValid());
-    m_listView->selectionModel()->setCurrentIndex
-        (index, QItemSelectionModel::ClearAndSelect);
+    m_listView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::ClearAndSelect);
 }
 
 void EventView::timeFrameChanged(int index)
 {
     // wait for the next update, in this case:
-    if (m_comboBox->count() == 0) return;
-    if (!m_model) return;
+    if (m_comboBox->count() == 0)
+        return;
+    if (!m_model)
+        return;
     if (index >= 0 && index < m_timeSpans.size()) {
         m_model->setFilterStartDate(m_timeSpans[index].timespan.first);
         m_model->setFilterEndDate(m_timeSpans[index].timespan.second);
@@ -359,7 +346,7 @@ void EventView::slotConfigureUi()
 
     bool active = MODEL.charmDataModel()->isEventActive(m_event.id());
 
-    m_actionNewEvent.setEnabled(true);   // always on
+    m_actionNewEvent.setEnabled(true); // always on
     m_actionEditEvent.setEnabled(m_event.isValid());
     m_actionDeleteEvent.setEnabled(m_event.isValid() && !active);
     // m_ui->frame->setEnabled( ! active );
@@ -374,7 +361,7 @@ void EventView::slotUpdateCurrent()
 }
 
 void EventView::slotUpdateTotal()
-{   // what matching signal does the proxy emit?
+{ // what matching signal does the proxy emit?
     int seconds = m_model->totalDuration();
     if (seconds == 0) {
         m_labelTotal->clear();
@@ -408,11 +395,11 @@ void EventView::stateChanged(State)
     switch (ApplicationCore::instance().state()) {
     case Connecting:
         setModel(&MODEL);
-        connect(MODEL.charmDataModel(), &CharmDataModel::resetGUIState,
-                this, &EventView::restoreGuiState);
+        connect(MODEL.charmDataModel(), &CharmDataModel::resetGUIState, this,
+                &EventView::restoreGuiState);
         break;
     case Connected:
-        //the model is populated when entering Connected, so delay state restore
+        // the model is populated when entering Connected, so delay state restore
         QMetaObject::invokeMethod(this, "restoreGuiState", Qt::QueuedConnection);
         configurationChanged();
         break;
@@ -447,28 +434,20 @@ void EventView::setModel(ModelConnector *connector)
     m_listView->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_listView->setSelectionMode(QAbstractItemView::SingleSelection);
 
-    connect(m_listView->selectionModel(),&QItemSelectionModel::currentChanged,
-            this, &EventView::slotCurrentItemChanged);
+    connect(m_listView->selectionModel(), &QItemSelectionModel::currentChanged, this,
+            &EventView::slotCurrentItemChanged);
 
-    connect(model, &EventModelFilter::eventActivationNotice,
-            this, &EventView::slotEventActivated);
-    connect(model, &EventModelFilter::eventDeactivationNotice,
-            this, &EventView::slotEventDeactivated);
+    connect(model, &EventModelFilter::eventActivationNotice, this, &EventView::slotEventActivated);
+    connect(model, &EventModelFilter::eventDeactivationNotice, this,
+            &EventView::slotEventDeactivated);
 
-    connect(model, &EventModelFilter::dataChanged,
-            this, &EventView::slotUpdateCurrent);
-    connect(model, &EventModelFilter::rowsInserted,
-            this, &EventView::slotUpdateTotal);
-    connect(model, &EventModelFilter::rowsRemoved,
-            this, &EventView::slotUpdateTotal);
-    connect(model, &EventModelFilter::rowsInserted,
-            this, &EventView::slotConfigureUi);
-    connect(model, &EventModelFilter::rowsRemoved,
-            this, &EventView::slotConfigureUi);
-    connect(model, &EventModelFilter::layoutChanged,
-            this, &EventView::slotUpdateCurrent);
-    connect(model, &EventModelFilter::modelReset,
-            this, &EventView::slotUpdateTotal);
+    connect(model, &EventModelFilter::dataChanged, this, &EventView::slotUpdateCurrent);
+    connect(model, &EventModelFilter::rowsInserted, this, &EventView::slotUpdateTotal);
+    connect(model, &EventModelFilter::rowsRemoved, this, &EventView::slotUpdateTotal);
+    connect(model, &EventModelFilter::rowsInserted, this, &EventView::slotConfigureUi);
+    connect(model, &EventModelFilter::rowsRemoved, this, &EventView::slotConfigureUi);
+    connect(model, &EventModelFilter::layoutChanged, this, &EventView::slotUpdateCurrent);
+    connect(model, &EventModelFilter::modelReset, this, &EventView::slotUpdateTotal);
 
     m_model = model;
     // normally, the model is set only once, so this should be no problem:
@@ -479,7 +458,7 @@ void EventView::setModel(ModelConnector *connector)
 
 void EventView::slotEventDoubleClicked(const QModelIndex &index)
 {
-    Q_ASSERT(m_model);   // otherwise, how can we get a doubleclick on an item?
+    Q_ASSERT(m_model); // otherwise, how can we get a doubleclick on an item?
     const Event &event = m_model->eventForIndex(index);
     slotEditEvent(event);
 }
@@ -495,11 +474,9 @@ void EventView::slotEditEvent(const Event &event)
     if (editor.exec()) {
         Event newEvent = editor.eventResult();
         if (!newEvent.isValid()) {
-            auto command
-                = new CommandMakeEvent(newEvent, this);
-            connect(command, &CommandMakeEvent::finishedOk,
-                    this, &EventView::slotEventChangesCompleted,
-                    Qt::QueuedConnection);
+            auto command = new CommandMakeEvent(newEvent, this);
+            connect(command, &CommandMakeEvent::finishedOk, this,
+                    &EventView::slotEventChangesCompleted, Qt::QueuedConnection);
             stageCommand(command);
             return;
         } else {

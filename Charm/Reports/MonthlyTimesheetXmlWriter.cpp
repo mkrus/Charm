@@ -63,5 +63,5 @@ QList<TimeSheetInfo> MonthlyTimesheetXmlWriter::createTimeSheetInfo() const
 {
     return TimeSheetInfo::filteredTaskWithSubTasks(
         TimeSheetInfo::taskWithSubTasks(dataModel(), m_numberOfWeeks, rootTask(), SecondsMap()),
-       false);  // here, we don't care about active or not, because we only report on the tasks
+        false); // here, we don't care about active or not, because we only report on the tasks
 }

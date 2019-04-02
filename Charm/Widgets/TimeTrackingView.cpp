@@ -49,12 +49,12 @@ TimeTrackingView::TimeTrackingView(QWidget *parent)
     m_paintAttributes.initialize(palette());
     for (int i = 0; i < 7; ++i)
         m_shortDayNames[i] = QLocale::system().dayName(i + 1, QLocale::ShortFormat);
-    connect(m_taskSelector, &TimeTrackingTaskSelector::startEvent,
-            this, &TimeTrackingView::startEvent);
-    connect(m_taskSelector, &TimeTrackingTaskSelector::stopEvents,
-            this, &TimeTrackingView::stopEvents);
-    connect(m_taskSelector, &TimeTrackingTaskSelector::updateSummariesPlease,
-            this, &TimeTrackingView::slotUpdateSummaries);
+    connect(m_taskSelector, &TimeTrackingTaskSelector::startEvent, this,
+            &TimeTrackingView::startEvent);
+    connect(m_taskSelector, &TimeTrackingTaskSelector::stopEvents, this,
+            &TimeTrackingView::stopEvents);
+    connect(m_taskSelector, &TimeTrackingTaskSelector::updateSummariesPlease, this,
+            &TimeTrackingView::slotUpdateSummaries);
 
     setFocusProxy(m_taskSelector);
     setFocusPolicy(Qt::StrongFocus);
@@ -85,8 +85,7 @@ QSize TimeTrackingView::sizeHint() const
         // the sizeHint is like the minimum size hint, only it allows
         // for more text in the task name column
         const QFontMetrics narrowFontMetrics = QFontMetrics(m_narrowFont);
-        const QRect textRect
-            = narrowFontMetrics.boundingRect(tr("moremoremoremoremore"));
+        const QRect textRect = narrowFontMetrics.boundingRect(tr("moremoremoremoremore"));
         const int widthHint = minimumSizeHint().width() + textRect.width();
         m_cachedSizeHint = QSize(widthHint, minimumSizeHint().height());
     }
@@ -99,24 +98,19 @@ QSize TimeTrackingView::minimumSizeHint() const
         // the header row, task rows, and totals row are all of the same height
         const QFontMetrics fixedFontMetrics(m_fixedFont);
         const QFontMetrics narrowFontMetrics(m_narrowFont);
-        const QRect totalsColumnFieldRect(
-            fixedFontMetrics.boundingRect(QStringLiteral("100:00"))
-            .adjusted(0, 0, 2 * Margin, 2 * Margin));
+        const QRect totalsColumnFieldRect(fixedFontMetrics.boundingRect(QStringLiteral("100:00"))
+                                              .adjusted(0, 0, 2 * Margin, 2 * Margin));
         const int dayWidth = fixedFontMetrics.width(QStringLiteral("00:00")) + 2 * Margin;
-        const int fieldHeight = qMax(fixedFontMetrics.lineSpacing(),
-                                     narrowFontMetrics.lineSpacing())
-                                + 2 * Margin;
-        const QRect taskColumnFieldRect = narrowFontMetrics.boundingRect(
-            tr("KDABStuffngy"))
-                                          .adjusted(0, 0, 2 * Margin, 2 * Margin);
+        const int fieldHeight =
+            qMax(fixedFontMetrics.lineSpacing(), narrowFontMetrics.lineSpacing()) + 2 * Margin;
+        const QRect taskColumnFieldRect = narrowFontMetrics.boundingRect(tr("KDABStuffngy"))
+                                              .adjusted(0, 0, 2 * Margin, 2 * Margin);
         // the tracking row needs to accommodate the task selector widget
         const QSize taskSelectorSizeHint = m_taskSelector->sizeHint();
         const int trackingRowHeight = qMax(fieldHeight, taskSelectorSizeHint.height() + 2 * Margin);
 
-        const int minimumWidth
-            = totalsColumnFieldRect.width()
-              + 7 * dayWidth
-              + taskColumnFieldRect.width();
+        const int minimumWidth =
+            totalsColumnFieldRect.width() + 7 * dayWidth + taskColumnFieldRect.width();
         const int minimumHeight = (rowCount() - 1) * fieldHeight + trackingRowHeight;
         m_cachedMinimumSizeHint = QSize(minimumWidth, minimumHeight);
         m_cachedTotalsFieldRect = QRect(0, 0, totalsColumnFieldRect.width(), fieldHeight);
@@ -141,16 +135,16 @@ void TimeTrackingView::paintEvent(QPaintEvent *e)
             // get the rectangle of the field that will be drawn
             QRect fieldRect;
             const int y = row * FieldHeight;
-            if (column == columnCount() - 1) {   // totals column
+            if (column == columnCount() - 1) { // totals column
                 fieldRect = QRect(width() - m_cachedTotalsFieldRect.width(), y,
                                   m_cachedTotalsFieldRect.width(), FieldHeight);
-            } else if (column == 0) {   // task column
+            } else if (column == 0) { // task column
                 fieldRect = QRect(0, y, taskColumnWidth(), FieldHeight);
-            } else if (column > 0) {   //  a task
+            } else if (column > 0) { //  a task
                 fieldRect = QRect(width() - m_cachedTotalsFieldRect.width()
-                                  - 8 * m_cachedDayFieldRect.width()
-                                  + column * m_cachedDayFieldRect.width(), y,
-                                  m_cachedDayFieldRect.width(), FieldHeight);
+                                      - 8 * m_cachedDayFieldRect.width()
+                                      + column * m_cachedDayFieldRect.width(),
+                                  y, m_cachedDayFieldRect.width(), FieldHeight);
             }
             // paint the field, if it is in the dirty region
             if (e->rect().contains(fieldRect)) {
@@ -162,9 +156,10 @@ void TimeTrackingView::paintEvent(QPaintEvent *e)
                 } else if (column == 0 && row < rowCount() - 1) {
                     alignment = Qt::AlignLeft | Qt::AlignVCenter;
                 }
-                if (column == 0)    // task column
-                    field.text = elidedText(field.text, field.font, fieldRect.width() - 2*Margin);
-                if (field.storeAsActive) m_activeFieldRects << fieldRect;
+                if (column == 0) // task column
+                    field.text = elidedText(field.text, field.font, fieldRect.width() - 2 * Margin);
+                if (field.storeAsActive)
+                    m_activeFieldRects << fieldRect;
                 const QRect textRect = fieldRect.adjusted(Margin, Margin, -Margin, -Margin);
                 if (field.hasHighlight) {
                     painter.setBrush(field.highlight);
@@ -196,7 +191,7 @@ void TimeTrackingView::paintEvent(QPaintEvent *e)
 void TimeTrackingView::resizeEvent(QResizeEvent *)
 {
     sizeHint(); // make sure cached values are updated
-    m_taskSelector->resize(width() - 2*Margin, m_taskSelector->sizeHint().height());
+    m_taskSelector->resize(width() - 2 * Margin, m_taskSelector->sizeHint().height());
     m_taskSelector->move(Margin, height() - Margin - m_taskSelector->height());
     m_elidedTexts.clear();
 }
@@ -218,7 +213,7 @@ void TimeTrackingView::mousePressEvent(QMouseEvent *event)
 }
 
 void TimeTrackingView::mouseDoubleClickEvent(QMouseEvent *event)
-{   // we rely on the mouse press event that was received before the doubleclick!
+{ // we rely on the mouse press event that was received before the doubleclick!
     // start tracking
     const int position = getSummaryAt(event->pos());
     if (position < 0)
@@ -272,11 +267,10 @@ void TimeTrackingView::data(DataField &field, int column, int row) const
         } else if (column == TotalsColumn) {
             field.text = tr("Total");
         } else {
-            field.text = m_shortDayNames[ column - 1 ];
+            field.text = m_shortDayNames[column - 1];
         }
-        field.background = (Day % 2)
-                           ? m_paintAttributes.headerBrush
-                           : m_paintAttributes.headerEvenDayBrush;
+        field.background =
+            (Day % 2) ? m_paintAttributes.headerBrush : m_paintAttributes.headerEvenDayBrush;
     } else if (row == TotalsRow) {
         field.background = m_paintAttributes.totalsRowBrush;
         if (column == TaskColumn) {
@@ -291,9 +285,8 @@ void TimeTrackingView::data(DataField &field, int column, int row) const
             for (const WeeklySummary &s : m_summaries)
                 total += s.durations[Day];
             field.text = hoursAndMinutes(total);
-            field.background = (Day % 2)
-                               ? m_paintAttributes.totalsRowBrush
-                               : m_paintAttributes.totalsRowEvenDayBrush;
+            field.background = (Day % 2) ? m_paintAttributes.totalsRowBrush
+                                         : m_paintAttributes.totalsRowEvenDayBrush;
         }
     } else if (row == TrackingRow) {
         // we only return one value, the paint method will treat this
@@ -301,8 +294,8 @@ void TimeTrackingView::data(DataField &field, int column, int row) const
         field.background = m_paintAttributes.taskBrushOdd;
         // field.text = tr( " 00:45 2345 KDAB/HR/Project Time Bookkeeping" );
     } else { // a task row
-        field.background = row % 2 ? m_paintAttributes.taskBrushEven
-                           : m_paintAttributes.taskBrushOdd;
+        field.background =
+            row % 2 ? m_paintAttributes.taskBrushEven : m_paintAttributes.taskBrushOdd;
         if (m_summaries.size() > row - 1) {
             const int index = row - 1; // index into summaries
             const bool active = DATAMODEL->isTaskActive(m_summaries[index].task);
@@ -322,12 +315,11 @@ void TimeTrackingView::data(DataField &field, int column, int row) const
                 int duration = m_summaries[index].durations[day];
                 field.text = duration > 0 ? hoursAndMinutes(duration) : QString();
                 // highlight today as well, with the half highlight:
-                if (day == m_dayOfWeek -1) {
+                if (day == m_dayOfWeek - 1) {
                     field.hasHighlight = true;
                     field.storeAsActive = active;
-                    field.highlight
-                        = active ? QBrush(m_paintAttributes.runningTaskColor) : m_paintAttributes.
-                          halfHighlight;
+                    field.highlight = active ? QBrush(m_paintAttributes.runningTaskColor)
+                                             : m_paintAttributes.halfHighlight;
                 }
             }
         }
@@ -425,11 +417,11 @@ bool TimeTrackingView::taskIsValidAndTrackable(int taskId)
     QString expirationDate = QLocale::system().toString(task.validUntil(), QLocale::ShortFormat);
 
     if (!trackable || expired) {
-        QString message = notTrackableAndExpired ? tr(
-            "The task %1 (%2) is not trackable and expired since %3").arg(id, name, expirationDate)
-                          : expired ? tr("The task %1 (%2) is expired since %3").arg(id, name,
-                                                                                     expirationDate)
-                          : tr("The task %1 (%2) is not trackable").arg(id, name);
+        QString message = notTrackableAndExpired
+            ? tr("The task %1 (%2) is not trackable and expired since %3")
+                  .arg(id, name, expirationDate)
+            : expired ? tr("The task %1 (%2) is expired since %3").arg(id, name, expirationDate)
+                      : tr("The task %1 (%2) is not trackable").arg(id, name);
 
         QMessageBox::information(this, tr("Please choose another task"), message);
         return false;

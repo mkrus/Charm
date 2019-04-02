@@ -38,12 +38,7 @@ class IdleCorrectionDialog : public QDialog
     Q_OBJECT
 
 public:
-    enum Result {
-        Idle_NoResult,
-        Idle_Ignore,
-        Idle_EndEvent,
-        Idle_RestartEvent
-    };
+    enum Result { Idle_NoResult, Idle_Ignore, Idle_EndEvent, Idle_RestartEvent };
 
     explicit IdleCorrectionDialog(const IdleDetector::IdlePeriod &idlePeriod,
                                   QWidget *parent = nullptr);

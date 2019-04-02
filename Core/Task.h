@@ -26,12 +26,12 @@
 
 #include <map>
 
-#include <QVector>
-#include <QString>
-#include <QMetaType>
-#include <QDomElement>
-#include <QDomDocument>
 #include <QDateTime>
+#include <QDomDocument>
+#include <QDomElement>
+#include <QMetaType>
+#include <QString>
+#include <QVector>
 
 typedef int TaskId;
 Q_DECLARE_METATYPE(TaskId)
@@ -53,15 +53,9 @@ public:
 
     bool isValid() const;
 
-    bool operator ==(const Task &other) const;
-    bool operator !=(const Task &other) const
-    {
-        return !operator==(other);
-    }
-    bool operator <(const Task &other) const
-    {
-        return m_id < other.id();
-    }
+    bool operator==(const Task &other) const;
+    bool operator!=(const Task &other) const { return !operator==(other); }
+    bool operator<(const Task &other) const { return m_id < other.id(); }
 
     TaskId id() const;
 

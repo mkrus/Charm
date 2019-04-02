@@ -32,9 +32,7 @@ CommandModifyEvent::CommandModifyEvent(const Event &event, QObject *parent)
 {
 }
 
-CommandModifyEvent::~CommandModifyEvent()
-{
-}
+CommandModifyEvent::~CommandModifyEvent() {}
 
 bool CommandModifyEvent::prepare()
 {

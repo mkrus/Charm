@@ -24,9 +24,9 @@
 #ifndef TIMETRACKINGTASKSELECTOR_H
 #define TIMETRACKINGTASKSELECTOR_H
 
-#include <QWidget>
-#include <QVector>
 #include <QDialog>
+#include <QVector>
+#include <QWidget>
 
 #include "Core/Event.h"
 #include "Core/Task.h"

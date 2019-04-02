@@ -49,7 +49,6 @@ namespace Constants {
 const int RootTaskId = 1;
 }
 
-
 // Metadata and QSettings Keys:
 extern const QString MetaKey_MainWindowGeometry;
 extern const QString MetaKey_MainWindowVisible;
@@ -85,8 +84,10 @@ extern const QString FalseString;
 #define CONFIGURATION (Configuration::instance())
 
 // helper functions to persist meta data:
-template<class T> T strToT(const QString &str);
-template<> inline int strToT(const QString &str)
+template <class T>
+T strToT(const QString &str);
+template <>
+inline int strToT(const QString &str)
 {
     bool ok;
     int ret = str.toInt(&ok);
@@ -95,14 +96,18 @@ template<> inline int strToT(const QString &str)
     return ret;
 }
 
-template<> inline bool strToT(const QString &str)
+template <>
+inline bool strToT(const QString &str)
 {
     return str.simplified() == TrueString;
 }
 
-#define INT_CONFIG_TYPE(TYPE) \
-    template<> inline TYPE strToT(const QString &str) \
-    { return static_cast<TYPE>(strToT<int>(str)); }
+#define INT_CONFIG_TYPE(TYPE)                                                                      \
+    template <>                                                                                    \
+    inline TYPE strToT(const QString &str)                                                         \
+    {                                                                                              \
+        return static_cast<TYPE>(strToT<int>(str));                                                \
+    }
 INT_CONFIG_TYPE(Configuration::TimeTrackerFontSize)
 INT_CONFIG_TYPE(Configuration::DurationFormat)
 INT_CONFIG_TYPE(Configuration::TaskPrefilteringMode)

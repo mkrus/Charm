@@ -25,8 +25,8 @@
 #ifndef SQLITESTORAGE_H
 #define SQLITESTORAGE_H
 
-#include <QSqlDatabase>
 #include <QDir>
+#include <QSqlDatabase>
 
 #include "SqlStorage.h"
 

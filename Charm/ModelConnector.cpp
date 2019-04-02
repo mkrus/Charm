@@ -26,12 +26,12 @@
 */
 
 #include "ModelConnector.h"
-#include "ViewHelpers.h"
 #include "Data.h"
+#include "ViewHelpers.h"
 #include "charm_application_debug.h"
 
-#include "Commands/CommandModifyEvent.h"
 #include "Commands/CommandMakeAndActivateEvent.h"
+#include "Commands/CommandModifyEvent.h"
 
 ModelConnector::ModelConnector()
     : QObject()
@@ -39,12 +39,11 @@ ModelConnector::ModelConnector()
     , m_eventModelFilter(&m_dataModel)
     , m_findEventModelFilter(&m_dataModel)
 {
-    connect(&m_dataModel, &CharmDataModel::makeAndActivateEvent,
-            this, &ModelConnector::slotMakeAndActivateEvent);
-    connect(&m_dataModel, &CharmDataModel::requestEventModification,
-            this, &ModelConnector::slotRequestEventModification);
-    connect(&m_dataModel, &CharmDataModel::sysTrayUpdate,
-            this, &ModelConnector::slotSysTrayUpdate);
+    connect(&m_dataModel, &CharmDataModel::makeAndActivateEvent, this,
+            &ModelConnector::slotMakeAndActivateEvent);
+    connect(&m_dataModel, &CharmDataModel::requestEventModification, this,
+            &ModelConnector::slotRequestEventModification);
+    connect(&m_dataModel, &CharmDataModel::sysTrayUpdate, this, &ModelConnector::slotSysTrayUpdate);
 }
 
 CharmDataModel *ModelConnector::charmDataModel()
@@ -65,9 +64,9 @@ EventModelFilter *ModelConnector::findEventModel()
 void ModelConnector::commitCommand(CharmCommand *command)
 {
     if (!command->finalize()) {
-        qCWarning(CHARM_APPLICATION_LOG) << "CharmDataModel::commitCommand:"
-                   << command->metaObject()->className()
-                   << "command has failed";
+        qCWarning(CHARM_APPLICATION_LOG)
+            << "CharmDataModel::commitCommand:" << command->metaObject()->className()
+            << "command has failed";
     }
 }
 

@@ -30,21 +30,21 @@
 #include "CharmConstants.h"
 #include "Configuration.h"
 
-#include <QList>
 #include "charm_core_debug.h"
 #include <QDateTime>
+#include <QList>
 #include <QSettings>
 #include <QStringList>
 
 #include <algorithm>
 #include <functional>
 #include <queue>
-#include <unordered_map>
 #include <set>
+#include <unordered_map>
 
 CharmDataModel::CharmDataModel()
     : QObject()
-      , m_taskModel(new TaskModel(this))
+    , m_taskModel(new TaskModel(this))
 {
     connect(&m_timer, SIGNAL(timeout()), SLOT(eventUpdateTimerEvent()));
 }
@@ -120,10 +120,10 @@ void CharmDataModel::setAllEvents(const EventList &events)
 
     for (int i = 0; i < events.size(); ++i) {
         if (!eventExists(events[i].id())) {
-            m_events[ events[i].id() ] = events[i];
+            m_events[events[i].id()] = events[i];
         } else {
-            qCCritical(CHARM_CORE_LOG) <<  "CharmDataModel::setAllEvents: event with id "
-                        << events[i].id() << " ignored. THIS IS A BUG";
+            qCCritical(CHARM_CORE_LOG) << "CharmDataModel::setAllEvents: event with id "
+                                       << events[i].id() << " ignored. THIS IS A BUG";
         }
     }
 
@@ -133,13 +133,12 @@ void CharmDataModel::setAllEvents(const EventList &events)
 
 void CharmDataModel::addEvent(const Event &event)
 {
-    Q_ASSERT_X(!eventExists(event.id()), Q_FUNC_INFO,
-               "New event must have a unique id");
+    Q_ASSERT_X(!eventExists(event.id()), Q_FUNC_INFO, "New event must have a unique id");
 
     for (auto adapter : m_adapters)
         adapter->eventAboutToBeAdded(event.id());
 
-    m_events[ event.id() ] = event;
+    m_events[event.id()] = event;
 
     for (auto adapter : m_adapters)
         adapter->eventAdded(event.id());
@@ -147,12 +146,11 @@ void CharmDataModel::addEvent(const Event &event)
 
 void CharmDataModel::modifyEvent(const Event &newEvent)
 {
-    Q_ASSERT_X(eventExists(newEvent.id()), Q_FUNC_INFO,
-               "Event to modify has to exist");
+    Q_ASSERT_X(eventExists(newEvent.id()), Q_FUNC_INFO, "Event to modify has to exist");
 
     const Event oldEvent = eventForId(newEvent.id());
 
-    m_events[ newEvent.id() ] = newEvent;
+    m_events[newEvent.id()] = newEvent;
 
     for (auto adapter : m_adapters)
         adapter->eventModified(newEvent.id(), oldEvent);
@@ -160,8 +158,7 @@ void CharmDataModel::modifyEvent(const Event &newEvent)
 
 void CharmDataModel::deleteEvent(const Event &event)
 {
-    Q_ASSERT_X(eventExists(event.id()), Q_FUNC_INFO,
-               "Event to delete has to exist");
+    Q_ASSERT_X(eventExists(event.id()), Q_FUNC_INFO, "Event to delete has to exist");
     Q_ASSERT_X(!m_activeEventIds.contains(event.id()), Q_FUNC_INFO,
                "Cannot delete an active event");
 
@@ -313,7 +310,8 @@ void CharmDataModel::endEventRequested(const Task &task)
 
     emit requestEventModification(event, old);
 
-    if (m_activeEventIds.isEmpty()) m_timer.stop();
+    if (m_activeEventIds.isEmpty())
+        m_timer.stop();
     updateToolTip();
 }
 
@@ -383,11 +381,10 @@ QString CharmDataModel::eventsString() const
         if (event.isValid()) {
             const Task &task = getTask(event.taskId());
             const int taskIdLength = CONFIGURATION.taskPaddingLength;
-            eStrList
-                <<tr("%1 - %2 %3")
-                .arg(hoursAndMinutes(event.duration()))
-                .arg(task.id(), taskIdLength, 10, QLatin1Char('0'))
-                .arg(fullTaskName(task));
+            eStrList << tr("%1 - %2 %3")
+                            .arg(hoursAndMinutes(event.duration()))
+                            .arg(task.id(), taskIdLength, 10, QLatin1Char('0'))
+                            .arg(fullTaskName(task));
         }
     }
     return eStrList.join(QLatin1Char('\n'));
@@ -396,8 +393,8 @@ QString CharmDataModel::eventsString() const
 QString CharmDataModel::taskIdAndSmartNameString(TaskId id) const
 {
     return QStringLiteral("%1 %2")
-           .arg(id, CONFIGURATION.taskPaddingLength, 10, QLatin1Char('0'))
-           .arg(smartTaskName(getTask(id)));
+        .arg(id, CONFIGURATION.taskPaddingLength, 10, QLatin1Char('0'))
+        .arg(smartTaskName(getTask(id)));
 }
 
 int CharmDataModel::totalDuration() const
@@ -429,7 +426,9 @@ void CharmDataModel::updateToolTip()
         break;
     default:
         toolTip = tr("<qt>%1 for %2 active events:<hr>%3</qt>")
-                  .arg(totalDurationString()).arg(numEvents).arg(eventsString());
+                      .arg(totalDurationString())
+                      .arg(numEvents)
+                      .arg(eventsString());
         break;
     }
 
@@ -459,8 +458,7 @@ EventIdList CharmDataModel::eventsThatStartInTimeFrame(const QDate &start, const
     const QDateTime endUTC = QDateTime(end, QTime(0, 0, 0)).toUTC();
     EventIdList events;
     EventMap::const_iterator it;
-    for (it = m_events.begin();
-         it != m_events.end(); ++it) {
+    for (it = m_events.begin(); it != m_events.end(); ++it) {
         const Event &event(it->second);
         if (event.startDateTime(Qt::UTC) >= startUTC && event.startDateTime(Qt::UTC) < endUTC)
             events << event.id();
@@ -481,60 +479,53 @@ EventIdList CharmDataModel::activeEvents() const
 
 TaskIdList CharmDataModel::mostFrequentlyUsedTasks() const
 {
-    std::unordered_map<TaskId, quint32 > mfuMap;
-    const EventMap& events = eventMap();
-    for( auto it : events) {
+    std::unordered_map<TaskId, quint32> mfuMap;
+    const EventMap &events = eventMap();
+    for (auto it : events) {
         mfuMap[it.second.taskId()]++;
     }
 
-    const auto comp = []( quint32 a, quint32 b ){
-        return a > b;
-    };
+    const auto comp = [](quint32 a, quint32 b) { return a > b; };
 
-    std::map<quint32, TaskId, decltype( comp )> mfu( comp );
-    for ( const auto kv : mfuMap ) {
+    std::map<quint32, TaskId, decltype(comp)> mfu(comp);
+    for (const auto kv : mfuMap) {
         mfu[kv.second] = kv.first;
     }
 
     TaskIdList out;
-    out.reserve( static_cast<int>( mfu.size() ) );
-    std::transform( mfu.cbegin(), mfu.cend(), std::inserter( out, out.begin() ),  []( const std::pair<const quint32, TaskId> &in ) {
-        return in.second;
-    });
+    out.reserve(static_cast<int>(mfu.size()));
+    std::transform(mfu.cbegin(), mfu.cend(), std::inserter(out, out.begin()),
+                   [](const std::pair<const quint32, TaskId> &in) { return in.second; });
     return out;
 }
 
 TaskIdList CharmDataModel::mostRecentlyUsedTasks() const
 {
     std::unordered_map<TaskId, QDateTime> mruMap;
-    const EventMap& events = eventMap();
-    for( const auto &it : events ) {
+    const EventMap &events = eventMap();
+    for (const auto &it : events) {
         const TaskId id = it.second.taskId();
-        if ( id == 0 )
+        if (id == 0)
             continue;
         // process use date
         // Note: for a relative order, the UTC time is sufficient and much faster
-        const QDateTime date = it.second.startDateTime( Qt::UTC );
-        const auto old = mruMap.find( id );
-        if ( old != mruMap.cend() ) {
-            mruMap[id]= qMax( old->second, date );
+        const QDateTime date = it.second.startDateTime(Qt::UTC);
+        const auto old = mruMap.find(id);
+        if (old != mruMap.cend()) {
+            mruMap[id] = qMax(old->second, date);
         } else {
-            mruMap[id]= date;
+            mruMap[id] = date;
         }
     }
-    const auto comp = [] ( const QDateTime &a, const QDateTime &b )
-    {
-        return a > b;
-    };
-    std::map<QDateTime, TaskId, decltype( comp )> mru( comp );
-    for ( const auto kv : mruMap ) {
+    const auto comp = [](const QDateTime &a, const QDateTime &b) { return a > b; };
+    std::map<QDateTime, TaskId, decltype(comp)> mru(comp);
+    for (const auto kv : mruMap) {
         mru[kv.second] = kv.first;
     }
     TaskIdList out;
-    out.reserve( static_cast<int>( mru.size() ) );
-    std::transform( mru.cbegin(), mru.cend(), std::inserter( out, out.begin() ),  []( const std::pair<const QDateTime, TaskId> &in ) {
-        return in.second;
-    });
+    out.reserve(static_cast<int>(mru.size()));
+    std::transform(mru.cbegin(), mru.cend(), std::inserter(out, out.begin()),
+                   [](const std::pair<const QDateTime, TaskId> &in) { return in.second; });
     return out;
 }
 
@@ -543,9 +534,8 @@ bool CharmDataModel::operator==(const CharmDataModel &other) const
     // not compared: m_timer, m_adapters
     if (&other == this)
         return true;
-    return getAllTasks() == other.getAllTasks()
-           && m_events == other.m_events
-           && m_activeEventIds == other.m_activeEventIds;
+    return getAllTasks() == other.getAllTasks() && m_events == other.m_events
+        && m_activeEventIds == other.m_activeEventIds;
 }
 
 CharmDataModel *CharmDataModel::clone() const

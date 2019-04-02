@@ -71,9 +71,9 @@ void CharmNewReleaseDialog::slotLaunchBrowser()
 {
     if (!QDesktopServices::openUrl(m_link)) {
         QMessageBox::warning(this, tr("Warning"),
-                             tr(
-                                 "Could not open url: %1 in your browser, please go to the Charm download page manually!").arg(
-                                 m_link.toString()));
+                             tr("Could not open url: %1 in your browser, please go to the Charm "
+                                "download page manually!")
+                                 .arg(m_link.toString()));
     }
     accept();
 }
@@ -92,6 +92,4 @@ void CharmNewReleaseDialog::slotRemindMe()
     reject();
 }
 
-CharmNewReleaseDialog::~CharmNewReleaseDialog()
-{
-}
+CharmNewReleaseDialog::~CharmNewReleaseDialog() {}

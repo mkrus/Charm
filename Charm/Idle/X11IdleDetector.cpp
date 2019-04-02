@@ -39,7 +39,7 @@ X11IdleDetector::X11IdleDetector(QObject *parent)
 
 bool X11IdleDetector::idleCheckPossible()
 {
-    m_connection = xcb_connect(NULL, NULL); //krazy:exclude=null
+    m_connection = xcb_connect(NULL, NULL); // krazy:exclude=null
     m_screen = xcb_setup_roots_iterator(xcb_get_setup(m_connection)).data;
     if (m_screen)
         return true;
@@ -57,7 +57,7 @@ void X11IdleDetector::checkIdleness()
     xcb_screensaver_query_info_cookie_t cookie;
     cookie = xcb_screensaver_query_info(m_connection, m_screen->root);
     xcb_screensaver_query_info_reply_t *info;
-    info = xcb_screensaver_query_info_reply(m_connection, cookie, NULL);    //krazy:exclude=null
+    info = xcb_screensaver_query_info_reply(m_connection, cookie, NULL); // krazy:exclude=null
     const int idleSecs = info->ms_since_user_input / 1000;
     free(info);
 

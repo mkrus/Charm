@@ -73,15 +73,13 @@ public:
 
     CommandEmitterInterface *owner() const;
 
-    //used by UndoCharmCommandWrapper to forward signal firing
-    //forwards to emitExecute/emitRollback/emitRequestSlotEventIdChanged
+    // used by UndoCharmCommandWrapper to forward signal firing
+    // forwards to emitExecute/emitRollback/emitRequestSlotEventIdChanged
     void requestExecute();
     void requestSlotEventIdChanged(int oldId, int newId);
 
-    //notify CharmCommands in a QUndoStack that an event ID has changed
-    virtual void eventIdChanged(int, int)
-    {
-    }
+    // notify CharmCommands in a QUndoStack that an event ID has changed
+    virtual void eventIdChanged(int, int) {}
 
 Q_SIGNALS:
     void emitExecute(CharmCommand *);
@@ -93,7 +91,7 @@ protected:
     void showCritical(const QString &title, const QString &message);
 
 private:
-    CharmCommand(const CharmCommand &);  // disallow copying
+    CharmCommand(const CharmCommand &); // disallow copying
 
     CommandEmitterInterface *m_owner = nullptr;
     const QString m_description;

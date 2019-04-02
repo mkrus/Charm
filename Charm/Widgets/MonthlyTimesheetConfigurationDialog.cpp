@@ -42,27 +42,25 @@ MonthlyTimesheetConfigurationDialog::MonthlyTimesheetConfigurationDialog(QWidget
     setWindowTitle(tr("Monthly Timesheet"));
 
     m_ui->setupUi(this);
-    connect(m_ui->buttonBox, &QDialogButtonBox::accepted,
-            this, &MonthlyTimesheetConfigurationDialog::accept);
-    connect(m_ui->buttonBox, &QDialogButtonBox::rejected,
-            this, &MonthlyTimesheetConfigurationDialog::reject);
+    connect(m_ui->buttonBox, &QDialogButtonBox::accepted, this,
+            &MonthlyTimesheetConfigurationDialog::accept);
+    connect(m_ui->buttonBox, &QDialogButtonBox::rejected, this,
+            &MonthlyTimesheetConfigurationDialog::reject);
 
     connect(m_ui->comboBoxMonth, SIGNAL(currentIndexChanged(int)),
             SLOT(slotMonthComboItemSelected(int)));
     m_ui->comboBoxMonth->setCurrentIndex(1);
 
     slotStandardTimeSpansChanged();
-    connect(ApplicationCore::instance().dateChangeWatcher(), &DateChangeWatcher::dateChanged,
-            this, &MonthlyTimesheetConfigurationDialog::slotStandardTimeSpansChanged);
+    connect(ApplicationCore::instance().dateChangeWatcher(), &DateChangeWatcher::dateChanged, this,
+            &MonthlyTimesheetConfigurationDialog::slotStandardTimeSpansChanged);
 
     // set current month and year:
     m_ui->spinBoxMonth->setValue(QDate::currentDate().month());
     m_ui->spinBoxYear->setValue(QDate::currentDate().year());
 }
 
-MonthlyTimesheetConfigurationDialog::~MonthlyTimesheetConfigurationDialog()
-{
-}
+MonthlyTimesheetConfigurationDialog::~MonthlyTimesheetConfigurationDialog() {}
 
 void MonthlyTimesheetConfigurationDialog::setDefaultMonth(int yearOfMonth, int month)
 {
@@ -75,7 +73,7 @@ void MonthlyTimesheetConfigurationDialog::showReportPreviewDialog()
 {
     QDate start, end;
     int index = m_ui->comboBoxMonth->currentIndex();
-    if (index == m_monthInfo.size() -1) {
+    if (index == m_monthInfo.size() - 1) {
         // manual selection
         start = QDate(m_ui->spinBoxYear->value(), m_ui->spinBoxMonth->value(), 1);
         end = start.addMonths(1);
@@ -92,11 +90,7 @@ void MonthlyTimesheetConfigurationDialog::slotStandardTimeSpansChanged()
 {
     const TimeSpans timeSpans;
     m_monthInfo = timeSpans.last4Months();
-    NamedTimeSpan custom = {
-        tr("Manual Selection"),
-        timeSpans.thisMonth().timespan,
-        Range
-    };
+    NamedTimeSpan custom = {tr("Manual Selection"), timeSpans.thisMonth().timespan, Range};
     m_monthInfo << custom;
     m_ui->comboBoxMonth->clear();
     for (int i = 0; i < m_monthInfo.size(); ++i)
@@ -108,10 +102,11 @@ void MonthlyTimesheetConfigurationDialog::slotStandardTimeSpansChanged()
 void MonthlyTimesheetConfigurationDialog::slotMonthComboItemSelected(int index)
 {
     // wait for the next update, in this case:
-    if (m_ui->comboBoxMonth->count() == 0 || index == -1) return;
+    if (m_ui->comboBoxMonth->count() == 0 || index == -1)
+        return;
     Q_ASSERT(m_ui->comboBoxMonth->count() > index);
 
-    if (index == m_monthInfo.size() - 1) {   // manual selection
+    if (index == m_monthInfo.size() - 1) { // manual selection
         m_ui->groupBox->setEnabled(true);
     } else {
         m_ui->groupBox->setEnabled(false);

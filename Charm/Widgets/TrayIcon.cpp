@@ -31,9 +31,7 @@ TrayIcon::TrayIcon(QObject *parent)
     connect(this, &QSystemTrayIcon::activated, this, &TrayIcon::slotActivated);
 }
 
-TrayIcon::~TrayIcon()
-{
-}
+TrayIcon::~TrayIcon() {}
 
 void TrayIcon::slotActivated(QSystemTrayIcon::ActivationReason reason)
 {

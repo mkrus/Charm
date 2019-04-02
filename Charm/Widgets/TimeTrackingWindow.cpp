@@ -81,20 +81,20 @@ TimeTrackingWindow::TimeTrackingWindow(QWidget *parent)
     setWindowNumber(3);
     setWindowIdentifier(QStringLiteral("window_tracking"));
     setCentralWidget(m_summaryWidget);
-    connect(m_summaryWidget, &TimeTrackingView::startEvent,
-            this, &TimeTrackingWindow::slotStartEvent);
-    connect(m_summaryWidget, &TimeTrackingView::stopEvents,
-            this, &TimeTrackingWindow::slotStopEvent);
-    connect(m_summaryWidget, &TimeTrackingView::taskMenuChanged,
-            this, &TimeTrackingWindow::taskMenuChanged);
-    connect(&m_checkUploadedSheetsTimer, &QTimer::timeout,
-            this, &TimeTrackingWindow::slotCheckUploadedTimesheets);
-    connect(&m_checkCharmReleaseVersionTimer, &QTimer::timeout,
-            this, &TimeTrackingWindow::slotCheckForUpdatesAutomatic);
-    connect(&m_updateUserInfoAndTasksDefinitionsTimer, &QTimer::timeout,
-            this, &TimeTrackingWindow::slotGetUserInfo);
+    connect(m_summaryWidget, &TimeTrackingView::startEvent, this,
+            &TimeTrackingWindow::slotStartEvent);
+    connect(m_summaryWidget, &TimeTrackingView::stopEvents, this,
+            &TimeTrackingWindow::slotStopEvent);
+    connect(m_summaryWidget, &TimeTrackingView::taskMenuChanged, this,
+            &TimeTrackingWindow::taskMenuChanged);
+    connect(&m_checkUploadedSheetsTimer, &QTimer::timeout, this,
+            &TimeTrackingWindow::slotCheckUploadedTimesheets);
+    connect(&m_checkCharmReleaseVersionTimer, &QTimer::timeout, this,
+            &TimeTrackingWindow::slotCheckForUpdatesAutomatic);
+    connect(&m_updateUserInfoAndTasksDefinitionsTimer, &QTimer::timeout, this,
+            &TimeTrackingWindow::slotGetUserInfo);
 
-    //Check every 60 minutes if there are timesheets due
+    // Check every 60 minutes if there are timesheets due
     if (CONFIGURATION.warnUnuploadedTimesheets)
         m_checkUploadedSheetsTimer.start();
     m_checkUploadedSheetsTimer.setInterval(60 * 60 * 1000);
@@ -105,7 +105,7 @@ TimeTrackingWindow::TimeTrackingWindow(QWidget *parent)
         m_checkCharmReleaseVersionTimer.start();
     }
 #endif
-    //Update tasks definitions once every 24h
+    // Update tasks definitions once every 24h
     m_updateUserInfoAndTasksDefinitionsTimer.setInterval(24 * 60 * 60 * 1000);
     QTimer::singleShot(1000, this, SLOT(slotSyncTasksAutomatic()));
     m_updateUserInfoAndTasksDefinitionsTimer.start();
@@ -170,9 +170,7 @@ void TimeTrackingWindow::resetEvents()
     slotSelectTasksToShow();
 }
 
-void TimeTrackingWindow::eventAboutToBeAdded(EventId)
-{
-}
+void TimeTrackingWindow::eventAboutToBeAdded(EventId) {}
 
 void TimeTrackingWindow::eventAdded(EventId)
 {
@@ -184,9 +182,7 @@ void TimeTrackingWindow::eventModified(EventId, Event)
     slotSelectTasksToShow();
 }
 
-void TimeTrackingWindow::eventAboutToBeDeleted(EventId)
-{
-}
+void TimeTrackingWindow::eventAboutToBeDeleted(EventId) {}
 
 void TimeTrackingWindow::eventDeleted(EventId)
 {
@@ -249,11 +245,9 @@ void TimeTrackingWindow::slotStartEvent(TaskId id)
         QString nm = DATAMODEL->taskIdAndSmartNameString(id);
         if (task.isValid())
             QMessageBox::critical(this, tr("Invalid task"),
-                              tr("Task '%1' is no longer valid, so can't be started").arg(nm));
+                                  tr("Task '%1' is no longer valid, so can't be started").arg(nm));
         else if (id > 0)
-            QMessageBox::critical(this, tr("Invalid task"),
-                              tr("Task '%1' does not exist").arg(id));
-
+            QMessageBox::critical(this, tr("Invalid task"), tr("Task '%1' does not exist").arg(id));
     }
     ApplicationCore::instance().updateTaskList();
     uploadStagedTimesheet();
@@ -307,8 +301,8 @@ void TimeTrackingWindow::resetWeeklyTimesheetDialog()
     delete m_weeklyTimesheetDialog;
     m_weeklyTimesheetDialog = new WeeklyTimesheetConfigurationDialog(this);
     m_weeklyTimesheetDialog->setAttribute(Qt::WA_DeleteOnClose);
-    connect(m_weeklyTimesheetDialog, &WeeklyTimesheetConfigurationDialog::finished,
-            this, &TimeTrackingWindow::slotWeeklyTimesheetPreview);
+    connect(m_weeklyTimesheetDialog, &WeeklyTimesheetConfigurationDialog::finished, this,
+            &TimeTrackingWindow::slotWeeklyTimesheetPreview);
 }
 
 void TimeTrackingWindow::slotWeeklyTimesheetReport()
@@ -322,8 +316,8 @@ void TimeTrackingWindow::resetMonthlyTimesheetDialog()
     delete m_monthlyTimesheetDialog;
     m_monthlyTimesheetDialog = new MonthlyTimesheetConfigurationDialog(this);
     m_monthlyTimesheetDialog->setAttribute(Qt::WA_DeleteOnClose);
-    connect(m_monthlyTimesheetDialog, &MonthlyTimesheetConfigurationDialog::finished,
-            this, &TimeTrackingWindow::slotMonthlyTimesheetPreview);
+    connect(m_monthlyTimesheetDialog, &MonthlyTimesheetConfigurationDialog::finished, this,
+            &TimeTrackingWindow::slotMonthlyTimesheetPreview);
 }
 
 void TimeTrackingWindow::slotMonthlyTimesheetReport()
@@ -367,8 +361,7 @@ void TimeTrackingWindow::slotSyncTasks(VerboseMode mode)
         client->setVerbose(false);
     }
 
-    connect(client, &GetProjectCodesJob::finished,
-            this, &TimeTrackingWindow::slotTasksDownloaded);
+    connect(client, &GetProjectCodesJob::finished, this, &TimeTrackingWindow::slotTasksDownloaded);
     client->start();
 }
 
@@ -411,11 +404,9 @@ void TimeTrackingWindow::slotTasksDownloaded(HttpJob *job_)
 
 void TimeTrackingWindow::slotImportTasks()
 {
-    const QString filename = QFileDialog::getOpenFileName(this, tr(
-                                                              "Please Select File"),
-                                                          QLatin1String(""),
-                                                          tr(
-                                                              "Task definitions (*.xml);;All Files (*)"));
+    const QString filename =
+        QFileDialog::getOpenFileName(this, tr("Please Select File"), QLatin1String(""),
+                                     tr("Task definitions (*.xml);;All Files (*)"));
     if (filename.isNull())
         return;
     importTasksFromDeviceOrFile(0, filename);
@@ -427,15 +418,14 @@ void TimeTrackingWindow::slotCheckUploadedTimesheets()
     if (missing.isEmpty())
         return;
     m_checkUploadedSheetsTimer.stop();
-    //The usual case is just one missing week, unless we've been giving Bill a hard time
-    //Perhaps in the future Bill can bug us about more than one report at a time
+    // The usual case is just one missing week, unless we've been giving Bill a hard time
+    // Perhaps in the future Bill can bug us about more than one report at a time
     Q_ASSERT(!missing.begin().value().isEmpty());
     int year = missing.begin().key();
     int week = missing.begin().value().first();
     delete m_billDialog;
     m_billDialog = new BillDialog(this);
-    connect(m_billDialog, &BillDialog::finished,
-            this, &TimeTrackingWindow::slotBillGone);
+    connect(m_billDialog, &BillDialog::finished, this, &TimeTrackingWindow::slotBillGone);
     m_billDialog->setReport(year, week);
     m_billDialog->show();
     m_billDialog->raise();
@@ -476,8 +466,8 @@ void TimeTrackingWindow::slotCheckForUpdatesManual()
 void TimeTrackingWindow::startCheckForUpdates(VerboseMode mode)
 {
     CheckForUpdatesJob *checkForUpdates = new CheckForUpdatesJob(this);
-    connect(checkForUpdates, &CheckForUpdatesJob::finished,
-            this, &TimeTrackingWindow::slotCheckForUpdates);
+    connect(checkForUpdates, &CheckForUpdatesJob::finished, this,
+            &TimeTrackingWindow::slotCheckForUpdates);
     checkForUpdates->setUrl(QUrl(CharmUpdateCheckUrl()));
     if (mode == Verbose)
         checkForUpdates->setVerbose(true);
@@ -534,7 +524,7 @@ void TimeTrackingWindow::handleIdleEvents(IdleDetector *detector, bool restart)
     for (EventId eventId : activeEvents) {
         Event event = DATAMODEL->eventForId(eventId);
         if (event.isValid()) {
-            QDateTime start = period.first;  // initializes a valid QDateTime
+            QDateTime start = period.first; // initializes a valid QDateTime
             event.setEndDateTime(qMax(event.startDateTime(), start));
             Q_ASSERT(event.isValid());
             auto cmd = new CommandModifyEvent(event, this);
@@ -567,13 +557,11 @@ void TimeTrackingWindow::maybeIdle(IdleDetector *detector)
     switch (dialog.result()) {
     case IdleCorrectionDialog::Idle_Ignore:
         break;
-    case IdleCorrectionDialog::Idle_EndEvent:
-    {
+    case IdleCorrectionDialog::Idle_EndEvent: {
         handleIdleEvents(detector, false);
         break;
     }
-    case IdleCorrectionDialog::Idle_RestartEvent:
-    {
+    case IdleCorrectionDialog::Idle_RestartEvent: {
         handleIdleEvents(detector, true);
         break;
     }
@@ -601,8 +589,8 @@ void TimeTrackingWindow::importTasksFromDeviceOrFile(QIODevice *device, const QS
         sendCommand(cmd);
         // At this point the command was finalized and we have a result.
         const bool success = cmd->finalize();
-        const QString detailsText = success ? tr("The task list has been updated.") : tr(
-            "Setting the new tasks failed.");
+        const QString detailsText =
+            success ? tr("The task list has been updated.") : tr("Setting the new tasks failed.");
         const QString title = success ? tr("Tasks Import") : tr("Failure setting new tasks");
         if (verbose) {
             QMessageBox::information(this, title, detailsText);
@@ -625,10 +613,8 @@ void TimeTrackingWindow::importTasksFromDeviceOrFile(QIODevice *device, const QS
     } catch (const CharmException &e) {
         const QString title = tr("Invalid Task Definitions");
         const QString message = e.what().isEmpty()
-                                ? tr(
-            "The selected task definitions are invalid and cannot be imported.")
-                                : tr("There was an error importing the task definitions:<br />%1").
-                                arg(e.what());
+            ? tr("The selected task definitions are invalid and cannot be imported.")
+            : tr("There was an error importing the task definitions:<br />%1").arg(e.what());
         if (verbose) {
             QMessageBox::critical(this, title, message);
         } else {
@@ -722,7 +708,7 @@ void TimeTrackingWindow::slotUserInfoDownloaded(HttpJob *job_)
     // getUserInfo done -> sync task
     slotSyncTasksAutomatic();
 
-    auto job = qobject_cast<RestJob*>(job_);
+    auto job = qobject_cast<RestJob *>(job_);
     Q_ASSERT(job);
     if (job->error() == HttpJob::Canceled)
         return;
@@ -744,8 +730,8 @@ void TimeTrackingWindow::slotUserInfoDownloaded(HttpJob *job_)
         return;
     }
 
-    const auto weeklyHoursValue = doc.object().value(QLatin1String("hrInfo")).toObject().value(QLatin1String(
-                                                                                                   "weeklyHours"));
+    const auto weeklyHoursValue =
+        doc.object().value(QLatin1String("hrInfo")).toObject().value(QLatin1String("weeklyHours"));
     const auto weeklyHours = weeklyHoursValue.isDouble() ? weeklyHoursValue.toDouble() : 40;
 
     QSettings settings;

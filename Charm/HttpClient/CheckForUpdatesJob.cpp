@@ -27,8 +27,8 @@
 #include <QByteArray>
 #include <QDomDocument>
 #include <QNetworkAccessManager>
-#include <QNetworkRequest>
 #include <QNetworkReply>
+#include <QNetworkRequest>
 #include <QStringList>
 
 bool Charm::versionLessThan(const QString &lhs, const QString &rhs)
@@ -53,9 +53,7 @@ CheckForUpdatesJob::CheckForUpdatesJob(QObject *parent)
 {
 }
 
-CheckForUpdatesJob::~CheckForUpdatesJob()
-{
-}
+CheckForUpdatesJob::~CheckForUpdatesJob() {}
 
 void CheckForUpdatesJob::start()
 {
@@ -69,8 +67,8 @@ void CheckForUpdatesJob::start()
 void CheckForUpdatesJob::jobFinished(QNetworkReply *reply)
 {
     if (reply->error()) {
-        const QString errorString = tr("Could not download update information from %1: %2").arg(
-            m_url.toString(), reply->errorString());
+        const QString errorString = tr("Could not download update information from %1: %2")
+                                        .arg(m_url.toString(), reply->errorString());
         m_jobData.errorString = errorString;
         m_jobData.error = reply->error();
     } else {
@@ -99,11 +97,11 @@ void CheckForUpdatesJob::parseXmlData(const QByteArray &data)
     int errorLine = 0;
     int errorColumn = 0;
     if (!document.setContent(&buffer, &errorMessage, &errorLine, &errorColumn)) {
-        m_jobData.errorString = tr("Invalid XML: [%1:%2] %3").arg(QString::number(
-                                                                      errorLine),
-                                                                  QString::number(
-                                                                      errorColumn), errorMessage);
-        m_jobData.error = 999; // this value is just to have an and does not mean anything - error != 0
+        m_jobData.errorString =
+            tr("Invalid XML: [%1:%2] %3")
+                .arg(QString::number(errorLine), QString::number(errorColumn), errorMessage);
+        m_jobData.error =
+            999; // this value is just to have an and does not mean anything - error != 0
         return;
     }
 
@@ -114,7 +112,8 @@ void CheckForUpdatesJob::parseXmlData(const QByteArray &data)
     m_jobData.releaseVersion = releaseVersion;
     QUrl link(linkElement.text());
     m_jobData.link = link;
-    QString releaseInfoLink(linkElement.nextSiblingElement(QStringLiteral("releaseinfolink")).text());
+    QString releaseInfoLink(
+        linkElement.nextSiblingElement(QStringLiteral("releaseinfolink")).text());
     m_jobData.releaseInformationLink = releaseInfoLink;
 }
 

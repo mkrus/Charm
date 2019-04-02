@@ -36,7 +36,8 @@ class QDomElement;
 class CharmDataModel;
 class TimeSheetInfo;
 
-class TimesheetXmlWriter {
+class TimesheetXmlWriter
+{
 public:
     explicit TimesheetXmlWriter(const QString &templateName);
     virtual ~TimesheetXmlWriter();

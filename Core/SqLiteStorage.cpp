@@ -29,8 +29,8 @@
 #include "Configuration.h"
 #include "Event.h"
 
-#include <QDir>
 #include "charm_core_debug.h"
+#include <QDir>
 #include <QFileInfo>
 #include <QSqlDatabase>
 #include <QSqlQuery>
@@ -38,10 +38,8 @@
 #include <cerrno>
 
 // DATABASE STRUCTURE DEFINITION
-static const QString Tables[] = {
-    QStringLiteral("MetaData"), QStringLiteral("Installations"), QStringLiteral("Tasks"),
-    QStringLiteral("Events")
-};
+static const QString Tables[] = {QStringLiteral("MetaData"), QStringLiteral("Installations"),
+                                 QStringLiteral("Tasks"), QStringLiteral("Events")};
 
 static const int NumberOfTables = sizeof Tables / sizeof Tables[0];
 
@@ -52,47 +50,44 @@ struct Field
 };
 
 typedef Field Fields;
-const Field LastField =
-{ QString(), QString()};
+const Field LastField = {QString(), QString()};
 
 static const Fields MetaData_Fields[] = {
-    { QStringLiteral("id"), QStringLiteral("INTEGER PRIMARY KEY") },
-    { QStringLiteral("key"), QStringLiteral("VARCHAR( 128 ) NOT NULL") },
-    { QStringLiteral("value"), QStringLiteral("VARCHAR( 128 )") }, LastField
-};
+    {QStringLiteral("id"), QStringLiteral("INTEGER PRIMARY KEY")},
+    {QStringLiteral("key"), QStringLiteral("VARCHAR( 128 ) NOT NULL")},
+    {QStringLiteral("value"), QStringLiteral("VARCHAR( 128 )")},
+    LastField};
 
 static const Fields Installations_Fields[] = {
-    { QStringLiteral("id"), QStringLiteral("INTEGER PRIMARY KEY") },
-    { QStringLiteral("inst_id"), QStringLiteral("INTEGER") },
-    { QStringLiteral("name"), QStringLiteral("varchar(256)") }, LastField
-};
+    {QStringLiteral("id"), QStringLiteral("INTEGER PRIMARY KEY")},
+    {QStringLiteral("inst_id"), QStringLiteral("INTEGER")},
+    {QStringLiteral("name"), QStringLiteral("varchar(256)")},
+    LastField};
 
-static const Fields Tasks_Fields[] = {
-    { QStringLiteral("id"), QStringLiteral("INTEGER PRIMARY KEY") },
-    { QStringLiteral("task_id"), QStringLiteral("INTEGER UNIQUE") },
-    { QStringLiteral("parent"), QStringLiteral("INTEGER") },
-    { QStringLiteral("validfrom"), QStringLiteral("timestamp") },
-    { QStringLiteral("validuntil"), QStringLiteral("timestamp") },
-    { QStringLiteral("trackable"), QStringLiteral("INTEGER") },
-    { QStringLiteral("comment"), QStringLiteral("varchar(256)")},
-    { QStringLiteral("name"), QStringLiteral("varchar(256)") }, LastField
-};
+static const Fields Tasks_Fields[] = {{QStringLiteral("id"), QStringLiteral("INTEGER PRIMARY KEY")},
+                                      {QStringLiteral("task_id"), QStringLiteral("INTEGER UNIQUE")},
+                                      {QStringLiteral("parent"), QStringLiteral("INTEGER")},
+                                      {QStringLiteral("validfrom"), QStringLiteral("timestamp")},
+                                      {QStringLiteral("validuntil"), QStringLiteral("timestamp")},
+                                      {QStringLiteral("trackable"), QStringLiteral("INTEGER")},
+                                      {QStringLiteral("comment"), QStringLiteral("varchar(256)")},
+                                      {QStringLiteral("name"), QStringLiteral("varchar(256)")},
+                                      LastField};
 
 static const Fields Event_Fields[] = {
-    { QStringLiteral("id"), QStringLiteral("INTEGER PRIMARY KEY") },
-    { QStringLiteral("user_id"), QStringLiteral("INTEGER") },
-    { QStringLiteral("event_id"), QStringLiteral("INTEGER") },
-    { QStringLiteral("installation_id"), QStringLiteral("INTEGER") },
-    { QStringLiteral("report_id"), QStringLiteral("INTEGER NULL") },
-    { QStringLiteral("task"), QStringLiteral("INTEGER") },
-    { QStringLiteral("comment"), QStringLiteral("varchar(256)") },
-    { QStringLiteral("start"), QStringLiteral("date") },
-    { QStringLiteral("end"), QStringLiteral("date") }, LastField
-};
+    {QStringLiteral("id"), QStringLiteral("INTEGER PRIMARY KEY")},
+    {QStringLiteral("user_id"), QStringLiteral("INTEGER")},
+    {QStringLiteral("event_id"), QStringLiteral("INTEGER")},
+    {QStringLiteral("installation_id"), QStringLiteral("INTEGER")},
+    {QStringLiteral("report_id"), QStringLiteral("INTEGER NULL")},
+    {QStringLiteral("task"), QStringLiteral("INTEGER")},
+    {QStringLiteral("comment"), QStringLiteral("varchar(256)")},
+    {QStringLiteral("start"), QStringLiteral("date")},
+    {QStringLiteral("end"), QStringLiteral("date")},
+    LastField};
 
-static const Fields *Database_Fields[NumberOfTables] = {
-    MetaData_Fields, Installations_Fields, Tasks_Fields, Event_Fields
-};
+static const Fields *Database_Fields[NumberOfTables] = {MetaData_Fields, Installations_Fields,
+                                                        Tasks_Fields, Event_Fields};
 
 const QString DatabaseName = QStringLiteral("charm.kdab.com");
 const QString DriverName = QStringLiteral("QSQLITE");
@@ -105,9 +100,7 @@ SqLiteStorage::SqLiteStorage()
         throw CharmException(QObject::tr("QSQLITE driver not available"));
 }
 
-SqLiteStorage::~SqLiteStorage()
-{
-}
+SqLiteStorage::~SqLiteStorage() {}
 
 QString SqLiteStorage::lastInsertRowFunction() const
 {
@@ -121,8 +114,7 @@ QString SqLiteStorage::description() const
 
 bool SqLiteStorage::createDatabaseTables()
 {
-    Q_ASSERT_X(database().open(), Q_FUNC_INFO,
-               "Connection to database must be established first");
+    Q_ASSERT_X(database().open(), Q_FUNC_INFO, "Connection to database must be established first");
 
     bool error = false;
     // create tables:
@@ -133,12 +125,11 @@ bool SqLiteStorage::createDatabaseTables()
 
             stream << "CREATE table  `" << Tables[i] << "` (";
             const Field *field = Database_Fields[i];
-            while (!field->name.isEmpty())
-            {
-                stream << " `" << field->name << "` "
-                       << field->type;
+            while (!field->name.isEmpty()) {
+                stream << " `" << field->name << "` " << field->type;
                 ++field;
-                if (!field->name.isEmpty()) stream << ", ";
+                if (!field->name.isEmpty())
+                    stream << ", ";
             }
             stream << ");";
 
@@ -150,27 +141,27 @@ bool SqLiteStorage::createDatabaseTables()
     }
 
     error = error
-            || !setMetaData(CHARM_DATABASE_VERSION_DESCRIPTOR,
-                            QString().setNum(CHARM_DATABASE_VERSION));
+        || !setMetaData(CHARM_DATABASE_VERSION_DESCRIPTOR,
+                        QString().setNum(CHARM_DATABASE_VERSION));
     return !error;
 }
 
 bool SqLiteStorage::connect(Configuration &configuration)
-{   // make sure the database folder exits:
+{ // make sure the database folder exits:
     configuration.failure = true;
 
-    const QFileInfo fileInfo(configuration.localStorageDatabase);   // this is the full path
+    const QFileInfo fileInfo(configuration.localStorageDatabase); // this is the full path
 
     // make sure the path exists, file will be created by sqlite
     if (!QDir().mkpath(fileInfo.absolutePath())) {
-        configuration.failureMessage = QObject::tr("Cannot make database directory: %1").arg(qt_error_string(
-                                                                                                 errno));
+        configuration.failureMessage =
+            QObject::tr("Cannot make database directory: %1").arg(qt_error_string(errno));
         return false;
     }
 
     if (!QDir(fileInfo.absolutePath()).exists()) {
-        configuration.failureMessage
-            = QObject::tr("I made a directory, but it is not there. Weird.");
+        configuration.failureMessage =
+            QObject::tr("I made a directory, but it is not there. Weird.");
         return false;
     }
 
@@ -182,26 +173,26 @@ bool SqLiteStorage::connect(Configuration &configuration)
 
     if (!fileInfo.exists() && !configuration.newDatabase) {
         error = true;
-        configuration.failureMessage = QObject::tr(
-            "<html><head><meta name=\"qrichtext\" content=\"1\" /></head>"
-            "<body><p>The configuration seems to be valid, but the database "
-            "file does not exist.</p>"
-            "<p>The file will automatically be generated. Please verify "
-            "the configuration.</p>"
-            "<p>If the configuration is correct, just close the dialog.</p>"
-            "</body></html>");
+        configuration.failureMessage =
+            QObject::tr("<html><head><meta name=\"qrichtext\" content=\"1\" /></head>"
+                        "<body><p>The configuration seems to be valid, but the database "
+                        "file does not exist.</p>"
+                        "<p>The file will automatically be generated. Please verify "
+                        "the configuration.</p>"
+                        "<p>If the configuration is correct, just close the dialog.</p>"
+                        "</body></html>");
     }
 
     if (!m_database.open()) {
-        configuration.failureMessage = QObject::tr("Could not open SQLite database %1").arg(
-            databaseName);
+        configuration.failureMessage =
+            QObject::tr("Could not open SQLite database %1").arg(databaseName);
         return false;
     }
 
     if (!verifyDatabase()) {
         if (!createDatabase(configuration)) {
-            configuration.failureMessage = QObject::tr(
-                "SqLiteStorage::connect: error creating default database contents");
+            configuration.failureMessage =
+                QObject::tr("SqLiteStorage::connect: error creating default database contents");
             return false;
         }
     }
@@ -229,6 +220,7 @@ bool SqLiteStorage::createDatabase(Configuration &configuration)
 {
     Q_UNUSED(configuration);
     bool success = createDatabaseTables();
-    if (!success) return false;
+    if (!success)
+        return false;
     return true;
 }

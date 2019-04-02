@@ -37,7 +37,7 @@
 #include "CharmCMake.h"
 
 namespace {
-typedef QHash<int, QVector<int> > WeeksByYear;
+typedef QHash<int, QVector<int>> WeeksByYear;
 static float SecondsInDay = 60. * 60. * 8. /* eight hour work day */;
 }
 
@@ -55,16 +55,14 @@ MonthlyTimeSheetReport::MonthlyTimeSheetReport(QWidget *parent)
         m_dailyhours = 8;
     }
 
-    connect(this, &MonthlyTimeSheetReport::anchorClicked,
-            this, &MonthlyTimeSheetReport::slotLinkClicked);
+    connect(this, &MonthlyTimeSheetReport::anchorClicked, this,
+            &MonthlyTimeSheetReport::slotLinkClicked);
 }
 
-MonthlyTimeSheetReport::~MonthlyTimeSheetReport()
-{
-}
+MonthlyTimeSheetReport::~MonthlyTimeSheetReport() {}
 
-void MonthlyTimeSheetReport::setReportProperties(
-    const QDate &start, const QDate &end, TaskId rootTask, bool activeTasksOnly)
+void MonthlyTimeSheetReport::setReportProperties(const QDate &start, const QDate &end,
+                                                 TaskId rootTask, bool activeTasksOnly)
 {
     m_numberOfWeeks = Charm::weekDifference(start, end.addDays(-1)) + 1;
     m_monthNumber = start.month();
@@ -74,20 +72,20 @@ void MonthlyTimeSheetReport::setReportProperties(
 
 QString MonthlyTimeSheetReport::suggestedFileName() const
 {
-    return tr("MonthlyTimeSheet-%1-%2").arg(m_yearOfMonth).arg(m_monthNumber, 2, 10, QLatin1Char(
-                                                                   '0'));
+    return tr("MonthlyTimeSheet-%1-%2")
+        .arg(m_yearOfMonth)
+        .arg(m_monthNumber, 2, 10, QLatin1Char('0'));
 }
 
 QByteArray MonthlyTimeSheetReport::saveToText()
 {
     QByteArray output;
     QTextStream stream(&output);
-    QString content = tr("Report for %1, %2 %3 (%4 to %5)")
-                      .arg(CONFIGURATION.userName,
-                           QLocale::system().monthName(m_monthNumber),
-                           QString::number(startDate().year()),
-                           startDate().toString(Qt::TextDate),
-                           endDate().addDays(-1).toString(Qt::TextDate));
+    QString content =
+        tr("Report for %1, %2 %3 (%4 to %5)")
+            .arg(CONFIGURATION.userName, QLocale::system().monthName(m_monthNumber),
+                 QString::number(startDate().year()), startDate().toString(Qt::TextDate),
+                 endDate().addDays(-1).toString(Qt::TextDate));
     stream << content << '\n';
     stream << '\n';
     TimeSheetInfoList timeSheetInfo = TimeSheetInfo::filteredTaskWithSubTasks(
@@ -98,12 +96,12 @@ QByteArray MonthlyTimeSheetReport::saveToText()
     if (!timeSheetInfo.isEmpty()) {
         totalsLine = timeSheetInfo.first();
         if (rootTask() == 0)
-            timeSheetInfo.removeAt(0);   // there is always one, because there is always the root item
+            timeSheetInfo.removeAt(0); // there is always one, because there is always the root item
     }
 
     for (int i = 0; i < timeSheetInfo.size(); ++i)
-        stream << timeSheetInfo[i].formattedTaskIdAndName(CONFIGURATION.taskPaddingLength)
-               << "\t" << hoursAndMinutes(timeSheetInfo[i].total()) << '\n';
+        stream << timeSheetInfo[i].formattedTaskIdAndName(CONFIGURATION.taskPaddingLength) << "\t"
+               << hoursAndMinutes(timeSheetInfo[i].total()) << '\n';
     stream << '\n';
     stream << "Month total: " << hoursAndMinutes(totalsLine.total()) << '\n';
     stream.flush();
@@ -121,8 +119,8 @@ QByteArray MonthlyTimeSheetReport::saveToXml(SaveToXmlMode mode)
         timesheet.setNumberOfWeeks(m_numberOfWeeks);
         timesheet.setRootTask(rootTask());
         timesheet.setIncludeTaskList(mode == IncludeTaskList);
-        const EventIdList matchingEventIds = DATAMODEL->eventsThatStartInTimeFrame(
-            startDate(), endDate());
+        const EventIdList matchingEventIds =
+            DATAMODEL->eventsThatStartInTimeFrame(startDate(), endDate());
         EventList events;
         events.reserve(matchingEventIds.size());
         Q_FOREACH (const EventId &eventId, matchingEventIds)
@@ -159,8 +157,8 @@ void MonthlyTimeSheetReport::update()
 {
     // this creates the time sheet
     // retrieve matching events:
-    const EventIdList matchingEvents
-        = DATAMODEL->eventsThatStartInTimeFrame(startDate(), endDate());
+    const EventIdList matchingEvents =
+        DATAMODEL->eventsThatStartInTimeFrame(startDate(), endDate());
 
     m_secondsMap.clear();
 
@@ -185,7 +183,7 @@ void MonthlyTimeSheetReport::update()
     QDomElement root = doc.documentElement();
     QDomElement body = root.firstChildElement(QStringLiteral("body"));
 
-//     QTextCursor cursor( m_report );
+    //     QTextCursor cursor( m_report );
     // create the caption:
     {
         QDomElement headline = doc.createElement(QStringLiteral("h1"));
@@ -195,12 +193,11 @@ void MonthlyTimeSheetReport::update()
     }
     {
         QDomElement headline = doc.createElement(QStringLiteral("h3"));
-        QString content = tr("Report for %1, %2 %3 (%4 to %5)")
-                          .arg(CONFIGURATION.userName,
-                               QLocale::system().monthName(m_monthNumber),
-                               QString::number(startDate().year()),
-                               startDate().toString(Qt::TextDate),
-                               endDate().addDays(-1).toString(Qt::TextDate));
+        QString content =
+            tr("Report for %1, %2 %3 (%4 to %5)")
+                .arg(CONFIGURATION.userName, QLocale::system().monthName(m_monthNumber),
+                     QString::number(startDate().year()), startDate().toString(Qt::TextDate),
+                     endDate().addDays(-1).toString(Qt::TextDate));
         QDomText text = doc.createTextNode(content);
         headline.appendChild(text);
         body.appendChild(headline);
@@ -236,10 +233,11 @@ void MonthlyTimeSheetReport::update()
         if (!timeSheetInfo.isEmpty()) {
             totalsLine = timeSheetInfo.first();
             if (rootTask() == 0)
-                timeSheetInfo.removeAt(0);   // there is always one, because there is always the root item
+                timeSheetInfo.removeAt(
+                    0); // there is always one, because there is always the root item
         }
 
-        {   //Header Row
+        { // Header Row
             QDomElement headerRow = doc.createElement(QStringLiteral("tr"));
             headerRow.setAttribute(QStringLiteral("class"), QStringLiteral("header_row"));
             table.appendChild(headerRow);
@@ -250,14 +248,14 @@ void MonthlyTimeSheetReport::update()
             addTblHdr(headerRow, tr("Days"));
         }
 
-        {   //Header day row
+        { // Header day row
             QDomElement headerDayRow = doc.createElement(QStringLiteral("tr"));
             headerDayRow.setAttribute(QStringLiteral("class"), QStringLiteral("header_row"));
             table.appendChild(headerDayRow);
             addTblHdr(headerDayRow, QString());
             for (int i = 0; i < m_numberOfWeeks; ++i) {
-                QString label = tr("%1").arg(startDate().addDays(
-                                                 i * 7).weekNumber(), 2, 10, QLatin1Char('0'));
+                QString label =
+                    tr("%1").arg(startDate().addDays(i * 7).weekNumber(), 2, 10, QLatin1Char('0'));
                 addTblHdr(headerDayRow, label);
             }
             addTblHdr(headerDayRow, QString());
@@ -270,20 +268,19 @@ void MonthlyTimeSheetReport::update()
                 row.setAttribute(QStringLiteral("class"), QStringLiteral("alternate_row"));
             table.appendChild(row);
 
-            QDomElement taskCell
-                = addTblCell(row,
-                             timeSheetInfo[i].formattedTaskIdAndName(
-                                 CONFIGURATION.taskPaddingLength));
+            QDomElement taskCell = addTblCell(
+                row, timeSheetInfo[i].formattedTaskIdAndName(CONFIGURATION.taskPaddingLength));
             taskCell.setAttribute(QStringLiteral("align"), QStringLiteral("left"));
-            taskCell.setAttribute(QStringLiteral("style"), QStringLiteral("text-indent: %1px;")
-                                  .arg(9 * timeSheetInfo[i].indentation));
+            taskCell.setAttribute(
+                QStringLiteral("style"),
+                QStringLiteral("text-indent: %1px;").arg(9 * timeSheetInfo[i].indentation));
             for (int week = 0; week < m_numberOfWeeks; ++week)
                 addTblCell(row, hoursAndMinutes(timeSheetInfo[i].seconds[week]));
             addTblCell(row, hoursAndMinutes(timeSheetInfo[i].total()));
             addTblCell(row, QString::number(timeSheetInfo[i].total() / SecondsInDay, 'f', 1));
         }
 
-        {   // Totals row
+        { // Totals row
             QDomElement totals = doc.createElement(QStringLiteral("tr"));
             totals.setAttribute(QStringLiteral("class"), QStringLiteral("header_row"));
             table.appendChild(totals);
@@ -308,9 +305,9 @@ void MonthlyTimeSheetReport::update()
 
 void MonthlyTimeSheetReport::slotLinkClicked(const QUrl &which)
 {
-    QDate start = which.toString()
-                  == QLatin1String("Previous") ? startDate().addMonths(-1) : startDate().addMonths(1);
-    QDate end = which.toString()
-                == QLatin1String("Previous") ? endDate().addMonths(-1) : endDate().addMonths(1);
+    QDate start = which.toString() == QLatin1String("Previous") ? startDate().addMonths(-1)
+                                                                : startDate().addMonths(1);
+    QDate end = which.toString() == QLatin1String("Previous") ? endDate().addMonths(-1)
+                                                              : endDate().addMonths(1);
     setReportProperties(start, end, rootTask(), activeTasksOnly());
 }

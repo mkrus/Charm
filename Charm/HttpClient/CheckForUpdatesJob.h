@@ -39,8 +39,8 @@ class CheckForUpdatesJob : public QObject
 {
     Q_OBJECT
 public:
-
-    struct JobData {
+    struct JobData
+    {
         QUrl link;
         QString releaseInformationLink;
         QString releaseVersion;

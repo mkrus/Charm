@@ -30,8 +30,7 @@ class BillDialog : public QDialog
 {
     Q_OBJECT
 public:
-    enum BillResponse
-    {
+    enum BillResponse {
         Later,
         AsYouWish,
         AlreadyDone,
@@ -44,6 +43,7 @@ private Q_SLOTS:
     void slotAsYouWish();
     void slotAlreadyDone();
     void slotLater();
+
 private:
     QPushButton *m_asYouWish;
     QPushButton *m_alreadyDone;

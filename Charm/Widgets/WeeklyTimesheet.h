@@ -27,8 +27,8 @@
 #include <Core/Task.h>
 #include <Core/TimeSpans.h>
 
-#include "Timesheet.h"
 #include "ReportConfigurationDialog.h"
+#include "Timesheet.h"
 
 #include <QScopedPointer>
 
@@ -39,10 +39,10 @@ class WeeklyTimesheetConfigurationDialog;
 class HttpJob;
 class QUrl;
 
-typedef QHash<int, QVector<int> > WeeksByYear;
-///Set the timesheet for the @param week of the @param year as having been uploaded
+typedef QHash<int, QVector<int>> WeeksByYear;
+/// Set the timesheet for the @param week of the @param year as having been uploaded
 void addUploadedTimesheet(int year, int week);
-///Get all missing timesheets
+/// Get all missing timesheets
 WeeksByYear missingTimeSheets();
 
 class WeeklyTimesheetConfigurationDialog : public ReportConfigurationDialog

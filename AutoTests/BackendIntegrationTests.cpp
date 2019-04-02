@@ -24,15 +24,15 @@
 #include "BackendIntegrationTests.h"
 
 #include "Core/CharmConstants.h"
-#include "Core/Controller.h"
-#include "Core/TaskTreeItem.h"
-#include "Core/Configuration.h"
 #include "Core/CharmDataModel.h"
+#include "Core/Configuration.h"
+#include "Core/Controller.h"
 #include "Core/SqlStorage.h"
+#include "Core/TaskTreeItem.h"
 
+#include <QDebug>
 #include <QDir>
 #include <QFileInfo>
-#include <QDebug>
 #include <QTest>
 
 BackendIntegrationTests::BackendIntegrationTests()
@@ -98,9 +98,8 @@ const TaskList &BackendIntegrationTests::referenceTasks()
         Task task2_2(2200, QStringLiteral("Task 2-2"), task2.id());
         Task task2_2_1(2210, QStringLiteral("Task 2-2-1"), task2_2.id());
         Task task2_2_2(2220, QStringLiteral("Task 2-2-2"), task2_2.id());
-        Tasks << task1 << task1_1 << task1_2 << task1_3
-              << task2 << task2_1 << task2_1_1 << task2_1_2
-              << task2_2 << task2_2_1 << task2_2_2;
+        Tasks << task1 << task1_1 << task1_2 << task1_3 << task2 << task2_1 << task2_1_1
+              << task2_1_2 << task2_2 << task2_2_1 << task2_2_2;
     }
     return Tasks;
 }

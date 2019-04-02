@@ -24,15 +24,15 @@
 
 #include "TestApplication.h"
 
-#include "Core/Configuration.h"
 #include "Core/CharmConstants.h"
-#include "Core/Controller.h"
 #include "Core/CharmDataModel.h"
+#include "Core/Configuration.h"
+#include "Core/Controller.h"
 
-#include <QString>
-#include <QFileInfo>
 #include <QDebug>
 #include <QDir>
+#include <QFileInfo>
+#include <QString>
 #include <QTest>
 
 const int UserId = 1;

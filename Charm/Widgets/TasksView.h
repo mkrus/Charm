@@ -34,7 +34,7 @@ class TasksView : public QDialog
     Q_OBJECT
 
 public:
-    explicit TasksView (QWidget *parent = nullptr);
+    explicit TasksView(QWidget *parent = nullptr);
     ~TasksView() override;
 
 protected:

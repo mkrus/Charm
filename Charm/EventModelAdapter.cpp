@@ -52,8 +52,7 @@ QVariant EventModelAdapter::data(const QModelIndex &index, int role) const
         return QVariant(); // beware of stale persistent indexes
 
     switch (role) {
-    case Qt::DisplayRole:
-    {
+    case Qt::DisplayRole: {
         EventId eventId = m_events[index.row()];
         const Event &event = m_dataModel->eventForId(eventId);
 
@@ -99,23 +98,23 @@ void EventModelAdapter::eventModified(EventId id, Event)
 {
     // nothing to do, except:
     int row = m_events.indexOf(id);
-    Q_ASSERT(row != -1);   // inconsistency between model and adapter
+    Q_ASSERT(row != -1); // inconsistency between model and adapter
     emit(dataChanged(index(row), index(row)));
 }
 
 void EventModelAdapter::eventAboutToBeDeleted(EventId id)
 {
     int row = m_events.indexOf(id);
-    Q_ASSERT(row != -1);   // inconsistency between model and adapter
+    Q_ASSERT(row != -1); // inconsistency between model and adapter
     beginRemoveRows(QModelIndex(), row, row);
 }
 
 void EventModelAdapter::eventDeleted(EventId id)
 {
     int position = m_events.indexOf(id);
-    Q_ASSERT(position != -1);   // inconsistency between model and adapter
+    Q_ASSERT(position != -1); // inconsistency between model and adapter
     m_events.removeAt(position);
-    Q_ASSERT(m_events.indexOf(id) == -1);      // cannot be in there
+    Q_ASSERT(m_events.indexOf(id) == -1); // cannot be in there
     endRemoveRows();
 }
 

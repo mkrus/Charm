@@ -55,11 +55,7 @@ private Q_SLOTS:
     void slotReplaceProjectCode();
 
 private:
-
-    enum SelectTaskType {
-        TaskToSearch,
-        TaskToReplaceWith
-    };
+    enum SelectTaskType { TaskToSearch, TaskToReplaceWith };
 
     void searchProjectCode();
     void selectTask(SelectTaskType type);

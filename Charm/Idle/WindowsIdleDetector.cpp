@@ -28,7 +28,8 @@
 
 #include "charm_application_debug.h"
 
-WindowsIdleDetector::WindowsIdleDetector(QObject *parent) : IdleDetector(parent)
+WindowsIdleDetector::WindowsIdleDetector(QObject *parent)
+    : IdleDetector(parent)
 {
     connect(&m_timer, &QTimer::timeout, this, &WindowsIdleDetector::timeout);
     m_timer.setInterval(idlenessDuration() * 1000 / 2);

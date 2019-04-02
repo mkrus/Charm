@@ -62,7 +62,6 @@ private Q_SLOTS:
     void cleanupTestCase();
 
 private:
-
     Controller *m_controller = nullptr;
     Configuration &m_configuration;
     QString m_localPath;

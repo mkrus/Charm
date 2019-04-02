@@ -68,20 +68,16 @@ Configuration::Configuration(TaskPrefilteringMode _taskPrefilteringMode,
 
 bool Configuration::operator==(const Configuration &other) const
 {
-    return userName == other.userName
-           && taskPrefilteringMode == other.taskPrefilteringMode
-           && timeTrackerFontSize == other.timeTrackerFontSize
-           && durationFormat == other.durationFormat
-           && detectIdling == other.detectIdling
-           && warnUnuploadedTimesheets == other.warnUnuploadedTimesheets
-           && requestEventComment == other.requestEventComment
-           && toolButtonStyle == other.toolButtonStyle
-           && showStatusBar == other.showStatusBar
-           && configurationName == other.configurationName
-           && installationId == other.installationId
-           && localStorageType == other.localStorageType
-           && localStorageDatabase == other.localStorageDatabase
-           && numberOfTaskSelectorEntries == other.numberOfTaskSelectorEntries;
+    return userName == other.userName && taskPrefilteringMode == other.taskPrefilteringMode
+        && timeTrackerFontSize == other.timeTrackerFontSize
+        && durationFormat == other.durationFormat && detectIdling == other.detectIdling
+        && warnUnuploadedTimesheets == other.warnUnuploadedTimesheets
+        && requestEventComment == other.requestEventComment
+        && toolButtonStyle == other.toolButtonStyle && showStatusBar == other.showStatusBar
+        && configurationName == other.configurationName && installationId == other.installationId
+        && localStorageType == other.localStorageType
+        && localStorageDatabase == other.localStorageDatabase
+        && numberOfTaskSelectorEntries == other.numberOfTaskSelectorEntries;
 }
 
 void Configuration::writeTo(QSettings &settings)
@@ -101,7 +97,8 @@ bool Configuration::readFrom(QSettings &settings)
         installationId = settings.value(MetaKey_Key_InstallationId).toUInt(&ok);
         if (!ok || installationId == 1) {
             const auto newId = createInstallationId();
-            qCDebug(CHARM_CORE_LOG) << "Migrating installationId" << installationId << "to" << newId;
+            qCDebug(CHARM_CORE_LOG)
+                << "Migrating installationId" << installationId << "to" << newId;
             installationId = newId;
             dirty = true;
         }
@@ -129,9 +126,7 @@ void Configuration::dump(const QString &why)
 {
     // dump configuration:
     return; // disable debug output
-    qDebug() << "Configuration: configuration:"
-             << (why.isEmpty() ? QString() : why)
-             << endl
+    qDebug() << "Configuration: configuration:" << (why.isEmpty() ? QString() : why) << endl
              << "--> installation id:          " << installationId << endl
              << "--> local storage type:       " << localStorageType << endl
              << "--> local storage database:   " << localStorageDatabase << endl

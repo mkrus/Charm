@@ -30,9 +30,9 @@
 
 #include "Charm/HttpClient/CheckForUpdatesJob.h"
 
-#include "CharmWindow.h"
-#include "Charm/WeeklySummary.h"
 #include "BillDialog.h"
+#include "Charm/WeeklySummary.h"
+#include "CharmWindow.h"
 
 class HttpJob;
 class CheckForUpdatesJob;
@@ -50,10 +50,7 @@ public:
     explicit TimeTrackingWindow(QWidget *parent = nullptr);
     ~TimeTrackingWindow() override;
 
-    enum VerboseMode {
-        Verbose = 0,
-        Silent
-    };
+    enum VerboseMode { Verbose = 0, Silent };
     // application:
     void stateChanged(State previous) override;
     void restore() override;
@@ -74,7 +71,7 @@ public:
 
 public Q_SLOTS:
     // slots migrated from the old main window:
-    void slotEditPreferences(bool);   // show prefs dialog
+    void slotEditPreferences(bool); // show prefs dialog
     void slotAboutDialog();
     void slotEnterVacation();
     void slotWeeklyTimesheetReport();
@@ -114,7 +111,7 @@ private:
     void resetWeeklyTimesheetDialog();
     void resetMonthlyTimesheetDialog();
     void showPreview(ReportConfigurationDialog *, int result);
-    //ugly but private:
+    // ugly but private:
     void importTasksFromDeviceOrFile(QIODevice *device, const QString &filename,
                                      bool verbose = true);
     void startCheckForUpdates(VerboseMode mode = Silent);

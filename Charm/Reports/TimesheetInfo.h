@@ -25,9 +25,9 @@
 #define TIMESHEETINFO_H
 
 #include <QList>
+#include <QMap>
 #include <QString>
 #include <QVector>
-#include <QMap>
 
 #include "Core/Task.h"
 
@@ -35,7 +35,7 @@ class CharmDataModel;
 class TimeSheetInfo;
 typedef QList<TimeSheetInfo> TimeSheetInfoList;
 
-typedef QMap< TaskId, QVector<int> > SecondsMap;
+typedef QMap<TaskId, QVector<int>> SecondsMap;
 
 class TimeSheetInfo
 {

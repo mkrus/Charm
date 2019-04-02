@@ -24,9 +24,9 @@
 #ifndef COMMANDMAKEEVENT_H
 #define COMMANDMAKEEVENT_H
 
-#include <Core/Task.h>
-#include <Core/Event.h>
 #include <Core/CharmCommand.h>
+#include <Core/Event.h>
+#include <Core/Task.h>
 
 class QObject;
 

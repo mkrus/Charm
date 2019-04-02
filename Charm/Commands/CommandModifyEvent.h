@@ -25,8 +25,8 @@
 #ifndef COMMANDMODIFYEVENT_H
 #define COMMANDMODIFYEVENT_H
 
-#include <Core/Event.h>
 #include <Core/CharmCommand.h>
+#include <Core/Event.h>
 
 class CommandModifyEvent : public CharmCommand
 {

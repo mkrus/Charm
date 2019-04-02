@@ -46,4 +46,4 @@ private:
     int m_weekDay;
 };
 
-#endif //DATEENTRYSYNCER_H
+#endif // DATEENTRYSYNCER_H

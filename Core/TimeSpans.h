@@ -27,22 +27,17 @@
 
 #include <QCoreApplication>
 #include <QDate>
+#include <QDateTime>
+#include <QObject>
 #include <QPair>
 #include <QTimer>
-#include <QObject>
-#include <QDateTime>
 
 typedef QPair<QDate, QDate> TimeSpan;
 
-enum TimeSpanType {
-    Day = 0,
-    Week,
-    Month,
-    Range,
-    Year
-};
+enum TimeSpanType { Day = 0, Week, Month, Range, Year };
 
-struct NamedTimeSpan {
+struct NamedTimeSpan
+{
     QString name;
     TimeSpan timespan;
     bool contains(const QDate &date) const;
@@ -61,7 +56,6 @@ class TimeSpans
 {
     Q_DECLARE_TR_FUNCTIONS(TimeSpans)
 public:
-
     /**
      * Creates a collection of timespans with @p referenceDate as reference date.
      *

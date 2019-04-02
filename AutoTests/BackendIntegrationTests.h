@@ -24,8 +24,8 @@
 #ifndef BACKENDINTEGRATIONTESTS_H
 #define BACKENDINTEGRATIONTESTS_H
 
-#include "TestApplication.h"
 #include "Core/Task.h"
+#include "TestApplication.h"
 
 class BackendIntegrationTests : public TestApplication
 {

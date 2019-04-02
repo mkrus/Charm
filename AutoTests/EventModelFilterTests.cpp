@@ -60,10 +60,7 @@ void EventModelFilterTests::initTestCase()
     m_todaySpan = spans.today();
     NamedTimeSpan allEvents = {
         tr("Ever"),
-        TimeSpan(QDate::currentDate().addYears(-200),
-                 QDate::currentDate().addYears(+200)),
-        Range
-    };
+        TimeSpan(QDate::currentDate().addYears(-200), QDate::currentDate().addYears(+200)), Range};
     m_everSpan = allEvents;
 }
 

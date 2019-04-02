@@ -25,11 +25,11 @@
 
 #include "Core/SqlRaiiTransactor.h"
 
-#include <QTest>
 #include <QSqlDatabase>
-#include <QSqlQuery>
 #include <QSqlDriver>
 #include <QSqlError>
+#include <QSqlQuery>
+#include <QTest>
 
 SqlTransactionTests::SqlTransactionTests()
     : QObject()
@@ -40,8 +40,8 @@ void SqlTransactionTests::testSqLiteDriverRequirements()
 {
     const auto DriverName = QStringLiteral("QSQLITE");
     QVERIFY(QSqlDatabase::isDriverAvailable(DriverName));
-    QSqlDatabase db
-        = QSqlDatabase::addDatabase(DriverName, QStringLiteral("test-sqlite.charm.kdab.com"));
+    QSqlDatabase db =
+        QSqlDatabase::addDatabase(DriverName, QStringLiteral("test-sqlite.charm.kdab.com"));
     QSqlDriver *driver = db.driver();
     QVERIFY(driver->hasFeature(QSqlDriver::Transactions));
 }

@@ -37,9 +37,9 @@
 #include "Lotsofcake/Configuration.h"
 #include "Widgets/HttpJobProgressDialog.h"
 
+#include "Core/CharmConstants.h"
 #include "SelectTaskDialog.h"
 #include "ViewHelpers.h"
-#include "Core/CharmConstants.h"
 
 #include "ui_WeeklyTimesheetConfigurationDialog.h"
 
@@ -115,10 +115,10 @@ WeeklyTimesheetConfigurationDialog::WeeklyTimesheetConfigurationDialog(QWidget *
     m_ui->setupUi(this);
     m_ui->dateEditDay->calendarWidget()->setFirstDayOfWeek(Qt::Monday);
     m_ui->dateEditDay->calendarWidget()->setVerticalHeaderFormat(QCalendarWidget::ISOWeekNumbers);
-    connect(m_ui->buttonBox, &QDialogButtonBox::accepted,
-            this, &WeeklyTimesheetConfigurationDialog::accept);
-    connect(m_ui->buttonBox, &QDialogButtonBox::rejected,
-            this, &WeeklyTimesheetConfigurationDialog::reject);
+    connect(m_ui->buttonBox, &QDialogButtonBox::accepted, this,
+            &WeeklyTimesheetConfigurationDialog::accept);
+    connect(m_ui->buttonBox, &QDialogButtonBox::rejected, this,
+            &WeeklyTimesheetConfigurationDialog::reject);
 
     connect(m_ui->comboBoxWeek, SIGNAL(currentIndexChanged(int)),
             SLOT(slotWeekComboItemSelected(int)));
@@ -126,13 +126,11 @@ WeeklyTimesheetConfigurationDialog::WeeklyTimesheetConfigurationDialog(QWidget *
     new DateEntrySyncer(m_ui->spinBoxWeek, m_ui->spinBoxYear, m_ui->dateEditDay, 1, this);
 
     slotStandardTimeSpansChanged();
-    connect(ApplicationCore::instance().dateChangeWatcher(), &DateChangeWatcher::dateChanged,
-            this, &WeeklyTimesheetConfigurationDialog::slotStandardTimeSpansChanged);
+    connect(ApplicationCore::instance().dateChangeWatcher(), &DateChangeWatcher::dateChanged, this,
+            &WeeklyTimesheetConfigurationDialog::slotStandardTimeSpansChanged);
 }
 
-WeeklyTimesheetConfigurationDialog::~WeeklyTimesheetConfigurationDialog()
-{
-}
+WeeklyTimesheetConfigurationDialog::~WeeklyTimesheetConfigurationDialog() {}
 
 void WeeklyTimesheetConfigurationDialog::setDefaultWeek(int yearOfWeek, int week)
 {
@@ -145,7 +143,7 @@ void WeeklyTimesheetConfigurationDialog::showReportPreviewDialog()
 {
     QDate start, end;
     int index = m_ui->comboBoxWeek->currentIndex();
-    if (index == m_weekInfo.size() -1) {
+    if (index == m_weekInfo.size() - 1) {
         // manual selection
         QDate selectedDate = m_ui->dateEditDay->date();
         start = selectedDate.addDays(-selectedDate.dayOfWeek() + 1);
@@ -163,11 +161,7 @@ void WeeklyTimesheetConfigurationDialog::slotStandardTimeSpansChanged()
 {
     const TimeSpans timeSpans;
     m_weekInfo = timeSpans.last4Weeks();
-    NamedTimeSpan custom = {
-        tr("Manual Selection"),
-        timeSpans.thisWeek().timespan,
-        Range
-    };
+    NamedTimeSpan custom = {tr("Manual Selection"), timeSpans.thisWeek().timespan, Range};
     m_weekInfo << custom;
     m_ui->comboBoxWeek->clear();
     for (int i = 0; i < m_weekInfo.size(); ++i)
@@ -179,10 +173,11 @@ void WeeklyTimesheetConfigurationDialog::slotStandardTimeSpansChanged()
 void WeeklyTimesheetConfigurationDialog::slotWeekComboItemSelected(int index)
 {
     // wait for the next update, in this case:
-    if (m_ui->comboBoxWeek->count() == 0 || index == -1) return;
+    if (m_ui->comboBoxWeek->count() == 0 || index == -1)
+        return;
     Q_ASSERT(m_ui->comboBoxWeek->count() > index);
 
-    if (index == m_weekInfo.size() - 1) {   // manual selection
+    if (index == m_weekInfo.size() - 1) { // manual selection
         m_ui->groupBox->setEnabled(true);
     } else {
         m_ui->dateEditDay->setDate(m_weekInfo[index].timespan.first);
@@ -198,18 +193,17 @@ WeeklyTimeSheetReport::WeeklyTimeSheetReport(QWidget *parent)
 {
     QPushButton *upload = uploadButton();
     connect(upload, &QPushButton::clicked, this, &WeeklyTimeSheetReport::slotUploadTimesheet);
-    connect(this, &ReportPreviewWindow::anchorClicked, this, &WeeklyTimeSheetReport::slotLinkClicked);
+    connect(this, &ReportPreviewWindow::anchorClicked, this,
+            &WeeklyTimeSheetReport::slotLinkClicked);
 
     if (!Lotsofcake::Configuration().isConfigured())
         upload->hide();
 }
 
-WeeklyTimeSheetReport::~WeeklyTimeSheetReport()
-{
-}
+WeeklyTimeSheetReport::~WeeklyTimeSheetReport() {}
 
-void WeeklyTimeSheetReport::setReportProperties(
-    const QDate &start, const QDate &end, TaskId rootTask, bool activeTasksOnly)
+void WeeklyTimeSheetReport::setReportProperties(const QDate &start, const QDate &end,
+                                                TaskId rootTask, bool activeTasksOnly)
 {
     m_weekNumber = start.weekNumber(&m_yearOfWeek);
     TimeSheetReport::setReportProperties(start, end, rootTask, activeTasksOnly);
@@ -257,10 +251,10 @@ QString WeeklyTimeSheetReport::suggestedFileName() const
 }
 
 void WeeklyTimeSheetReport::update()
-{   // this creates the time sheet
+{ // this creates the time sheet
     // retrieve matching events:
-    const EventIdList matchingEvents
-        = DATAMODEL->eventsThatStartInTimeFrame(startDate(), endDate());
+    const EventIdList matchingEvents =
+        DATAMODEL->eventsThatStartInTimeFrame(startDate(), endDate());
 
     m_secondsMap.clear();
 
@@ -296,10 +290,10 @@ void WeeklyTimeSheetReport::update()
     {
         QDomElement headline = doc.createElement(QStringLiteral("h3"));
         QString content = tr("Report for %1, Week %2 (%3 to %4)")
-                          .arg(CONFIGURATION.userName)
-                          .arg(m_weekNumber, 2, 10, QLatin1Char('0'))
-                          .arg(startDate().toString(Qt::TextDate))
-                          .arg(endDate().addDays(-1).toString(Qt::TextDate));
+                              .arg(CONFIGURATION.userName)
+                              .arg(m_weekNumber, 2, 10, QLatin1Char('0'))
+                              .arg(startDate().toString(Qt::TextDate))
+                              .arg(endDate().addDays(-1).toString(Qt::TextDate));
         QDomText text = doc.createTextNode(content);
         headline.appendChild(text);
         body.appendChild(headline);
@@ -335,7 +329,8 @@ void WeeklyTimeSheetReport::update()
         if (!timeSheetInfo.isEmpty()) {
             totalsLine = timeSheetInfo.first();
             if (rootTask() == 0)
-                timeSheetInfo.removeAt(0);   // there is always one, because there is always the root item
+                timeSheetInfo.removeAt(
+                    0); // there is always one, because there is always the root item
         }
 
         QDomElement headerRow = doc.createElement(QStringLiteral("tr"));
@@ -354,8 +349,7 @@ void WeeklyTimeSheetReport::update()
             QLocale::system().dayName(5, QLocale::ShortFormat),
             QLocale::system().dayName(6, QLocale::ShortFormat),
             QLocale::system().dayName(7, QLocale::ShortFormat),
-            tr("Total")
-        };
+            tr("Total")};
         const QString DayHeadlines[NumberOfColumns] = {
             QString(),
             tr("%1").arg(startDate().day(), 2, 10, QLatin1Char('0')),
@@ -365,8 +359,7 @@ void WeeklyTimeSheetReport::update()
             tr("%1").arg(startDate().addDays(4).day(), 2, 10, QLatin1Char('0')),
             tr("%1").arg(startDate().addDays(5).day(), 2, 10, QLatin1Char('0')),
             tr("%1").arg(startDate().addDays(6).day(), 2, 10, QLatin1Char('0')),
-            QString()
-        };
+            QString()};
 
         for (int i = 0; i < NumberOfColumns; ++i) {
             QDomElement header = doc.createElement(QStringLiteral("th"));
@@ -386,8 +379,8 @@ void WeeklyTimeSheetReport::update()
             table.appendChild(row);
 
             QString texts[NumberOfColumns];
-            texts[Column_Task] = timeSheetInfo[i].formattedTaskIdAndName(
-                CONFIGURATION.taskPaddingLength);
+            texts[Column_Task] =
+                timeSheetInfo[i].formattedTaskIdAndName(CONFIGURATION.taskPaddingLength);
             texts[Column_Monday] = hoursAndMinutes(timeSheetInfo[i].seconds[0]);
             texts[Column_Tuesday] = hoursAndMinutes(timeSheetInfo[i].seconds[1]);
             texts[Column_Wednesday] = hoursAndMinutes(timeSheetInfo[i].seconds[2]);
@@ -400,12 +393,12 @@ void WeeklyTimeSheetReport::update()
             for (int column = 0; column < NumberOfColumns; ++column) {
                 QDomElement cell = doc.createElement(QStringLiteral("td"));
                 cell.setAttribute(QStringLiteral("align"),
-                                  column
-                                  == Column_Task ? QStringLiteral("left") : QStringLiteral("center"));
+                                  column == Column_Task ? QStringLiteral("left")
+                                                        : QStringLiteral("center"));
 
                 if (column == Column_Task) {
-                    QString style = QStringLiteral("text-indent: %1px;")
-                                    .arg(9 * timeSheetInfo[i].indentation);
+                    QString style =
+                        QStringLiteral("text-indent: %1px;").arg(9 * timeSheetInfo[i].indentation);
                     cell.setAttribute(QStringLiteral("style"), style);
                 }
 
@@ -415,17 +408,15 @@ void WeeklyTimeSheetReport::update()
             }
         }
         // put the totals:
-        QString TotalsTexts[NumberOfColumns] = {
-            tr("Total:"),
-            hoursAndMinutes(totalsLine.seconds[0]),
-            hoursAndMinutes(totalsLine.seconds[1]),
-            hoursAndMinutes(totalsLine.seconds[2]),
-            hoursAndMinutes(totalsLine.seconds[3]),
-            hoursAndMinutes(totalsLine.seconds[4]),
-            hoursAndMinutes(totalsLine.seconds[5]),
-            hoursAndMinutes(totalsLine.seconds[6]),
-            hoursAndMinutes(totalsLine.total())
-        };
+        QString TotalsTexts[NumberOfColumns] = {tr("Total:"),
+                                                hoursAndMinutes(totalsLine.seconds[0]),
+                                                hoursAndMinutes(totalsLine.seconds[1]),
+                                                hoursAndMinutes(totalsLine.seconds[2]),
+                                                hoursAndMinutes(totalsLine.seconds[3]),
+                                                hoursAndMinutes(totalsLine.seconds[4]),
+                                                hoursAndMinutes(totalsLine.seconds[5]),
+                                                hoursAndMinutes(totalsLine.seconds[6]),
+                                                hoursAndMinutes(totalsLine.total())};
         QDomElement totals = doc.createElement(QStringLiteral("tr"));
         totals.setAttribute(QStringLiteral("class"), QStringLiteral("header_row"));
         table.appendChild(totals);
@@ -455,8 +446,8 @@ QByteArray WeeklyTimeSheetReport::saveToXml(SaveToXmlMode mode)
         timesheet.setWeekNumber(m_weekNumber);
         timesheet.setRootTask(rootTask());
         timesheet.setIncludeTaskList(mode == IncludeTaskList);
-        const EventIdList matchingEventIds = DATAMODEL->eventsThatStartInTimeFrame(
-            startDate(), endDate());
+        const EventIdList matchingEventIds =
+            DATAMODEL->eventsThatStartInTimeFrame(startDate(), endDate());
         EventList events;
         events.reserve(matchingEventIds.size());
         for (const EventId &id : matchingEventIds)
@@ -476,10 +467,10 @@ QByteArray WeeklyTimeSheetReport::saveToText()
     QByteArray output;
     QTextStream stream(&output);
     QString content = tr("Report for %1, Week %2 (%3 to %4)")
-                      .arg(CONFIGURATION.userName)
-                      .arg(m_weekNumber, 2, 10, QLatin1Char('0'))
-                      .arg(startDate().toString(Qt::TextDate))
-                      .arg(endDate().addDays(-1).toString(Qt::TextDate));
+                          .arg(CONFIGURATION.userName)
+                          .arg(m_weekNumber, 2, 10, QLatin1Char('0'))
+                          .arg(startDate().toString(Qt::TextDate))
+                          .arg(endDate().addDays(-1).toString(Qt::TextDate));
     stream << content << '\n';
     stream << '\n';
     TimeSheetInfoList timeSheetInfo = TimeSheetInfo::filteredTaskWithSubTasks(
@@ -490,12 +481,12 @@ QByteArray WeeklyTimeSheetReport::saveToText()
     if (!timeSheetInfo.isEmpty()) {
         totalsLine = timeSheetInfo.first();
         if (rootTask() == 0)
-            timeSheetInfo.removeAt(0);   // there is always one, because there is always the root item
+            timeSheetInfo.removeAt(0); // there is always one, because there is always the root item
     }
 
     for (int i = 0; i < timeSheetInfo.size(); ++i)
-        stream << timeSheetInfo[i].formattedTaskIdAndName(CONFIGURATION.taskPaddingLength)
-               << "\t" << hoursAndMinutes(timeSheetInfo[i].total()) << '\n';
+        stream << timeSheetInfo[i].formattedTaskIdAndName(CONFIGURATION.taskPaddingLength) << "\t"
+               << hoursAndMinutes(timeSheetInfo[i].total()) << '\n';
     stream << '\n';
     stream << "Week total: " << hoursAndMinutes(totalsLine.total()) << '\n';
     stream.flush();
@@ -505,9 +496,9 @@ QByteArray WeeklyTimeSheetReport::saveToText()
 
 void WeeklyTimeSheetReport::slotLinkClicked(const QUrl &which)
 {
-    QDate start = which.toString()
-                  == QLatin1String("Previous") ? startDate().addDays(-7) : startDate().addDays(7);
-    QDate end = which.toString()
-                == QLatin1String("Previous") ? endDate().addDays(-7) : endDate().addDays(7);
+    QDate start = which.toString() == QLatin1String("Previous") ? startDate().addDays(-7)
+                                                                : startDate().addDays(7);
+    QDate end = which.toString() == QLatin1String("Previous") ? endDate().addDays(-7)
+                                                              : endDate().addDays(7);
     setReportProperties(start, end, rootTask(), activeTasksOnly());
 }

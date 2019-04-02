@@ -40,9 +40,9 @@ private Q_SLOTS:
     void handleStateChange(State state) const;
 
 private:
-    static QList< QShortcut * > shortcuts(QWidget *parent);
-    static QList< QShortcut * > activeShortcuts(const QKeySequence &seq, bool autorep,
-                                                QWidget *parent = nullptr);
+    static QList<QShortcut *> shortcuts(QWidget *parent);
+    static QList<QShortcut *> activeShortcuts(const QKeySequence &seq, bool autorep,
+                                              QWidget *parent = nullptr);
 
     QMenu m_dockMenu;
 

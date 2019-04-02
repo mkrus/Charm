@@ -36,9 +36,7 @@ TaskFilterProxyModel::TaskFilterProxyModel(QObject *parent)
     setRecursiveFilteringEnabled(true);
 }
 
-TaskFilterProxyModel::~TaskFilterProxyModel()
-{
-}
+TaskFilterProxyModel::~TaskFilterProxyModel() {}
 
 void TaskFilterProxyModel::setFilterMode(TaskFilterProxyModel::FilterMode filter)
 {
@@ -71,6 +69,6 @@ bool TaskFilterProxyModel::filterAcceptsColumn(int, const QModelIndex &) const
 
 QModelIndex TaskFilterProxyModel::indexForTaskId(TaskId id) const
 {
-    auto model = qobject_cast<TaskModel*>(sourceModel());
+    auto model = qobject_cast<TaskModel *>(sourceModel());
     return mapFromSource(model->indexForTaskId(id));
 }

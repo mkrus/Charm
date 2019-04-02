@@ -33,7 +33,6 @@ class RestJob : public HttpJob
 {
     Q_OBJECT
 public:
-
     explicit RestJob(QObject *parent = nullptr);
     ~RestJob() override;
 

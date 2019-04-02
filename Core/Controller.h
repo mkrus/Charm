@@ -29,8 +29,8 @@
 #include <QObject>
 
 #include "Event.h"
-#include "Task.h"
 #include "State.h"
+#include "Task.h"
 
 class CharmCommand;
 class Configuration;
@@ -118,7 +118,8 @@ Q_SIGNALS:
     void commandCompleted(CharmCommand *);
 
 private:
-    template<class T> void loadConfigValue(const QString &key, T &configValue) const;
+    template <class T>
+    void loadConfigValue(const QString &key, T &configValue) const;
     SqlStorage *m_storage = nullptr;
 };
 

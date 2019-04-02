@@ -28,15 +28,17 @@
 #include <QAbstractItemModel>
 #include <QPointer>
 
-#include "Core/Event.h"
-#include "Core/EventModelInterface.h"
 #include "Core/CharmDataModelAdapterInterface.h"
 #include "Core/CommandEmitterInterface.h"
+#include "Core/Event.h"
+#include "Core/EventModelInterface.h"
 
 class CharmDataModel;
 
-class EventModelAdapter : public QAbstractListModel, public CharmDataModelAdapterInterface,
-    public CommandEmitterInterface, public EventModelInterface
+class EventModelAdapter : public QAbstractListModel,
+                          public CharmDataModelAdapterInterface,
+                          public CommandEmitterInterface,
+                          public EventModelInterface
 {
     Q_OBJECT
 
@@ -49,9 +51,7 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
     // reimplement CharmDataModelAdapterInterface:
-    void resetTasks() override
-    {
-    }
+    void resetTasks() override {}
 
     void resetEvents() override;
     void eventAboutToBeAdded(EventId id) override;

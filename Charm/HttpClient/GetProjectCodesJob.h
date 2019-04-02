@@ -32,7 +32,6 @@ class GetProjectCodesJob : public HttpJob
 {
     Q_OBJECT
 public:
-
     explicit GetProjectCodesJob(QObject *parent = nullptr);
     ~GetProjectCodesJob() override;
 

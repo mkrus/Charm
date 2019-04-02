@@ -29,9 +29,7 @@
 #include <QList>
 #include <QSettings>
 
-GUIState::GUIState()
-{
-}
+GUIState::GUIState() {}
 
 const TaskIdList &GUIState::expandedTasks() const
 {
@@ -91,8 +89,8 @@ void GUIState::loadFrom(const QSettings &settings)
         setSelectedTask(settings.value(MetaKey_MainWindowGUIStateSelectedTask).value<TaskId>());
     if (settings.contains(MetaKey_MainWindowGUIStateExpandedTasks)) {
         // workaround for not getting QVariant serialization of TaskIdLists to work:
-        QList<QVariant> values(settings.value(
-                                   MetaKey_MainWindowGUIStateExpandedTasks).value<QList<QVariant> >());
+        QList<QVariant> values(
+            settings.value(MetaKey_MainWindowGUIStateExpandedTasks).value<QList<QVariant>>());
         TaskIdList ids;
         for (const QVariant &variant : values)
             ids << variant.value<TaskId>();

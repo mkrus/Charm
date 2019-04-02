@@ -45,10 +45,7 @@ public:
         TaskPrefilter_NumberOfModes
     };
 
-    enum DurationFormat {
-        Minutes = 0,
-        Decimal
-    };
+    enum DurationFormat { Minutes = 0, Decimal };
 
     bool operator==(const Configuration &other) const;
 
@@ -78,14 +75,16 @@ public:
     bool enableCommandInterface = false;
     int numberOfTaskSelectorEntries = 5;
 
-    // these are stored in QSettings, since we need this information to locate and open the database:
+    // these are stored in QSettings, since we need this information to locate and open the
+    // database:
     QString configurationName;
     quint32 installationId = 0;
     QString localStorageType; // SqLite, MySql, ...
     QString localStorageDatabase; // database name (path, with sqlite)
     bool newDatabase = false; // true if the configuration has just been created
     bool failure = false; // used to reconfigure on failures
-    QString failureMessage; // a message to show the user if something is wrong with the configuration
+    QString
+        failureMessage; // a message to show the user if something is wrong with the configuration
 
     // appearance properties
     int taskPaddingLength = 6; // arbitrary
@@ -95,7 +94,8 @@ private:
     // configurations):
     friend class SqLiteStorageTests;
     friend class ControllerTests;
-    // these are all the persisted metadata settings, and the constructor is only used during test runs:
+    // these are all the persisted metadata settings, and the constructor is only used during test
+    // runs:
     Configuration(TaskPrefilteringMode taskPrefilteringMode, TimeTrackerFontSize,
                   DurationFormat durationFormat, bool detectIdling, Qt::ToolButtonStyle buttonstyle,
                   bool showStatusBar, bool warnUnuploadedTimesheets, bool _requestEventComment,

@@ -30,7 +30,6 @@
 
 #include "ui_SelectTaskDialog.h"
 
-
 SelectTaskDialog::SelectTaskDialog(QWidget *parent)
     : QDialog(parent)
     , m_ui(new Ui::SelectTaskDialog())
@@ -39,14 +38,12 @@ SelectTaskDialog::SelectTaskDialog(QWidget *parent)
     m_ui->buttonBox->button(QDialogButtonBox::Cancel)->setEnabled(true);
     m_ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
 
-    connect(this, &SelectTaskDialog::accepted,
-            this, &SelectTaskDialog::slotAccepted);
-    connect(MODEL.charmDataModel(), &CharmDataModel::resetGUIState,
-            this, &SelectTaskDialog::slotResetState);
-    connect(m_ui->view, &TasksViewWidget::taskSelected,
-            this, &SelectTaskDialog::slotTaskSelected);
-    connect(m_ui->view, &TasksViewWidget::taskDoubleClicked,
-            this, &SelectTaskDialog::slotTaskDoubleClicked);
+    connect(this, &SelectTaskDialog::accepted, this, &SelectTaskDialog::slotAccepted);
+    connect(MODEL.charmDataModel(), &CharmDataModel::resetGUIState, this,
+            &SelectTaskDialog::slotResetState);
+    connect(m_ui->view, &TasksViewWidget::taskSelected, this, &SelectTaskDialog::slotTaskSelected);
+    connect(m_ui->view, &TasksViewWidget::taskDoubleClicked, this,
+            &SelectTaskDialog::slotTaskDoubleClicked);
 
     QSettings settings;
     settings.beginGroup(QString::fromUtf8(staticMetaObject.className()));
@@ -56,9 +53,7 @@ SelectTaskDialog::SelectTaskDialog(QWidget *parent)
     m_ui->view->setFocus();
 }
 
-SelectTaskDialog::~SelectTaskDialog()
-{
-}
+SelectTaskDialog::~SelectTaskDialog() {}
 
 TaskId SelectTaskDialog::selectedTask() const
 {
@@ -134,4 +129,3 @@ void SelectTaskDialog::setNonValidSelectable()
 {
     m_nonValidSelectable = true;
 }
-

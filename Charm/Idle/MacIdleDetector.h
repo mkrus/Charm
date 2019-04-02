@@ -24,8 +24,8 @@
 #ifndef MACIDLEDETECTOR_H
 #define MACIDLEDETECTOR_H
 
-#include <QObject>
 #include <QDateTime>
+#include <QObject>
 
 #include "IdleDetector.h"
 

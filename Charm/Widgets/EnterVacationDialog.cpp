@@ -52,8 +52,8 @@ static QString formatDuration(const QDateTime &start, const QDateTime &end)
     if (minutes == 0) {
         return QObject::tr("%1 hours", "hours", hours).arg(hours);
     } else {
-        return QObject::tr("%1 hours %2 minutes").arg(QString::number(hours),
-                                                      QString::number(minutes));
+        return QObject::tr("%1 hours %2 minutes")
+            .arg(QString::number(hours), QString::number(minutes));
     }
 }
 
@@ -68,7 +68,7 @@ static EventList createEventList(const QDate &start, const QDate &end, int minut
     events.reserve(days);
     for (int i = 0; i < days; ++i) {
         const QDate date = start.addDays(i);
-        //for each work day, create an event starting at 8 am
+        // for each work day, create an event starting at 8 am
         if (isWorkDay(date)) {
             const QDateTime startTime = QDateTime(date, QTime(8, 0));
             const QDateTime endTime = startTime.addSecs(minutes * 60);
@@ -94,11 +94,12 @@ EnterVacationDialog::EnterVacationDialog(QWidget *parent)
     m_ui->startDate->calendarWidget()->setVerticalHeaderFormat(QCalendarWidget::ISOWeekNumbers);
     m_ui->endDate->calendarWidget()->setFirstDayOfWeek(Qt::Monday);
     m_ui->endDate->calendarWidget()->setVerticalHeaderFormat(QCalendarWidget::ISOWeekNumbers);
-    //set next week as default range
+    // set next week as default range
     const QDate referenceDate = QDate::currentDate().addDays(7);
     m_ui->startDate->setDate(Charm::weekDayInWeekOf(Qt::Monday, referenceDate));
     m_ui->endDate->setDate(Charm::weekDayInWeekOf(Qt::Friday, referenceDate));
-    connect(m_ui->startDate, &QDateEdit::dateChanged, this, &EnterVacationDialog::updateButtonStates);
+    connect(m_ui->startDate, &QDateEdit::dateChanged, this,
+            &EnterVacationDialog::updateButtonStates);
     connect(m_ui->endDate, &QDateEdit::dateChanged, this, &EnterVacationDialog::updateButtonStates);
     connect(m_ui->buttonBox, &QDialogButtonBox::accepted, this, &EnterVacationDialog::okClicked);
     connect(m_ui->buttonBox, &QDialogButtonBox::rejected, this, &EnterVacationDialog::reject);
@@ -112,16 +113,13 @@ EnterVacationDialog::EnterVacationDialog(QWidget *parent)
     updateTaskLabel();
 }
 
-EnterVacationDialog::~EnterVacationDialog()
-{
-}
+EnterVacationDialog::~EnterVacationDialog() {}
 
 void EnterVacationDialog::createEvents()
 {
-    const EventList events = createEventList(m_ui->startDate->date(),
-                                             m_ui->endDate->date().addDays(1),
-                                             m_ui->hoursSpinBox->value() * 60 + m_ui->minutesSpinBox->value(),
-                                             m_selectedTaskId);
+    const EventList events = createEventList(
+        m_ui->startDate->date(), m_ui->endDate->date().addDays(1),
+        m_ui->hoursSpinBox->value() * 60 + m_ui->minutesSpinBox->value(), m_selectedTaskId);
 
     QDialog confirmationDialog(this);
     auto layout = new QVBoxLayout(&confirmationDialog);
@@ -132,7 +130,7 @@ void EnterVacationDialog::createEvents()
     auto textBrowser = new QTextBrowser;
     layout->addWidget(textBrowser);
     auto box = new QDialogButtonBox;
-    box->setStandardButtons(QDialogButtonBox::Ok|QDialogButtonBox::Cancel);
+    box->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     box->button(QDialogButtonBox::Ok)->setText(tr("Create"));
     connect(box, &QDialogButtonBox::accepted, &confirmationDialog, &QDialog::accept);
     connect(box, &QDialogButtonBox::rejected, &confirmationDialog, &QDialog::reject);
@@ -155,16 +153,15 @@ void EnterVacationDialog::createEvents()
         const QDate eventStart = event.startDateTime().date();
         const QDate eventEnd = event.endDateTime().date();
         Q_ASSERT(eventStart == eventEnd);
-        Q_UNUSED(eventEnd)   //release mode
+        Q_UNUSED(eventEnd) // release mode
         const QString shortDate = eventStart.toString(Qt::DefaultLocaleShortDate);
         const QString duration = formatDuration(event.startDateTime(), event.endDateTime());
 
         const QString htmlShortDate = shortDate.toHtmlEscaped();
         const QString htmlDuration = duration.toHtmlEscaped();
 
-        html
-            += QStringLiteral("%1").arg(tr("%1: %3", "short date, duration").arg(htmlShortDate,
-                                                                                 htmlDuration));
+        html += QStringLiteral("%1").arg(
+            tr("%1: %3", "short date, duration").arg(htmlShortDate, htmlDuration));
         html += QLatin1String("</p><p>");
     }
     html += QLatin1String("</p>");
@@ -191,8 +188,7 @@ void EnterVacationDialog::updateButtonStates()
 {
     const bool validDates = m_ui->startDate->date() <= m_ui->endDate->date();
     const bool validDuration = m_ui->hoursSpinBox->value() > 0 || m_ui->minutesSpinBox->value() > 0;
-    m_ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(
-        validDates && validDuration);
+    m_ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(validDates && validDuration);
 }
 
 void EnterVacationDialog::updateTaskLabel()

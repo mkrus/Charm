@@ -24,8 +24,8 @@
 #ifndef VIEWHELPERS_H
 #define VIEWHELPERS_H
 
-#include "Core/Event.h"
 #include "Core/CharmConstants.h"
+#include "Core/Event.h"
 
 #include "ApplicationCore.h"
 #include "ModelConnector.h"
@@ -36,13 +36,7 @@
 #define TRAY (ApplicationCore::instance().trayIcon())
 
 namespace Charm {
-enum class SortOrder {
-    None = 0,
-    StartTime,
-    EndTime,
-    TaskId,
-    Comment
-};
+enum class SortOrder { None = 0, StartTime, EndTime, TaskId, Comment };
 
 typedef QVarLengthArray<SortOrder, 5> SortOrderList;
 

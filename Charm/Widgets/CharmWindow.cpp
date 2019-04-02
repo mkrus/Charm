@@ -190,8 +190,7 @@ void CharmWindow::keyPressEvent(QKeyEvent *event)
 {
     if (event->type() == QEvent::KeyPress) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-        if (keyEvent->modifiers() & Qt::ControlModifier
-            && keyEvent->key() == Qt::Key_W
+        if (keyEvent->modifiers() & Qt::ControlModifier && keyEvent->key() == Qt::Key_W
             && isVisible()) {
             showHideView();
             return;
@@ -255,15 +254,14 @@ void CharmWindow::restoreGuiState()
     WidgetUtils::restoreGeometry(this, MetaKey_MainWindowGeometry);
     // restore visibility
     bool visible = true;
-    if (m_hideAtStartUp)
-    {
+    if (m_hideAtStartUp) {
         visible = false;
-    }
-    else
-    {
-        // Time Tracking Window should always be visible, except when Charm is started with --hide-at-start
-        visible = (identifier == QLatin1String("window_tracking")) ? true : settings.value(
-                                                                         MetaKey_MainWindowVisible).toBool();
+    } else {
+        // Time Tracking Window should always be visible, except when Charm is started with
+        // --hide-at-start
+        visible = (identifier == QLatin1String("window_tracking"))
+            ? true
+            : settings.value(MetaKey_MainWindowVisible).toBool();
     }
     setVisible(visible);
 }

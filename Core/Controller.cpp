@@ -42,9 +42,7 @@ Controller::Controller(QObject *parent_)
 {
 }
 
-Controller::~Controller()
-{
-}
+Controller::~Controller() {}
 
 Event Controller::makeEvent(const Task &task)
 {
@@ -113,30 +111,28 @@ void Controller::stateChanged(State previous, State next)
     Q_UNUSED(previous);
 
     switch (next) {
-    case Connected:
-    {   // yes, it is that simple:
+    case Connected: { // yes, it is that simple:
         TaskList tasks = m_storage->getAllTasks();
         // tell the view about the existing tasks;
         if (!Task::checkForUniqueTaskIds(tasks)) {
-            throw CharmException(tr(
-                                     "The Charm database is corrupted, it contains duplicate task ids. "
-                                     "Please have it looked after by a professional."));
+            throw CharmException(
+                tr("The Charm database is corrupted, it contains duplicate task ids. "
+                   "Please have it looked after by a professional."));
         }
         if (!Task::checkForTreeness(tasks)) {
-            throw CharmException(tr(
-                                     "The Charm database is corrupted, the tasks do not form a tree. "
-                                     "Please have it looked after by a professional."));
+            throw CharmException(
+                tr("The Charm database is corrupted, the tasks do not form a tree. "
+                   "Please have it looked after by a professional."));
         }
         emit definedTasks(tasks);
         EventList events = m_storage->getAllEvents();
         emit allEvents(events);
         break;
     }
-    case Disconnecting:
-    {
+    case Disconnecting: {
         emit readyToQuit();
         if (m_storage) {
-// this will still leave Qt complaining about a repeated connection
+            // this will still leave Qt complaining about a repeated connection
             m_storage->disconnect();
             delete m_storage;
             m_storage = nullptr;
@@ -148,7 +144,8 @@ void Controller::stateChanged(State previous, State next)
     }
 }
 
-struct Setting {
+struct Setting
+{
     QString key;
     QString value;
 };
@@ -157,40 +154,31 @@ void Controller::persistMetaData(Configuration &configuration)
 {
     Q_ASSERT_X(m_storage != nullptr, Q_FUNC_INFO, "No storage interface available");
     Setting settings[] = {
-        { MetaKey_Key_UserName,
-          configuration.userName },
-        { MetaKey_Key_SubscribedTasksOnly,
-          QString().setNum(configuration.taskPrefilteringMode) },
-        { MetaKey_Key_TimeTrackerFontSize,
-          QString().setNum(configuration.timeTrackerFontSize) },
-        { MetaKey_Key_DurationFormat,
-          QString::number(configuration.durationFormat) },
-        { MetaKey_Key_IdleDetection,
-          stringForBool(configuration.detectIdling) },
-        { MetaKey_Key_WarnUnuploadedTimesheets,
-          stringForBool(configuration.warnUnuploadedTimesheets) },
-        { MetaKey_Key_RequestEventComment,
-          stringForBool(configuration.requestEventComment) },
-        { MetaKey_Key_ToolButtonStyle,
-          QString().setNum(configuration.toolButtonStyle) },
-        { MetaKey_Key_ShowStatusBar,
-          stringForBool(configuration.showStatusBar) },
-        { MetaKey_Key_EnableCommandInterface,
-          stringForBool(configuration.enableCommandInterface) },
-        { MetaKey_Key_NumberOfTaskSelectorEntries,
-          QString::number(configuration.numberOfTaskSelectorEntries) }
-    };
+        {MetaKey_Key_UserName, configuration.userName},
+        {MetaKey_Key_SubscribedTasksOnly, QString().setNum(configuration.taskPrefilteringMode)},
+        {MetaKey_Key_TimeTrackerFontSize, QString().setNum(configuration.timeTrackerFontSize)},
+        {MetaKey_Key_DurationFormat, QString::number(configuration.durationFormat)},
+        {MetaKey_Key_IdleDetection, stringForBool(configuration.detectIdling)},
+        {MetaKey_Key_WarnUnuploadedTimesheets,
+         stringForBool(configuration.warnUnuploadedTimesheets)},
+        {MetaKey_Key_RequestEventComment, stringForBool(configuration.requestEventComment)},
+        {MetaKey_Key_ToolButtonStyle, QString().setNum(configuration.toolButtonStyle)},
+        {MetaKey_Key_ShowStatusBar, stringForBool(configuration.showStatusBar)},
+        {MetaKey_Key_EnableCommandInterface, stringForBool(configuration.enableCommandInterface)},
+        {MetaKey_Key_NumberOfTaskSelectorEntries,
+         QString::number(configuration.numberOfTaskSelectorEntries)}};
     int NumberOfSettings = sizeof settings / sizeof settings[0];
 
     bool good = true;
     for (int i = 0; i < NumberOfSettings; ++i)
         good = good && m_storage->setMetaData(settings[i].key, settings[i].value);
-    Q_ASSERT_X(good, Q_FUNC_INFO, "Controller assumes write "
-                                  "permissions in meta data table if persistMetaData is called");
+    Q_ASSERT_X(good, Q_FUNC_INFO,
+               "Controller assumes write "
+               "permissions in meta data table if persistMetaData is called");
     CONFIGURATION.dump();
 }
 
-template<class T>
+template <class T>
 void Controller::loadConfigValue(const QString &key, T &configValue) const
 {
     const QString storedValue = m_storage->getMetaData(key);
@@ -213,7 +201,8 @@ void Controller::provideMetaData(Configuration &configuration)
     loadConfigValue(MetaKey_Key_ToolButtonStyle, configuration.toolButtonStyle);
     loadConfigValue(MetaKey_Key_ShowStatusBar, configuration.showStatusBar);
     loadConfigValue(MetaKey_Key_EnableCommandInterface, configuration.enableCommandInterface);
-    loadConfigValue(MetaKey_Key_NumberOfTaskSelectorEntries, configuration.numberOfTaskSelectorEntries);
+    loadConfigValue(MetaKey_Key_NumberOfTaskSelectorEntries,
+                    configuration.numberOfTaskSelectorEntries);
     configuration.numberOfTaskSelectorEntries = qMax(0, configuration.numberOfTaskSelectorEntries);
 
     CONFIGURATION.dump();

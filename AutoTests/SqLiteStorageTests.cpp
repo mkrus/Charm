@@ -26,9 +26,9 @@
 #include "Core/CharmConstants.h"
 #include "Core/SqLiteStorage.h"
 
+#include <QDateTime>
 #include <QDir>
 #include <QFileInfo>
-#include <QDateTime>
 #include <QTest>
 
 SqLiteStorageTests::SqLiteStorageTests()
@@ -118,8 +118,8 @@ void SqLiteStorageTests::makeModifyDeleteEventsTest()
     QVERIFY(event1.id() != event2.id());
 
     // modify the events
-    QVERIFY(m_storage->modifyEvent(event1));     // store new name
-    QVERIFY(m_storage->modifyEvent(event2));     // -"-
+    QVERIFY(m_storage->modifyEvent(event1)); // store new name
+    QVERIFY(m_storage->modifyEvent(event2)); // -"-
 
     // verify event database entries
     Event event1_1 = m_storage->getEvent(event1.id());

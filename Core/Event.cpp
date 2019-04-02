@@ -27,18 +27,13 @@
 #include <QDomElement>
 #include <QDomText>
 
-Event::Event()
-{
-}
+Event::Event() {}
 
-bool Event::operator ==(const Event &other) const
+bool Event::operator==(const Event &other) const
 {
-    return other.id() == id()
-           && other.taskId() == taskId()
-           && other.comment() == comment()
-           && other.startDateTime() == startDateTime()
-           && other.endDateTime() == endDateTime()
-           && other.reportId() == reportId();
+    return other.id() == id() && other.taskId() == taskId() && other.comment() == comment()
+        && other.startDateTime() == startDateTime() && other.endDateTime() == endDateTime()
+        && other.reportId() == reportId();
 }
 
 EventId Event::id() const
@@ -62,7 +57,7 @@ void Event::setReportId(int reportId)
 }
 
 bool Event::isValid() const
-{   // negative values are allowed and indicate calculated values
+{ // negative values are allowed and indicate calculated values
     return id() != 0;
 }
 
@@ -125,12 +120,9 @@ int Event::duration() const
 
 void Event::dump() const
 {
-    qCDebug(CHARM_CORE_LOG) << "[Event" << id() << "] - task "
-             << taskId()
-             << " - start: " << startDateTime()
-             << " - end: " << endDateTime()
-             << " - duration: " << duration()
-             << "seconds - comment:" << comment();
+    qCDebug(CHARM_CORE_LOG) << "[Event" << id() << "] - task " << taskId()
+                            << " - start: " << startDateTime() << " - end: " << endDateTime()
+                            << " - duration: " << duration() << "seconds - comment:" << comment();
 }
 
 void dumpEvents(const EventList &events)
@@ -170,35 +162,37 @@ QString Event::tagName()
 }
 
 Event Event::fromXml(const QDomElement &element, int databaseSchemaVersion)
-{   // in case any event object creates trouble with
+{ // in case any event object creates trouble with
     // serialization/deserialization, add an object of it to
     // void XmlSerializationTests::testEventSerialization()
     Event event;
     bool ok;
     event.setComment(element.text());
     event.setId(element.attribute(EventIdAttribute).toInt(&ok));
-    if (!ok) throw XmlSerializationException(QObject::tr("Event::fromXml: invalid event id"));
+    if (!ok)
+        throw XmlSerializationException(QObject::tr("Event::fromXml: invalid event id"));
 
     event.setTaskId(element.attribute(EventTaskIdAttribute).toInt(&ok));
-    if (!ok) throw XmlSerializationException(QObject::tr("Event::fromXml: invalid task id"));
+    if (!ok)
+        throw XmlSerializationException(QObject::tr("Event::fromXml: invalid task id"));
     event.setReportId(element.attribute(EventReportIdAttribute).toInt(&ok));
     if (!ok && databaseSchemaVersion > 1) {
         throw XmlSerializationException(QObject::tr("Event::fromXml: invalid report id"));
         event.setReportId(0);
     }
     if (element.hasAttribute(EventStartAttribute)) {
-        QDateTime start
-            = QDateTime::fromString(element.attribute(EventStartAttribute), Qt::ISODate);
-        if (!start.isValid()) throw XmlSerializationException(QObject::tr(
-                                                                  "Event::fromXml: invalid start date"));
+        QDateTime start =
+            QDateTime::fromString(element.attribute(EventStartAttribute), Qt::ISODate);
+        if (!start.isValid())
+            throw XmlSerializationException(QObject::tr("Event::fromXml: invalid start date"));
 
         start.setTimeSpec(Qt::UTC);
         event.setStartDateTime(start);
     }
     if (element.hasAttribute(EventEndAttribute)) {
         QDateTime end = QDateTime::fromString(element.attribute(EventEndAttribute), Qt::ISODate);
-        if (!end.isValid()) throw XmlSerializationException(QObject::tr(
-                                                                "Event::fromXml: invalid end date"));
+        if (!end.isValid())
+            throw XmlSerializationException(QObject::tr("Event::fromXml: invalid end date"));
 
         end.setTimeSpec(Qt::UTC);
         event.setEndDateTime(end.toLocalTime());

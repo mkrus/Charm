@@ -31,6 +31,7 @@ class CharmException
 public:
     explicit CharmException(const QString &message);
     QString what() const throw();
+
 private:
     QString m_message;
 };

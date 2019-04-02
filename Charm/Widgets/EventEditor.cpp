@@ -51,26 +51,18 @@ EventEditor::EventEditor(const Event &event, QWidget *parent)
     m_ui->buttonBox->button(QDialogButtonBox::Ok)->setShortcut(Qt::CTRL + Qt::Key_Return);
 
     // connect stuff:
-    connect(m_ui->spinBoxHours, SIGNAL(valueChanged(int)),
-            SLOT(durationHoursEdited(int)));
-    connect(m_ui->spinBoxMinutes, SIGNAL(valueChanged(int)),
-            SLOT(durationMinutesEdited(int)));
-    connect(m_ui->dateEditStart, &QDateEdit::dateChanged,
-            this, &EventEditor::startDateChanged);
-    connect(m_ui->timeEditStart, &QTimeEdit::timeChanged,
-            this, &EventEditor::startTimeChanged);
-    connect(m_ui->dateEditEnd, &QDateEdit::dateChanged,
-            this, &EventEditor::endDateChanged);
-    connect(m_ui->timeEditEnd, &QTimeEdit::timeChanged,
-            this, &EventEditor::endTimeChanged);
-    connect(m_ui->pushButtonSelectTask, &QPushButton::clicked,
-            this, &EventEditor::selectTaskClicked);
-    connect(m_ui->textEditComment, &QTextEdit::textChanged,
-            this, &EventEditor::commentChanged);
-    connect(m_ui->startToNowButton, &QPushButton::clicked,
-            this, &EventEditor::startToNowButtonClicked);
-    connect(m_ui->endToNowButton, &QPushButton::clicked,
-            this, &EventEditor::endToNowButtonClicked);
+    connect(m_ui->spinBoxHours, SIGNAL(valueChanged(int)), SLOT(durationHoursEdited(int)));
+    connect(m_ui->spinBoxMinutes, SIGNAL(valueChanged(int)), SLOT(durationMinutesEdited(int)));
+    connect(m_ui->dateEditStart, &QDateEdit::dateChanged, this, &EventEditor::startDateChanged);
+    connect(m_ui->timeEditStart, &QTimeEdit::timeChanged, this, &EventEditor::startTimeChanged);
+    connect(m_ui->dateEditEnd, &QDateEdit::dateChanged, this, &EventEditor::endDateChanged);
+    connect(m_ui->timeEditEnd, &QTimeEdit::timeChanged, this, &EventEditor::endTimeChanged);
+    connect(m_ui->pushButtonSelectTask, &QPushButton::clicked, this,
+            &EventEditor::selectTaskClicked);
+    connect(m_ui->textEditComment, &QTextEdit::textChanged, this, &EventEditor::commentChanged);
+    connect(m_ui->startToNowButton, &QPushButton::clicked, this,
+            &EventEditor::startToNowButtonClicked);
+    connect(m_ui->endToNowButton, &QPushButton::clicked, this, &EventEditor::endToNowButtonClicked);
 
     // what a fricking hack - but QDateTimeEdit does not seem to have
     // a simple function to toggle 12h and 24h mode:
@@ -78,18 +70,18 @@ EventEditor::EventEditor(const Event &event, QWidget *parent)
     // only for this instance of the edit dialog
     QString originalDateTimeFormat = m_ui->timeEditStart->displayFormat();
 
-    QString format = originalDateTimeFormat
-                     .remove(QStringLiteral("ap"))
-                     .remove(QStringLiteral("AP"))
-                     .simplified();
+    QString format = originalDateTimeFormat.remove(QStringLiteral("ap"))
+                         .remove(QStringLiteral("AP"))
+                         .simplified();
     m_ui->timeEditStart->setDisplayFormat(format);
     m_ui->timeEditEnd->setDisplayFormat(format);
 
     // initialize to some sensible values, unless we got something valid passed in
     if (!m_event.isValid()) {
         QSettings settings;
-        QDateTime start = settings.value(MetaKey_LastEventEditorDateTime,
-                                         QDateTime::currentDateTime()).toDateTime();
+        QDateTime start =
+            settings.value(MetaKey_LastEventEditorDateTime, QDateTime::currentDateTime())
+                .toDateTime();
         m_event.setStartDateTime(start);
         m_event.setEndDateTime(start);
         m_endDateChanged = false;
@@ -97,9 +89,7 @@ EventEditor::EventEditor(const Event &event, QWidget *parent)
     updateValues(true);
 }
 
-EventEditor::~EventEditor()
-{
-}
+EventEditor::~EventEditor() {}
 
 void EventEditor::accept()
 {
@@ -198,7 +188,8 @@ void EventEditor::commentChanged()
     updateValues();
 }
 
-struct SignalBlocker {
+struct SignalBlocker
+{
     explicit SignalBlocker(QObject *o)
         : m_object(o)
         , m_previous(o->signalsBlocked())
@@ -206,10 +197,7 @@ struct SignalBlocker {
         o->blockSignals(true);
     }
 
-    ~SignalBlocker()
-    {
-        m_object->blockSignals(m_previous);
-    }
+    ~SignalBlocker() { m_object->blockSignals(m_previous); }
 
     QObject *m_object;
     bool m_previous;
@@ -217,12 +205,13 @@ struct SignalBlocker {
 
 void EventEditor::updateValues(bool all)
 {
-    if (m_updating) return;
+    if (m_updating)
+        return;
 
     m_updating = true;
 
     m_ui->buttonBox->button(QDialogButtonBox::Ok)
-    ->setEnabled(m_event.endDateTime() >= m_event.startDateTime());
+        ->setEnabled(m_event.endDateTime() >= m_event.startDateTime());
 
     m_ui->dateEditStart->setDate(m_event.startDateTime().date());
     m_ui->timeEditStart->setTime(m_event.startDateTime().time());
@@ -259,9 +248,9 @@ void EventEditor::updateValues(bool all)
     m_ui->labelTaskName->setText(name);
 
     QString format = m_ui->dateEditStart->displayFormat()
-                     .remove(QStringLiteral("ap"))
-                     .remove(QStringLiteral("AP"))
-                     .simplified();
+                         .remove(QStringLiteral("ap"))
+                         .remove(QStringLiteral("AP"))
+                         .simplified();
     m_ui->dateEditStart->setDisplayFormat(format);
     m_ui->dateEditEnd->setDisplayFormat(format);
 

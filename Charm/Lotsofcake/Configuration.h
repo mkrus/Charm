@@ -49,12 +49,12 @@ public:
     QUrl restUrl() const;
 
 private:
-    mutable struct {
+    mutable struct
+    {
         bool set = false;
         QDate date;
     } m_lastStagedTimesheetUpload;
 };
-
 }
 
 #endif

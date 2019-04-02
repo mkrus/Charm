@@ -22,11 +22,11 @@
 */
 
 #include "TimesheetXmlWriter.h"
-#include "TimesheetInfo.h"
 #include "CharmCMake.h"
+#include "TimesheetInfo.h"
 
-#include "Core/CharmDataModel.h"
 #include "Core/CharmConstants.h"
+#include "Core/CharmDataModel.h"
 #include "Core/XmlSerialization.h"
 
 #include <QDomDocument>
@@ -36,9 +36,7 @@ TimesheetXmlWriter::TimesheetXmlWriter(const QString &templateName)
 {
 }
 
-TimesheetXmlWriter::~TimesheetXmlWriter()
-{
-}
+TimesheetXmlWriter::~TimesheetXmlWriter() {}
 
 const CharmDataModel *TimesheetXmlWriter::dataModel() const
 {
@@ -93,7 +91,8 @@ QByteArray TimesheetXmlWriter::saveToXml() const
     charmVersion.appendChild(charmVersionString);
     metadata.appendChild(charmVersion);
     auto installationId = document.createElement(QStringLiteral("installation-id"));
-    const auto installationIdString = document.createTextNode(QString::number(CONFIGURATION.installationId));
+    const auto installationIdString =
+        document.createTextNode(QString::number(CONFIGURATION.installationId));
     installationId.appendChild(installationIdString);
     metadata.appendChild(installationId);
 
@@ -105,28 +104,29 @@ QByteArray TimesheetXmlWriter::saveToXml() const
     TimeSheetInfoList timeSheetInfo = createTimeSheetInfo();
     // extend report tag: add tasks and effort structure
 
-    if (m_includeTaskList) {   // tasks
+    if (m_includeTaskList) { // tasks
         QDomElement tasks = document.createElement(QStringLiteral("tasks"));
         report.appendChild(tasks);
         for (const TimeSheetInfo &info : timeSheetInfo) {
-            if (info.taskId == 0)   // the root task
+            if (info.taskId == 0) // the root task
                 continue;
             const Task &modelTask = m_dataModel->getTask(info.taskId);
             tasks.appendChild(modelTask.toXml(document));
         }
     }
-    {   // effort
+    { // effort
         // make effort element:
         QDomElement effort = document.createElement(QStringLiteral("effort"));
         report.appendChild(effort);
 
         // aggregate (group by task and day):
         typedef QPair<TaskId, QDate> Key;
-        QMap< Key, Event> events;
+        QMap<Key, Event> events;
         for (const Event &event : m_events) {
             TimeSheetInfoList::iterator it;
             for (it = timeSheetInfo.begin(); it != timeSheetInfo.end(); ++it)
-                if ((*it).taskId == event.taskId()) break;
+                if ((*it).taskId == event.taskId())
+                    break;
             if (it == timeSheetInfo.end())
                 continue;
             Key key(event.taskId(), event.startDateTime().date());
@@ -143,7 +143,7 @@ QByteArray TimesheetXmlWriter::saveToXml() const
                 Q_ASSERT(newEvent.duration() == seconds);
                 QString comment = oldEvent.comment();
                 if (!event.comment().isEmpty()) {
-                    if (!comment.isEmpty())     // make separator
+                    if (!comment.isEmpty()) // make separator
                         comment += QLatin1String(" / ");
                     comment += event.comment();
                     newEvent.setComment(comment);
@@ -152,7 +152,7 @@ QByteArray TimesheetXmlWriter::saveToXml() const
             } else {
                 // add this event:
                 events[key] = event;
-                events[key].setId(-events[key].id());   // "synthetic" :-)
+                events[key].setId(-events[key].id()); // "synthetic" :-)
                 // move to start at midnight in UTC (for privacy reasons)
                 // never, never, never use setTime() here, it breaks on DST changes! (twice a year)
                 QDateTime start(event.startDateTime().date(), QTime(0, 0, 0, 0), Qt::UTC);

@@ -24,12 +24,12 @@
 
 #include "ApplicationCore.h"
 #include "CharmCMake.h"
-#include "Data.h"
-#include "ViewHelpers.h"
-#include "charm_application_debug.h"
 #include "Core/CharmConstants.h"
 #include "Core/CharmExceptions.h"
 #include "Core/SqLiteStorage.h"
+#include "Data.h"
+#include "ViewHelpers.h"
+#include "charm_application_debug.h"
 
 #include "Idle/IdleDetector.h"
 #include "Lotsofcake/Configuration.h"
@@ -37,17 +37,17 @@
 #include "Widgets/NotificationPopup.h"
 #include "Widgets/TasksView.h"
 
-#include <QDir>
-#include <QTimer>
 #include <QAction>
-#include <QSettings>
+#include <QApplication>
+#include <QDir>
+#include <QFile>
+#include <QLocalSocket>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QSessionManager>
-#include <QLocalSocket>
-#include <QFile>
-#include <QApplication>
+#include <QSettings>
 #include <QStandardPaths>
+#include <QTimer>
 
 #ifdef Q_OS_WIN
 #include <QtWinExtras/QWinJumpList>
@@ -83,12 +83,9 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
     , m_actionEnterVacation(this)
     , m_actionWeeklyTimesheetReport(this)
     , m_actionMonthlyTimesheetReport(this)
-    , m_uiElements(
-{
-    &m_timeTracker, &m_eventView
-}),
-    m_startupTask(startupTask)
-  , m_hideAtStart(hideAtStart)
+    , m_uiElements({&m_timeTracker, &m_eventView})
+    , m_startupTask(startupTask)
+    , m_hideAtStart(hideAtStart)
 
 #ifdef Q_OS_WIN
     , m_windowsJumpList(new QWinJumpList(this))
@@ -124,22 +121,24 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
         command += '\n';
         qint64 written = uniqueApplicationSocket.write(command);
         if (written == -1 || written != command.length()) {
-            qCWarning(CHARM_APPLICATION_LOG) << "Failed to pass " << command << " to running charm instance, error: "
-                        << uniqueApplicationSocket.errorString();
+            qCWarning(CHARM_APPLICATION_LOG)
+                << "Failed to pass " << command
+                << " to running charm instance, error: " << uniqueApplicationSocket.errorString();
         }
         uniqueApplicationSocket.flush();
         uniqueApplicationSocket.waitForBytesWritten();
         throw AlreadyRunningException();
     }
 
-    connect(&m_uniqueApplicationServer, &QLocalServer::newConnection,
-            this, &ApplicationCore::slotHandleUniqueApplicationConnection, Qt::QueuedConnection);
+    connect(&m_uniqueApplicationServer, &QLocalServer::newConnection, this,
+            &ApplicationCore::slotHandleUniqueApplicationConnection, Qt::QueuedConnection);
 
     QFile::remove(QDir::tempPath() + QLatin1Char('/') + serverName);
     bool listening = m_uniqueApplicationServer.listen(serverName);
     if (!listening)
-        qCDebug(CHARM_APPLICATION_LOG) << "Failed to create QLocalServer for unique application support:"
-                 << m_uniqueApplicationServer.errorString();
+        qCDebug(CHARM_APPLICATION_LOG)
+            << "Failed to create QLocalServer for unique application support:"
+            << m_uniqueApplicationServer.errorString();
 
     Q_INIT_RESOURCE(CharmResources);
     Q_ASSERT_X(m_instance == 0, "Application ctor",
@@ -149,27 +148,27 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
     qRegisterMetaType<Event>("Event");
 
     // exit process (app will only exit once controller says it is ready)
-    connect(&m_controller, &Controller::readyToQuit,
-            this, &ApplicationCore::slotControllerReadyToQuit);
+    connect(&m_controller, &Controller::readyToQuit, this,
+            &ApplicationCore::slotControllerReadyToQuit);
 
     connectControllerAndModel(&m_controller, m_model.charmDataModel());
     Charm::connectControllerAndView(&m_controller, &m_timeTracker);
 
     // save the configuration (configuration is managed by the application)
-    connect(&m_timeTracker, &CharmWindow::saveConfiguration,
-            this, &ApplicationCore::slotSaveConfiguration);
-    connect(&m_timeTracker, &TimeTrackingWindow::showNotification,
-            this, &ApplicationCore::slotShowNotification);
-    connect(&m_timeTracker, &TimeTrackingWindow::taskMenuChanged,
-            this, &ApplicationCore::slotPopulateTrayIconMenu);
+    connect(&m_timeTracker, &CharmWindow::saveConfiguration, this,
+            &ApplicationCore::slotSaveConfiguration);
+    connect(&m_timeTracker, &TimeTrackingWindow::showNotification, this,
+            &ApplicationCore::slotShowNotification);
+    connect(&m_timeTracker, &TimeTrackingWindow::taskMenuChanged, this,
+            &ApplicationCore::slotPopulateTrayIconMenu);
 
     // due to multiple inheritence we can't use the new style connects here
-    connect(&m_eventView, SIGNAL(emitCommand(CharmCommand*)),
-            &m_timeTracker, SLOT(sendCommand(CharmCommand*)));
+    connect(&m_eventView, SIGNAL(emitCommand(CharmCommand *)), &m_timeTracker,
+            SLOT(sendCommand(CharmCommand *)));
 
     // my own signals:
-    connect(this, &ApplicationCore::goToState,
-             this, &ApplicationCore::setState, Qt::QueuedConnection);
+    connect(this, &ApplicationCore::goToState, this, &ApplicationCore::setState,
+            Qt::QueuedConnection);
 
     // system tray icon:
     m_actionStopAllTasks.setText(tr("Stop Current Task"));
@@ -195,26 +194,25 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
     m_actionQuit.setShortcut(Qt::CTRL + Qt::Key_Q);
     m_actionQuit.setText(tr("Quit"));
     m_actionQuit.setIcon(Data::quitCharmIcon());
-    connect(&m_actionQuit, &QAction::triggered,
-            this, &ApplicationCore::slotQuitApplication);
+    connect(&m_actionQuit, &QAction::triggered, this, &ApplicationCore::slotQuitApplication);
 
     m_actionAboutDialog.setText(tr("About Charm"));
-    connect(&m_actionAboutDialog, &QAction::triggered,
-           &m_timeTracker, &TimeTrackingWindow::slotAboutDialog);
+    connect(&m_actionAboutDialog, &QAction::triggered, &m_timeTracker,
+            &TimeTrackingWindow::slotAboutDialog);
 
     m_actionPreferences.setText(tr("Preferences"));
     m_actionPreferences.setIcon(Data::configureIcon());
-    connect(&m_actionPreferences, &QAction::triggered,
-            &m_timeTracker, &TimeTrackingWindow::slotEditPreferences);
+    connect(&m_actionPreferences, &QAction::triggered, &m_timeTracker,
+            &TimeTrackingWindow::slotEditPreferences);
     m_actionPreferences.setEnabled(true);
 
     m_actionSyncTasks.setText(tr("Update Task Definitions..."));
-    //the signature of QAction::triggered does not match slotSyncTasks
-    connect(&m_actionSyncTasks,&QAction::triggered,
-            &m_timeTracker, &TimeTrackingWindow::slotSyncTasksVerbose);
+    // the signature of QAction::triggered does not match slotSyncTasks
+    connect(&m_actionSyncTasks, &QAction::triggered, &m_timeTracker,
+            &TimeTrackingWindow::slotSyncTasksVerbose);
     m_actionImportTasks.setText(tr("Import and Merge Task Definitions..."));
-    connect(&m_actionImportTasks, &QAction::triggered,
-            &m_timeTracker, &TimeTrackingWindow::slotImportTasks);
+    connect(&m_actionImportTasks, &QAction::triggered, &m_timeTracker,
+            &TimeTrackingWindow::slotImportTasks);
     m_actionCheckForUpdates.setText(tr("Check for Updates..."));
 #if 0
     // TODO this role should be set to have the action in the app menu, but that
@@ -222,19 +220,19 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
     // and Qt doesn't prevent duplicates (#222)
     m_actionCheckForUpdates.setMenuRole(QAction::ApplicationSpecificRole);
 #endif
-    connect(&m_actionCheckForUpdates, &QAction::triggered,
-            &m_timeTracker, &TimeTrackingWindow::slotCheckForUpdatesManual);
+    connect(&m_actionCheckForUpdates, &QAction::triggered, &m_timeTracker,
+            &TimeTrackingWindow::slotCheckForUpdatesManual);
     m_actionEnterVacation.setText(tr("Enter Vacation..."));
-    connect(&m_actionEnterVacation, &QAction::triggered,
-            &m_timeTracker, &TimeTrackingWindow::slotEnterVacation);
+    connect(&m_actionEnterVacation, &QAction::triggered, &m_timeTracker,
+            &TimeTrackingWindow::slotEnterVacation);
     m_actionWeeklyTimesheetReport.setText(tr("Weekly Timesheet..."));
     m_actionWeeklyTimesheetReport.setShortcut(Qt::CTRL + Qt::Key_R);
-    connect(&m_actionWeeklyTimesheetReport, &QAction::triggered,
-            &m_timeTracker, &TimeTrackingWindow::slotWeeklyTimesheetReport);
+    connect(&m_actionWeeklyTimesheetReport, &QAction::triggered, &m_timeTracker,
+            &TimeTrackingWindow::slotWeeklyTimesheetReport);
     m_actionMonthlyTimesheetReport.setText(tr("Monthly Timesheet..."));
     m_actionMonthlyTimesheetReport.setShortcut(Qt::CTRL + Qt::Key_M);
-    connect(&m_actionMonthlyTimesheetReport, &QAction::triggered,
-            &m_timeTracker, &TimeTrackingWindow::slotMonthlyTimesheetReport);
+    connect(&m_actionMonthlyTimesheetReport, &QAction::triggered, &m_timeTracker,
+            &TimeTrackingWindow::slotMonthlyTimesheetReport);
 
     // set up idle detection
     m_idleDetector = IdleDetector::createIdleDetector(this);
@@ -278,7 +276,7 @@ void ApplicationCore::slotPopulateTrayIconMenu()
 void ApplicationCore::slotHandleUniqueApplicationConnection()
 {
     QLocalSocket *socket = m_uniqueApplicationServer.nextPendingConnection();
-    connect(socket, &QLocalSocket::readyRead, socket, [this, socket](){
+    connect(socket, &QLocalSocket::readyRead, socket, [this, socket]() {
         if (!socket->canReadLine())
             return;
         while (socket->canReadLine()) {
@@ -308,7 +306,7 @@ void ApplicationCore::showMainWindow(ShowMode mode)
         m_timeTracker.raise();
         m_timeTracker.activateWindow();
 #ifdef Q_OS_WIN
-        //krazy:cond=captruefalse,null
+        // krazy:cond=captruefalse,null
         int idActive = GetWindowThreadProcessId(GetForegroundWindow(), NULL);
         int threadId = GetCurrentThreadId();
         if (AttachThreadInput(threadId, idActive, TRUE) != 0) {
@@ -317,7 +315,7 @@ void ApplicationCore::showMainWindow(ShowMode mode)
             SetFocus(wid);
             AttachThreadInput(threadId, idActive, FALSE);
         }
-        //krazy:endcond=captruefalse,null
+        // krazy:endcond=captruefalse,null
 #endif
     }
 }
@@ -326,10 +324,10 @@ void ApplicationCore::createWindowMenu(QMenuBar *menuBar)
 {
     auto menu = new QMenu(menuBar);
     menu->setTitle(tr("Window"));
-    menu->addAction(tr("Show Tasks Window"), this,
-                    SLOT(slotShowTasksEditor()), QKeySequence(tr("Ctrl+1")));
-    menu->addAction(tr("Show Event Editor Window"), this,
-                    SLOT(slotShowEventEditor()), QKeySequence(tr("Ctrl+2")));
+    menu->addAction(tr("Show Tasks Window"), this, SLOT(slotShowTasksEditor()),
+                    QKeySequence(tr("Ctrl+1")));
+    menu->addAction(tr("Show Event Editor Window"), this, SLOT(slotShowEventEditor()),
+                    QKeySequence(tr("Ctrl+2")));
     menu->addSeparator();
     menu->addAction(&m_actionEnterVacation);
     menu->addSeparator();
@@ -386,7 +384,7 @@ void ApplicationCore::setState(State state)
     if (m_state == state)
         return;
     qCDebug(CHARM_APPLICATION_LOG) << "ApplicationCore::setState: going from" << StateNames[m_state]
-             << "to" << StateNames[state];
+                                   << "to" << StateNames[state];
     State previous = m_state;
 
     try {
@@ -412,8 +410,7 @@ void ApplicationCore::setState(State state)
             leaveShuttingDownState();
             break;
         default:
-            Q_ASSERT_X(false, "ApplicationCore::setState",
-                       "Unknown previous application state");
+            Q_ASSERT_X(false, "ApplicationCore::setState", "Unknown previous application state");
         }
 
         m_state = state;
@@ -465,8 +462,7 @@ void ApplicationCore::setState(State state)
             enterShuttingDownState();
             break;
         default:
-            Q_ASSERT_X(false, "ApplicationCore::setState",
-                       "Unknown new application state");
+            Q_ASSERT_X(false, "ApplicationCore::setState", "Unknown new application state");
         }
     } catch (const CharmException &e) {
         showCritical(tr("Critical Charm Problem"), e.what());
@@ -481,8 +477,7 @@ State ApplicationCore::state() const
 
 ApplicationCore &ApplicationCore::instance()
 {
-    Q_ASSERT_X(m_instance, "ApplicationCore::instance",
-               "Singleton not constructed yet");
+    Q_ASSERT_X(m_instance, "ApplicationCore::instance", "Singleton not constructed yet");
     return *m_instance;
 }
 
@@ -496,9 +491,7 @@ void ApplicationCore::enterStartingUpState()
     emit goToState(Configuring);
 }
 
-void ApplicationCore::leaveStartingUpState()
-{
-}
+void ApplicationCore::leaveStartingUpState() {}
 
 void ApplicationCore::enterConfiguringState()
 {
@@ -510,9 +503,7 @@ void ApplicationCore::enterConfiguringState()
     }
 }
 
-void ApplicationCore::leaveConfiguringState()
-{
-}
+void ApplicationCore::leaveConfiguringState() {}
 
 void ApplicationCore::showCritical(const QString &title, const QString &message)
 {
@@ -537,8 +528,7 @@ void ApplicationCore::enterConnectingState()
     }
     // tell storage to connect to database
     CONFIGURATION.failure = false;
-    try
-    {
+    try {
         if (m_controller.connectToBackend()) {
             // delay switch to Connected state a bit to show the start screen:
             QTimer::singleShot(0, this, SLOT(slotGoToConnectedState()));
@@ -549,27 +539,27 @@ void ApplicationCore::enterConnectingState()
     } catch (const UnsupportedDatabaseVersionException &e) {
         qCDebug(CHARM_APPLICATION_LOG) << e.what();
         QFileInfo info(Configuration::instance().localStorageDatabase);
-        QString message = QObject::tr("<html><body>"
-                                      "<p>Your current Charm database is not supported by this version. "
-                                      "The error message is: %1."
-                                      "You have two options here:</p><ul>"
-                                      "<li>Start over with an empty database by moving or deleting your %2 folder "
-                                      "then re-running this version of Charm.</li>"
-                                      "<li>Load an older version of Charm that supports your current database and select "
-                                      "File->Export, and save that file somewhere. Then, either rename or delete your "
-                                      "%2 folder and restart this version of Charm and select File->Import from "
-                                      "previous export and select the file you saved in the previous step.</li>"
-                                      "</ul></body></html>").arg(
-            e.what().toHtmlEscaped(), info.absoluteDir().path());
+        QString message =
+            QObject::tr(
+                "<html><body>"
+                "<p>Your current Charm database is not supported by this version. "
+                "The error message is: %1."
+                "You have two options here:</p><ul>"
+                "<li>Start over with an empty database by moving or deleting your %2 folder "
+                "then re-running this version of Charm.</li>"
+                "<li>Load an older version of Charm that supports your current database and select "
+                "File->Export, and save that file somewhere. Then, either rename or delete your "
+                "%2 folder and restart this version of Charm and select File->Import from "
+                "previous export and select the file you saved in the previous step.</li>"
+                "</ul></body></html>")
+                .arg(e.what().toHtmlEscaped(), info.absoluteDir().path());
         showCritical(QObject::tr("Charm Database Error"), message);
         slotQuitApplication();
         return;
     }
 }
 
-void ApplicationCore::leaveConnectingState()
-{
-}
+void ApplicationCore::leaveConnectingState() {}
 
 void ApplicationCore::enterConnectedState()
 {
@@ -591,18 +581,14 @@ void ApplicationCore::enterDisconnectingState()
     // just wait for controller to emit readyToQuit()
 }
 
-void ApplicationCore::leaveDisconnectingState()
-{
-}
+void ApplicationCore::leaveDisconnectingState() {}
 
 void ApplicationCore::enterShuttingDownState()
 {
     QTimer::singleShot(0, qApp, SLOT(quit()));
 }
 
-void ApplicationCore::leaveShuttingDownState()
-{
-}
+void ApplicationCore::leaveShuttingDownState() {}
 
 void ApplicationCore::slotGoToConnectedState()
 {
@@ -641,8 +627,8 @@ bool ApplicationCore::configure()
         const QString storageDatabaseDirectory = charmDataDir();
         const QString storageDatabaseFileRelease = QStringLiteral("Charm.db");
         const QString storageDatabaseFileDebug = QStringLiteral("Charm_debug.db");
-        const QString storageDatabaseRelease = storageDatabaseDirectory
-                                               + storageDatabaseFileRelease;
+        const QString storageDatabaseRelease =
+            storageDatabaseDirectory + storageDatabaseFileRelease;
         const QString storageDatabaseDebug = storageDatabaseDirectory + storageDatabaseFileDebug;
         QString storageDatabase;
 #ifdef NDEBUG
@@ -769,9 +755,9 @@ void ApplicationCore::updateTaskList()
     for (const auto &id : recentData) {
         if (count++ > 5)
             break;
-        recentJumpList->addLink(Data::goIcon(), DATAMODEL->getTask(
-                                    id).name(), qApp->applicationFilePath(),
-                                { QLatin1String("--start-task"), QString::number(id) });
+        recentJumpList->addLink(Data::goIcon(), DATAMODEL->getTask(id).name(),
+                                qApp->applicationFilePath(),
+                                {QLatin1String("--start-task"), QString::number(id)});
     }
     recentJumpList->setVisible(true);
 #endif

@@ -25,22 +25,22 @@
 #ifndef APPLICATIONCORE_H
 #define APPLICATIONCORE_H
 
-#include <QMenu>
 #include <QAction>
 #include <QLocalServer>
+#include <QMenu>
 
 // this is an application, not a library:
 // no pimpling, and data members instead of forward declarations
+#include "Core/Configuration.h"
+#include "Core/Controller.h"
+#include "Core/SqlStorage.h"
 #include "Core/State.h"
 #include "Core/TimeSpans.h"
-#include "Core/Controller.h"
-#include "Core/Configuration.h"
-#include "Core/SqlStorage.h"
 
 #include "Widgets/CharmWindow.h"
 #include "Widgets/EventView.h"
-#include "Widgets/TimeTrackingWindow.h"
 #include "Widgets/TasksView.h"
+#include "Widgets/TimeTrackingWindow.h"
 #include "Widgets/TrayIcon.h"
 
 #include "ModelConnector.h"
@@ -57,10 +57,7 @@ class ApplicationCore : public QObject
     Q_OBJECT
 
 public:
-    enum class ShowMode {
-        Show,
-        ShowAndRaise
-    };
+    enum class ShowMode { Show, ShowAndRaise };
     explicit ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *parent = nullptr);
     ~ApplicationCore();
 

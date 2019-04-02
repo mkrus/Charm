@@ -48,12 +48,12 @@ QSize EventEditorDelegate::sizeHint(const QStyleOptionViewItem &option,
         const Event &event = m_model->eventForIndex(index);
         Q_ASSERT(event.isValid());
 
-        QPixmap pixmap(option.rect.size());   // temp
+        QPixmap pixmap(option.rect.size()); // temp
         QPainter painter(&pixmap);
-        m_cachedSizeHint = paint(&painter, option,
-                                 DATAMODEL->taskIdAndSmartNameString(event.taskId()),
-                                 dateAndDuration(event),
-                                 42, EventState_Locked).size();
+        m_cachedSizeHint =
+            paint(&painter, option, DATAMODEL->taskIdAndSmartNameString(event.taskId()),
+                  dateAndDuration(event), 42, EventState_Locked)
+                .size();
     }
     return m_cachedSizeHint;
 }
@@ -67,10 +67,8 @@ void EventEditorDelegate::paint(QPainter *painter, const QStyleOptionViewItem &o
     if (event.isValid()) {
         bool locked = DATAMODEL->isEventActive(event.id());
 
-        paint(painter, option,
-              DATAMODEL->taskIdAndSmartNameString(event.taskId()),
-              dateAndDuration(event),
-              logDuration(event.duration()),
+        paint(painter, option, DATAMODEL->taskIdAndSmartNameString(event.taskId()),
+              dateAndDuration(event), logDuration(event.duration()),
               locked ? EventState_Locked : EventState_Default);
     }
 }
@@ -82,11 +80,10 @@ QString EventEditorDelegate::dateAndDuration(const Event &event) const
     QDate date = event.startDateTime().date();
     QTime time = event.startDateTime().time();
     QTime endTime = event.endDateTime().time();
-    dateStream << date.toString(Qt::SystemLocaleDate)
-               << " " << time.toString(QStringLiteral("h:mm"))
-               << " - " << endTime.toString(QStringLiteral("h:mm"))
-               << " (" << hoursAndMinutes(event.duration()) << ") Week "
-               << date.weekNumber();
+    dateStream << date.toString(Qt::SystemLocaleDate) << " "
+               << time.toString(QStringLiteral("h:mm")) << " - "
+               << endTime.toString(QStringLiteral("h:mm")) << " ("
+               << hoursAndMinutes(event.duration()) << ") Week " << date.weekNumber();
     return dateAndDuration;
 }
 
@@ -125,8 +122,7 @@ QRect EventEditorDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
         QBrush brush(palette.color(QPalette::Active, QPalette::Highlight));
         painter->fillRect(option.rect, brush);
         if (state != EventState_Locked) {
-            foreground = palette.color(
-                QPalette::Active, QPalette::HighlightedText);
+            foreground = palette.color(QPalette::Active, QPalette::HighlightedText);
         }
     }
 
@@ -137,12 +133,11 @@ QRect EventEditorDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
     QRect taskRect(option.rect);
     taskRect.setWidth(option.rect.width() - decoration.width());
     QPoint decorationPoint(option.rect.width() - decoration.width(),
-                           option.rect.center().y()  - decoration.height() / 2);
+                           option.rect.center().y() - decoration.height() / 2);
 
     QRect boundingRect;
     QString elidedTask = Charm::elidedTaskName(taskName, mainFont, taskRect.width());
-    painter->drawText(taskRect, Qt::AlignLeft | Qt::AlignTop, elidedTask,
-                      &boundingRect);
+    painter->drawText(taskRect, Qt::AlignLeft | Qt::AlignTop, elidedTask, &boundingRect);
     taskRect = boundingRect;
     taskRect.setHeight(qMax(taskRect.height(), decoration.height()));
     // now taskRect tells us where to start line 2
@@ -153,8 +148,7 @@ QRect EventEditorDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
     QRect detailsRect(option.rect);
     detailsRect.setTop(taskRect.bottom());
     detailsRect.setHeight(option.rect.height() - taskRect.height());
-    painter->drawText(detailsRect, Qt::AlignLeft | Qt::AlignTop,
-                      timespan, &boundingRect);
+    painter->drawText(detailsRect, Qt::AlignLeft | Qt::AlignTop, timespan, &boundingRect);
     detailsRect = boundingRect;
 
     // draw the duration line:
@@ -164,13 +158,12 @@ QRect EventEditorDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
     painter->fillRect(durationRect, palette.dark());
 
     painter->restore();
-    return QRect(0, 0,
-                 qMax(taskRect.width(), detailsRect.width()),
+    return QRect(0, 0, qMax(taskRect.width(), detailsRect.width()),
                  durationRect.bottom() + 1 - option.rect.top());
 }
 
 double EventEditorDelegate::logDuration(int duration) const
-{   // we rely on the compiler to optimize at compile time :-)
+{ // we rely on the compiler to optimize at compile time :-)
     if (duration <= 0)
         return 0;
     if (duration <= 3600) {

@@ -35,6 +35,7 @@ public:
     bool isActive() const;
 
     bool commit();
+
 private:
     bool m_active = false;
     QSqlDatabase &m_database;

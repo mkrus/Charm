@@ -24,9 +24,9 @@
 #ifndef HTTPJOBPROGRESSDIALOG_H
 #define HTTPJOBPROGRESSDIALOG_H
 
-#include <QProgressDialog>
-#include <QPointer>
 #include "HttpClient/HttpJob.h"
+#include <QPointer>
+#include <QProgressDialog>
 
 class HttpJobProgressDialog : public QProgressDialog
 {

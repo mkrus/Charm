@@ -30,14 +30,14 @@
 #include <QObject>
 #include <QTimer>
 
-#include "Task.h"
-#include "State.h"
-#include "Event.h"
-#include "TimeSpans.h"
-#include "TaskTreeItem.h"
 #include "CharmDataModelAdapterInterface.h"
+#include "Event.h"
 #include "SmartNameCache.h"
+#include "State.h"
+#include "Task.h"
 #include "TaskModel.h"
+#include "TaskTreeItem.h"
+#include "TimeSpans.h"
 
 class QAbstractItemModel;
 
@@ -80,7 +80,8 @@ public:
     const EventMap &eventMap() const;
     /**
      * Get all events that start in a given time frame (e.g. a given day, a given week etc.)
-     * More precisely, all events that start at or after @p start, and start before @p end (@p end excluded!)
+     * More precisely, all events that start at or after @p start, and start before @p end (@p end
+     * excluded!)
      */
     EventIdList eventsThatStartInTimeFrame(const QDate &start, const QDate &end) const;
     // convenience overload
@@ -104,16 +105,19 @@ public:
     bool activateEvent(const Event &);
 
     /** Provide a list of the most frequently used tasks.
-      * Only tasks that have been used so far will be taken into account, so the list might be empty. */
+     * Only tasks that have been used so far will be taken into account, so the list might be empty.
+     */
     TaskIdList mostFrequentlyUsedTasks() const;
     /** Provide a list of the most recently used tasks.
-      * Only tasks that have been used so far will be taken into account, so the list might be empty. */
+     * Only tasks that have been used so far will be taken into account, so the list might be empty.
+     */
     TaskIdList mostRecentlyUsedTasks() const;
 
     /** Create a full task name from the specified TaskId. */
     QString fullTaskName(const Task &) const;
 
-    /** Create a "smart" task name (name and shortest path that makes the name unique) from the specified TaskId. */
+    /** Create a "smart" task name (name and shortest path that makes the name unique) from the
+     * specified TaskId. */
     QString smartTaskName(const Task &) const;
 
     /** Get the task id and smart name as a single string. */

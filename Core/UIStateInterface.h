@@ -24,15 +24,13 @@
 #ifndef CHARM_UISTATEINTERFACE_H
 #define CHARM_UISTATEINTERFACE_H
 
-#include <Core/State.h>
 #include <Core/CommandEmitterInterface.h>
+#include <Core/State.h>
 
 class UIStateInterface : public CommandEmitterInterface
 {
 public:
-    virtual ~UIStateInterface()
-    {
-    }
+    virtual ~UIStateInterface() {}
 
     virtual void saveGuiState() = 0;
     virtual void restoreGuiState() = 0;

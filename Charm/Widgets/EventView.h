@@ -24,15 +24,15 @@
 #ifndef EVENTVIEW_H
 #define EVENTVIEW_H
 
-#include <QWidget>
 #include <QAction>
-#include <QUndoStack>
 #include <QDialog>
+#include <QUndoStack>
+#include <QWidget>
 
-#include "Core/UIStateInterface.h"
+#include "Core/CommandEmitterInterface.h"
 #include "Core/Event.h"
 #include "Core/TimeSpans.h"
-#include "Core/CommandEmitterInterface.h"
+#include "Core/UIStateInterface.h"
 
 #include "Charm/ModelConnector.h"
 

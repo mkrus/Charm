@@ -32,10 +32,7 @@ class UploadTimesheetJob : public HttpJob
 {
     Q_OBJECT
 public:
-    enum Status {
-        Unreviewed,
-        Staged
-    };
+    enum Status { Unreviewed, Staged };
 
     explicit UploadTimesheetJob(QObject *parent = nullptr);
     ~UploadTimesheetJob() override;

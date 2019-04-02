@@ -33,9 +33,7 @@ GetProjectCodesJob::GetProjectCodesJob(QObject *parent)
 {
 }
 
-GetProjectCodesJob::~GetProjectCodesJob()
-{
-}
+GetProjectCodesJob::~GetProjectCodesJob() {}
 
 QByteArray GetProjectCodesJob::payload() const
 {
@@ -55,7 +53,7 @@ void GetProjectCodesJob::executeRequest(QNetworkAccessManager *manager)
 
 void GetProjectCodesJob::handleResult()
 {
-    auto reply = qobject_cast<QNetworkReply*>(sender());
+    auto reply = qobject_cast<QNetworkReply *>(sender());
     reply->deleteLater();
     /* check for failure */
     if (reply->error() != QNetworkReply::NoError) {

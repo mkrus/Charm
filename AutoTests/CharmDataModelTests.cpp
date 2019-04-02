@@ -24,12 +24,12 @@
 
 #include "CharmDataModelTests.h"
 
+#include "Core/CharmDataModel.h"
 #include "Core/Task.h"
 #include "Core/TaskTreeItem.h"
-#include "Core/CharmDataModel.h"
 
-#include <QTest>
 #include <QDebug>
+#include <QTest>
 
 CharmDataModelTests::CharmDataModelTests()
     : QObject()
@@ -50,8 +50,7 @@ void CharmDataModelTests::addTasksTest()
     Task task2_2_1(2210, QStringLiteral("Task 2-2-1"), task2_2.id());
     Task task2_2_2(2220, QStringLiteral("Task 2-2-2"), task2_2.id());
     TaskList tasks;
-    tasks << task1 << task1_1 << task1_2 << task1_3
-          << task2 << task2_1 << task2_1_1 << task2_1_2
+    tasks << task1 << task1_1 << task1_2 << task1_3 << task2 << task2_1 << task2_1_1 << task2_1_2
           << task2_2 << task2_2_1 << task2_2_2;
 
     CharmDataModel model;

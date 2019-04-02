@@ -26,10 +26,10 @@
 
 #include <QString>
 
-#include "Task.h"
-#include "State.h"
-#include "Event.h"
 #include "CharmExceptions.h"
+#include "Event.h"
+#include "State.h"
+#include "Task.h"
 
 class QSqlDatabase;
 class QSqlQuery;

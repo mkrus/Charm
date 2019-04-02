@@ -34,9 +34,7 @@ CommandImportFromXml::CommandImportFromXml(const QString &filename, QObject *par
 {
 }
 
-CommandImportFromXml::~CommandImportFromXml()
-{
-}
+CommandImportFromXml::~CommandImportFromXml() {}
 
 bool CommandImportFromXml::prepare()
 {
@@ -54,11 +52,9 @@ bool CommandImportFromXml::execute(Controller *controller)
         if (document.setContent(&file, &errorMessage, &errorLine, &errorColumn)) {
             m_error = controller->importDatabaseFromXml(document);
         } else {
-            m_error = tr("Cannot read the XML syntax of the specified file: [%1:%2] %3").arg(QString::number(
-                                                                                                 errorLine),
-                                                                                             QString::number(
-                                                                                                 errorColumn),
-                                                                                             errorMessage);
+            m_error =
+                tr("Cannot read the XML syntax of the specified file: [%1:%2] %3")
+                    .arg(QString::number(errorLine), QString::number(errorColumn), errorMessage);
         }
     } else {
         m_error = tr("Cannot open the specified file: %1").arg(file.errorString());

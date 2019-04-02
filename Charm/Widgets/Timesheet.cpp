@@ -36,12 +36,10 @@ TimeSheetReport::TimeSheetReport(QWidget *parent)
 {
 }
 
-TimeSheetReport::~TimeSheetReport()
-{
-}
+TimeSheetReport::~TimeSheetReport() {}
 
-void TimeSheetReport::setReportProperties(
-    const QDate &start, const QDate &end, TaskId rootTask, bool activeTasksOnly)
+void TimeSheetReport::setReportProperties(const QDate &start, const QDate &end, TaskId rootTask,
+                                          bool activeTasksOnly)
 {
     m_start = start;
     m_end = end;
@@ -89,8 +87,7 @@ void TimeSheetReport::slotSaveToText()
     QFile file(filename);
     if (!file.open(QIODevice::WriteOnly)) {
         QMessageBox::critical(this, tr("Error saving report"),
-                              tr("Cannot write to selected location:\n%1")
-                              .arg(file.errorString()));
+                              tr("Cannot write to selected location:\n%1").arg(file.errorString()));
         return;
     }
     file.write(saveToText());
@@ -104,7 +101,8 @@ QString TimeSheetReport::getFileName(const QString &filter)
     if (settings.contains(MetaKey_ReportsRecentSavePath)) {
         path = settings.value(MetaKey_ReportsRecentSavePath).toString();
         QDir dir(path);
-        if (!dir.exists()) path = QString();
+        if (!dir.exists())
+            path = QString();
     }
     // suggest file name:
     path += QDir::separator() + suggestedFileName();

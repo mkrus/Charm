@@ -45,9 +45,7 @@ IdleCorrectionDialog::IdleCorrectionDialog(const IdleDetector::IdlePeriod &idleP
     timer->start();
 }
 
-IdleCorrectionDialog::~IdleCorrectionDialog()
-{
-}
+IdleCorrectionDialog::~IdleCorrectionDialog() {}
 
 IdleCorrectionDialog::Result IdleCorrectionDialog::result() const
 {
@@ -58,7 +56,7 @@ IdleCorrectionDialog::Result IdleCorrectionDialog::result() const
     } else if (m_ui->restartEvent->isChecked()) {
         return Idle_RestartEvent;
     } else {
-        Q_ASSERT(false);   // unhandled whatever?
+        Q_ASSERT(false); // unhandled whatever?
     }
 
     return Idle_NoResult;
@@ -67,8 +65,7 @@ IdleCorrectionDialog::Result IdleCorrectionDialog::result() const
 void IdleCorrectionDialog::updateDuration()
 {
     const auto secs = m_start.secsTo(QDateTime::currentDateTime());
-    m_ui->idleLabel->setText(
-        tr(
-            "Charm detected that the computer became idle for %1 hours, while an event was in progress.")
-        .arg(hoursAndMinutes(secs)));
+    m_ui->idleLabel->setText(tr("Charm detected that the computer became idle for %1 hours, while "
+                                "an event was in progress.")
+                                 .arg(hoursAndMinutes(secs)));
 }

@@ -22,8 +22,8 @@
 */
 
 #include "TimesheetInfo.h"
-#include "charm_application_debug.h"
 #include "Core/CharmDataModel.h"
+#include "charm_application_debug.h"
 
 TimeSheetInfo::TimeSheetInfo(int segments)
     : seconds(segments)
@@ -41,14 +41,15 @@ int TimeSheetInfo::total() const
 
 void TimeSheetInfo::dump()
 {
-    qCDebug(CHARM_APPLICATION_LOG) << "TimeSheetInfo: (" << indentation << ")" << formattedTaskIdAndName(6) << ":"
-             << seconds << "-" << total() << "total";
+    qCDebug(CHARM_APPLICATION_LOG)
+        << "TimeSheetInfo: (" << indentation << ")" << formattedTaskIdAndName(6) << ":" << seconds
+        << "-" << total() << "total";
 }
 
 QString TimeSheetInfo::formattedTaskIdAndName(int taskPaddingLength) const
 {
-    const QString formattedId
-        = QStringLiteral("%1").arg(taskId, taskPaddingLength, 10, QLatin1Char('0'));
+    const QString formattedId =
+        QStringLiteral("%1").arg(taskId, taskPaddingLength, 10, QLatin1Char('0'));
     return QStringLiteral("%1: %2").arg(formattedId, taskName);
 }
 
@@ -61,7 +62,7 @@ TimeSheetInfoList TimeSheetInfo::taskWithSubTasks(const CharmDataModel *dataMode
     TimeSheetInfoList children;
 
     TimeSheetInfo myInformation(segments);
-    const Task &task= dataModel->getTask(id);
+    const Task &task = dataModel->getTask(id);
     // real task or virtual root item
     Q_ASSERT(task.isValid() || id == 0);
 
@@ -100,8 +101,8 @@ TimeSheetInfoList TimeSheetInfo::taskWithSubTasks(const CharmDataModel *dataMode
 }
 
 // retrieve events that match the settings (active, ...):
-TimeSheetInfoList TimeSheetInfo::filteredTaskWithSubTasks(
-    TimeSheetInfoList timeSheetInfo, bool activeTasksOnly)
+TimeSheetInfoList TimeSheetInfo::filteredTaskWithSubTasks(TimeSheetInfoList timeSheetInfo,
+                                                          bool activeTasksOnly)
 {
     if (activeTasksOnly) {
         TimeSheetInfoList nonZero;

@@ -36,8 +36,8 @@ CommentEditorPopup::CommentEditorPopup(QWidget *parent)
     , ui(new Ui::CommentEditorPopup)
 {
     ui->setupUi(this);
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setShortcut(QKeySequence(Qt::CTRL
-                                                                          + Qt::Key_Return));
+    ui->buttonBox->button(QDialogButtonBox::Ok)
+        ->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return));
     ui->textEdit->setFocus(Qt::TabFocusReason);
 }
 
@@ -68,11 +68,11 @@ void CommentEditorPopup::accept()
         DATAMODEL->modifyEvent(event);
     } else { // event already gone? should never happen, but you never know
         QPointer<QObject> that(this);
-        QMessageBox::critical(this, tr("Error"),
-                              tr(
-                                  "Could not save the comment, the edited event was deleted in the meantime."),
-                              QMessageBox::Ok);
-        if (!that)   // in case the popup was deleted while the msg box was open
+        QMessageBox::critical(
+            this, tr("Error"),
+            tr("Could not save the comment, the edited event was deleted in the meantime."),
+            QMessageBox::Ok);
+        if (!that) // in case the popup was deleted while the msg box was open
             return;
     }
     QDialog::accept();

@@ -38,9 +38,7 @@ UploadTimesheetJob::UploadTimesheetJob(QObject *parent)
 {
 }
 
-UploadTimesheetJob::~UploadTimesheetJob()
-{
-}
+UploadTimesheetJob::~UploadTimesheetJob() {}
 
 QByteArray UploadTimesheetJob::payload() const
 {
@@ -103,8 +101,9 @@ void UploadTimesheetJob::executeRequest(QNetworkAccessManager *manager)
 
     /* payload */
     data += "--KDAB\r\n"
-            "Content-Disposition: form-data; name=\"" + uploadName + "\"; filename=\""
-            +uploadName + "\"\r\nContent-Type: application/octet-stream\r\n\r\n";
+            "Content-Disposition: form-data; name=\""
+        + uploadName + "\"; filename=\"" + uploadName
+        + "\"\r\nContent-Type: application/octet-stream\r\n\r\n";
     data += m_payload;
     data += "\r\n";
 
@@ -127,16 +126,17 @@ void UploadTimesheetJob::executeRequest(QNetworkAccessManager *manager)
 
 void UploadTimesheetJob::handleResult()
 {
-    auto reply = qobject_cast<QNetworkReply*>(sender());
+    auto reply = qobject_cast<QNetworkReply *>(sender());
     reply->deleteLater();
 
     if (reply->error() == QNetworkReply::ProtocolInvalidOperationError) {
         const auto doc = QJsonDocument::fromJson(reply->readAll());
         const auto errorMessage = doc.object().value(QLatin1String("message")).toString();
 
-        setErrorAndEmitFinishedOrRestart(SomethingWentWrong, !errorMessage.isEmpty()
-                                         ? errorMessage
-                                         : tr("An error occurred, could not extract details"));
+        setErrorAndEmitFinishedOrRestart(SomethingWentWrong,
+                                         !errorMessage.isEmpty()
+                                             ? errorMessage
+                                             : tr("An error occurred, could not extract details"));
         return;
     }
 

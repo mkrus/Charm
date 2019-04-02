@@ -26,8 +26,8 @@
 
 #include <QGuiApplication>
 #include <QScreen>
-#include <QTimer>
 #include <QStyle>
+#include <QTimer>
 
 NotificationPopup::NotificationPopup(QWidget *parent)
     : QDialog(parent)
@@ -39,9 +39,7 @@ NotificationPopup::NotificationPopup(QWidget *parent)
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
 }
 
-NotificationPopup::~NotificationPopup()
-{
-}
+NotificationPopup::~NotificationPopup() {}
 
 void NotificationPopup::showNotification(const QString &title, const QString &message)
 {

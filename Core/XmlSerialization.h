@@ -55,7 +55,6 @@ public:
     QDateTime exportTime() const;
 
 private:
-
     TaskList m_tasks;
     QHash<QString, QString> m_metadata;
     QDateTime m_exportTime;

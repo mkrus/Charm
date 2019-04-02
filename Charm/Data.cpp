@@ -34,8 +34,7 @@
 const QIcon &Data::charmIcon()
 {
     static QIcon icon(QStringLiteral(":/Charm/charmicon.png"));
-    Q_ASSERT_X(!icon.isNull(), Q_FUNC_INFO,
-               "Required resource not available");
+    Q_ASSERT_X(!icon.isNull(), Q_FUNC_INFO, "Required resource not available");
     return icon;
 }
 
@@ -52,8 +51,7 @@ const QIcon &Data::charmTrayIcon()
     static const QString iconPath = QStringLiteral(":/Charm/charmtray22.png");
 #endif
 
-    Q_ASSERT_X(!QPixmap(iconPath).isNull(), Q_FUNC_INFO,
-               "Required resource not available");
+    Q_ASSERT_X(!QPixmap(iconPath).isNull(), Q_FUNC_INFO, "Required resource not available");
     static QIcon icon = QPixmap(iconPath);
     return icon;
 }
@@ -71,8 +69,7 @@ const QIcon &Data::charmTrayActiveIcon()
     static const QString iconPath = QStringLiteral(":/Charm/charmtrayactive22.png");
 #endif
 
-    Q_ASSERT_X(!QPixmap(iconPath).isNull(), Q_FUNC_INFO,
-               "Required resource not available");
+    Q_ASSERT_X(!QPixmap(iconPath).isNull(), Q_FUNC_INFO, "Required resource not available");
     static QIcon icon = QPixmap(iconPath);
     return icon;
 }
@@ -80,111 +77,97 @@ const QIcon &Data::charmTrayActiveIcon()
 const QIcon &Data::goIcon()
 {
     static QIcon icon(QStringLiteral(":/Charm/go.png"));
-    Q_ASSERT_X(!icon.isNull(), Q_FUNC_INFO,
-               "Required resource not available");
+    Q_ASSERT_X(!icon.isNull(), Q_FUNC_INFO, "Required resource not available");
     return icon;
 }
 
 const QIcon &Data::stopIcon()
 {
     static QIcon icon(QStringLiteral(":/Charm/stop.png"));
-    Q_ASSERT_X(!icon.isNull(), Q_FUNC_INFO,
-               "Required resource not available");
+    Q_ASSERT_X(!icon.isNull(), Q_FUNC_INFO, "Required resource not available");
     return icon;
 }
 
 const QIcon &Data::newTaskIcon()
 {
     static QIcon icon(QStringLiteral(":/Charm/newtask.png"));
-    Q_ASSERT_X(!icon.isNull(), Q_FUNC_INFO,
-               "Required resource not available");
+    Q_ASSERT_X(!icon.isNull(), Q_FUNC_INFO, "Required resource not available");
     return icon;
 }
 
 const QIcon &Data::newSubtaskIcon()
 {
     static QIcon icon(QStringLiteral(":/Charm/newsubtask.png"));
-    Q_ASSERT_X(!icon.isNull(), Q_FUNC_INFO,
-               "Required resource not available");
+    Q_ASSERT_X(!icon.isNull(), Q_FUNC_INFO, "Required resource not available");
     return icon;
 }
 
 const QIcon &Data::editTaskIcon()
-{   // FIXME same as edit-event icon
+{ // FIXME same as edit-event icon
     static QIcon icon(QStringLiteral(":/Charm/edit.png"));
-    Q_ASSERT_X(!icon.isNull(), Q_FUNC_INFO,
-               "Required resource not available");
+    Q_ASSERT_X(!icon.isNull(), Q_FUNC_INFO, "Required resource not available");
     return icon;
 }
 
 const QIcon &Data::deleteTaskIcon()
 {
     static QIcon icon(QStringLiteral(":/Charm/deletetask.png"));
-    Q_ASSERT_X(!icon.isNull(),
-               Q_FUNC_INFO, "Required resource not available");
+    Q_ASSERT_X(!icon.isNull(), Q_FUNC_INFO, "Required resource not available");
     return icon;
 }
 
 const QIcon &Data::searchIcon()
 {
     static QIcon icon(QStringLiteral(":/Charm/search.png"));
-    Q_ASSERT_X(!icon.isNull(),
-               Q_FUNC_INFO, "Required resource not available");
+    Q_ASSERT_X(!icon.isNull(), Q_FUNC_INFO, "Required resource not available");
     return icon;
 }
 
 const QIcon &Data::editEventIcon()
 {
     static QIcon icon(QStringLiteral(":/Charm/edit.png"));
-    Q_ASSERT_X(!icon.isNull(), Q_FUNC_INFO,
-               "Required resource not available");
+    Q_ASSERT_X(!icon.isNull(), Q_FUNC_INFO, "Required resource not available");
     return icon;
 }
 
 const QIcon &Data::createReportIcon()
 {
     static QIcon icon(QStringLiteral(":/Charm/createreport.png"));
-    Q_ASSERT_X(!icon.isNull(), Q_FUNC_INFO,
-               "Required resource not available");
+    Q_ASSERT_X(!icon.isNull(), Q_FUNC_INFO, "Required resource not available");
     return icon;
 }
 
 const QPixmap &Data::activePixmap()
 {
     static QPixmap pixmap(QStringLiteral(":/Charm/active.png"));
-    Q_ASSERT_X(!pixmap.isNull(), Q_FUNC_INFO,
-               "Required resource not available");
+    Q_ASSERT_X(!pixmap.isNull(), Q_FUNC_INFO, "Required resource not available");
     return pixmap;
 }
 
 const QIcon &Data::quitCharmIcon()
 {
     static QIcon icon(QStringLiteral(":/Charm/quitcharm.png"));
-    Q_ASSERT_X(!icon.isNull(),
-               Q_FUNC_INFO, "Required resource not available");
+    Q_ASSERT_X(!icon.isNull(), Q_FUNC_INFO, "Required resource not available");
     return icon;
 }
 
 const QIcon &Data::configureIcon()
 {
     static QIcon icon(QStringLiteral(":/Charm/configure.png"));
-    Q_ASSERT_X(!icon.isNull(),
-               Q_FUNC_INFO, "Required resource not available");
+    Q_ASSERT_X(!icon.isNull(), Q_FUNC_INFO, "Required resource not available");
     return icon;
 }
 
 const QPixmap &Data::editorLockedPixmap()
 {
     static QPixmap pixmap(QStringLiteral(":/Charm/editor_locked.png"));
-    Q_ASSERT_X(!pixmap.isNull(), Q_FUNC_INFO,
-               "Required resource not available");
+    Q_ASSERT_X(!pixmap.isNull(), Q_FUNC_INFO, "Required resource not available");
     return pixmap;
 }
 
 const QPixmap &Data::editorDirtyPixmap()
 {
     static QPixmap pixmap(QStringLiteral(":/Charm/editor_dirty.png"));
-    Q_ASSERT_X(!pixmap.isNull(), Q_FUNC_INFO,
-               "Required resource not available");
+    Q_ASSERT_X(!pixmap.isNull(), Q_FUNC_INFO, "Required resource not available");
     return pixmap;
 }

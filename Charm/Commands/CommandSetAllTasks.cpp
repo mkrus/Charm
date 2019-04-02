@@ -31,9 +31,7 @@ CommandSetAllTasks::CommandSetAllTasks(const TaskList &tasks, QObject *parent)
 {
 }
 
-CommandSetAllTasks::~CommandSetAllTasks()
-{
-}
+CommandSetAllTasks::~CommandSetAllTasks() {}
 
 bool CommandSetAllTasks::prepare()
 {

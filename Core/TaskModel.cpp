@@ -1,7 +1,7 @@
 #include "TaskModel.h"
 
-#include <QHash>
 #include <QColor>
+#include <QHash>
 
 #include <algorithm>
 #include <cmath>
@@ -38,8 +38,7 @@ void TaskModel::setTasks(const TaskList &tasks)
     m_items.resize(bigId + 1);
     m_taskMap[0] = 0;
 
-    for (int i = 0; i < m_tasks.size(); ++i)
-    {
+    for (int i = 0; i < m_tasks.size(); ++i) {
         const auto &task = m_tasks.at(i);
         m_taskMap[task.id()] = i;
 
@@ -126,7 +125,7 @@ QModelIndex TaskModel::parent(const QModelIndex &index) const
 QModelIndex TaskModel::indexForTaskId(TaskId id) const
 {
     Q_ASSERT(id >= 0 && id < m_items.size());
-    return indexForTreeItem(const_cast<TreeItem*>(&m_items[id]));
+    return indexForTreeItem(const_cast<TreeItem *>(&m_items[id]));
 }
 
 Task TaskModel::taskForIndex(const QModelIndex &index) const
@@ -134,9 +133,8 @@ Task TaskModel::taskForIndex(const QModelIndex &index) const
     Q_ASSERT(index.isValid());
 
     auto item = treeItemForIndex(index);
-    auto it = std::find_if(m_tasks.cbegin(), m_tasks.cend(), [id = item->id](const auto &task){
-        return task.id() == id;
-    });
+    auto it = std::find_if(m_tasks.cbegin(), m_tasks.cend(),
+                           [id = item->id](const auto &task) { return task.id() == id; });
     if (it != m_tasks.cend())
         return *it;
     return {};
@@ -187,7 +185,7 @@ QModelIndex TaskModel::indexForTreeItem(TreeItem *item) const
 const TaskModel::TreeItem *TaskModel::treeItemForIndex(const QModelIndex &index) const
 {
     if (index.isValid())
-        return static_cast<TreeItem*>(index.internalPointer());
+        return static_cast<TreeItem *>(index.internalPointer());
     else
         return &m_items[0];
 }

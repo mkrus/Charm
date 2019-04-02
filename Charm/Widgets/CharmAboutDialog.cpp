@@ -36,6 +36,4 @@ CharmAboutDialog::CharmAboutDialog(QWidget *parent)
     m_ui->versionLabel->setText(versionText);
 }
 
-CharmAboutDialog::~CharmAboutDialog()
-{
-}
+CharmAboutDialog::~CharmAboutDialog() {}

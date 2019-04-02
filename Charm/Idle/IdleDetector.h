@@ -25,10 +25,10 @@
 #ifndef IDLEDETECTOR_H
 #define IDLEDETECTOR_H
 
+#include <QDateTime>
+#include <QObject>
 #include <QPair>
 #include <QVector>
-#include <QObject>
-#include <QDateTime>
 
 /** IdleDetector implements idle detection (duh).
  * Idle detection is (as of now) platform dependent. The factory
@@ -41,8 +41,8 @@ class IdleDetector : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool available READ available NOTIFY availableChanged)
-    Q_PROPERTY(
-        int idlenessDuration READ idlenessDuration WRITE setIdlenessDuration NOTIFY idlenessDurationChanged)
+    Q_PROPERTY(int idlenessDuration READ idlenessDuration WRITE setIdlenessDuration NOTIFY
+                   idlenessDurationChanged)
 
 public:
     typedef QPair<QDateTime, QDateTime> IdlePeriod;
@@ -75,9 +75,7 @@ Q_SIGNALS:
     void availableChanged(bool available);
 
 protected:
-    virtual void onIdlenessDurationChanged()
-    {
-    }
+    virtual void onIdlenessDurationChanged() {}
 
     explicit IdleDetector(QObject *parent = nullptr);
     void maybeIdle(IdlePeriod period);

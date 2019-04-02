@@ -26,9 +26,7 @@
 
 #include "charm_core_debug.h"
 
-TaskTreeItem::TaskTreeItem()
-{
-}
+TaskTreeItem::TaskTreeItem() {}
 
 TaskTreeItem::TaskTreeItem(const Task &task, TaskTreeItem *parent)
     : m_parent(parent)
@@ -65,7 +63,7 @@ TaskTreeItem::~TaskTreeItem()
 void TaskTreeItem::makeChildOf(TaskTreeItem &parent)
 {
     if (m_parent != &parent) {
-        Q_ASSERT(!parent.m_children.contains(this));      // that would be wrong
+        Q_ASSERT(!parent.m_children.contains(this)); // that would be wrong
 
         // if there is an existing parent, unregister with it:
         // parent can only be zero if there never was a parent so far
@@ -118,8 +116,7 @@ int TaskTreeItem::row() const
                    "Internal error - cannot find myself in my parents family");
         return row;
     } else {
-        Q_ASSERT_X(false, Q_FUNC_INFO,
-                   "Calling row() on an invalid item");
+        Q_ASSERT_X(false, Q_FUNC_INFO, "Calling row() on an invalid item");
         return -1;
     }
 }
@@ -133,8 +130,7 @@ TaskList TaskTreeItem::children() const
 {
     TaskList tasks;
     for (int i = 0; i < m_children.size(); ++i) {
-        tasks << m_children[i]->task()
-              << m_children[i]->children();
+        tasks << m_children[i]->task() << m_children[i]->children();
     }
 
     return tasks;

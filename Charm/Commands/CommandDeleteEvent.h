@@ -25,8 +25,8 @@
 #ifndef COMMANDDELETEEVENT_H
 #define COMMANDDELETEEVENT_H
 
-#include <Core/Event.h>
 #include <Core/CharmCommand.h>
+#include <Core/Event.h>
 
 class CommandDeleteEvent : public CharmCommand
 {

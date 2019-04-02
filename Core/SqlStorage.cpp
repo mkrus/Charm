@@ -30,6 +30,7 @@
 #include "State.h"
 #include "Task.h"
 
+#include "charm_core_debug.h"
 #include <QDateTime>
 #include <QFile>
 #include <QFileInfo>
@@ -40,17 +41,12 @@
 #include <QSqlRecord>
 #include <QStringList>
 #include <QTextStream>
-#include "charm_core_debug.h"
 
 // SqlStorage class
 
-SqlStorage::SqlStorage()
-{
-}
+SqlStorage::SqlStorage() {}
 
-SqlStorage::~SqlStorage()
-{
-}
+SqlStorage::~SqlStorage() {}
 
 bool SqlStorage::verifyDatabase()
 {
@@ -75,20 +71,16 @@ bool SqlStorage::verifyDatabase()
         throw UnsupportedDatabaseVersionException(QObject::tr("Database version is too new."));
 
     if (version == CHARM_DATABASE_VERSION_BEFORE_TRACKABLE) {
-        return migrateDB(QStringLiteral(
-                             "ALTER TABLE Tasks ADD trackable INTEGER"),
+        return migrateDB(QStringLiteral("ALTER TABLE Tasks ADD trackable INTEGER"),
                          CHARM_DATABASE_VERSION_BEFORE_TRACKABLE);
     } else if (version == CHARM_DATABASE_VERSION_BEFORE_COMMENT) {
-        return migrateDB(QStringLiteral(
-                             "ALTER TABLE Tasks ADD comment varchar(256)"),
+        return migrateDB(QStringLiteral("ALTER TABLE Tasks ADD comment varchar(256)"),
                          CHARM_DATABASE_VERSION_BEFORE_COMMENT);
     } else if (version == CHARM_DATABASE_VERSION_BEFORE_SUBSCRIPTION_REMOVAL) {
-        return migrateDB(QStringLiteral(
-                             "DROP TABLE Subscriptions"),
+        return migrateDB(QStringLiteral("DROP TABLE Subscriptions"),
                          CHARM_DATABASE_VERSION_BEFORE_SUBSCRIPTION_REMOVAL);
     } else if (version == CHARM_DATABASE_VERSION_BEFORE_USER_REMOVAL) {
-        return migrateDB(QStringLiteral(
-                             "DROP TABLE Users"),
+        return migrateDB(QStringLiteral("DROP TABLE Users"),
                          CHARM_DATABASE_VERSION_BEFORE_USER_REMOVAL);
     }
 
@@ -104,8 +96,7 @@ TaskList SqlStorage::getAllTasks()
 
     // FIXME merge record retrieval with getTask:
     if (runQuery(query)) {
-        while (query.next())
-        {
+        while (query.next()) {
             Task task = makeTaskFromRecord(query.record());
             tasks.append(task);
         }
@@ -143,8 +134,8 @@ bool SqlStorage::addTask(const Task &task, const SqlRaiiTransactor &)
 {
     QSqlQuery query(database());
     query.prepare(QLatin1String(
-                      "INSERT into Tasks (task_id, name, parent, validfrom, validuntil, trackable, comment) "
-                      "values ( :task_id, :name, :parent, :validfrom, :validuntil, :trackable, :comment);"));
+        "INSERT into Tasks (task_id, name, parent, validfrom, validuntil, trackable, comment) "
+        "values ( :task_id, :name, :parent, :validfrom, :validuntil, :trackable, :comment);"));
     query.bindValue(QStringLiteral(":task_id"), task.id());
     query.bindValue(QStringLiteral(":name"), task.name());
     query.bindValue(QStringLiteral(":parent"), task.parent());
@@ -203,12 +194,10 @@ Event SqlStorage::makeEventFromRecord(const QSqlRecord &record)
     event.setTaskId(record.field(taskField).value().toInt());
     event.setComment(record.field(commentField).value().toString());
     if (!record.field(startField).isNull()) {
-        event.setStartDateTime
-            (record.field(startField).value().toDateTime());
+        event.setStartDateTime(record.field(startField).value().toDateTime());
     }
     if (!record.field(endField).isNull()) {
-        event.setEndDateTime
-            (record.field(endField).value().toDateTime());
+        event.setEndDateTime(record.field(endField).value().toDateTime());
     }
 
     return event;
@@ -247,9 +236,8 @@ Event SqlStorage::makeEvent(const SqlRaiiTransactor &)
         Q_ASSERT(result); // this has to suceed
     }
     if (result) { // retrieve the AUTOINCREMENT id value of it
-        const QString statement = QString::fromLocal8Bit(
-            "SELECT id from Events WHERE id = %1();").arg(
-            lastInsertRowFunction());
+        const QString statement = QString::fromLocal8Bit("SELECT id from Events WHERE id = %1();")
+                                      .arg(lastInsertRowFunction());
         QSqlQuery query(database());
         query.prepare(statement);
         result = runQuery(query);
@@ -258,23 +246,22 @@ Event SqlStorage::makeEvent(const SqlRaiiTransactor &)
             event.setId(query.value(indexField).toInt());
             Q_ASSERT(event.id() > 0);
         } else {
-            Q_ASSERT_X(false, Q_FUNC_INFO,
-                       "database implementation error (SELECT)");
+            Q_ASSERT_X(false, Q_FUNC_INFO, "database implementation error (SELECT)");
         }
     }
     if (result) {
         // modify the created record to make sure event_id is unique
         // within the installation:
         QSqlQuery query(database());
-        query.prepare(QLatin1String("UPDATE Events SET event_id = :event_id, "
-                                    "installation_id = :installation_id, report_id = :report_id WHERE id = :id;"));
+        query.prepare(QLatin1String(
+            "UPDATE Events SET event_id = :event_id, "
+            "installation_id = :installation_id, report_id = :report_id WHERE id = :id;"));
         query.bindValue(QStringLiteral(":event_id"), event.id());
         query.bindValue(QStringLiteral(":installation_id"), 1);
         query.bindValue(QStringLiteral(":report_id"), event.reportId());
         query.bindValue(QStringLiteral(":id"), event.id());
         result = runQuery(query);
-        Q_ASSERT_X(result, Q_FUNC_INFO,
-                   "database implementation error (UPDATE)");
+        Q_ASSERT_X(result, Q_FUNC_INFO, "database implementation error (UPDATE)");
     }
 
     if (result) {
@@ -302,7 +289,7 @@ Event SqlStorage::getEvent(int id)
     }
 }
 
-bool SqlStorage:: modifyEvent(const Event &event)
+bool SqlStorage::modifyEvent(const Event &event)
 {
     SqlRaiiTransactor transactor(database());
     if (modifyEvent(event, transactor)) {
@@ -381,23 +368,17 @@ bool SqlStorage::migrateDB(const QString &queryString, int oldVersion)
 {
     const QFileInfo info(Configuration::instance().localStorageDatabase);
     if (info.exists()) {
-        QFile::copy(info.fileName(), info.fileName().append(QStringLiteral("-backup-version-%1")
-                                                            .arg(oldVersion)));
+        QFile::copy(info.fileName(),
+                    info.fileName().append(QStringLiteral("-backup-version-%1").arg(oldVersion)));
     }
     SqlRaiiTransactor transactor(database());
     QSqlQuery query(database());
     query.prepare(queryString);
     if (!runQuery(query)) {
-        throw UnsupportedDatabaseVersionException(QObject::tr(
-                                                      "Could not upgrade database from version %1 to version %2: %3").arg(
-                                                      QString::number(
-                                                          oldVersion),
-                                                      QString
-                                                      ::
-                                                      number(oldVersion + 1),
-                                                      query
-                                                      .
-                                                      lastError().text()));
+        throw UnsupportedDatabaseVersionException(
+            QObject::tr("Could not upgrade database from version %1 to version %2: %3")
+                .arg(QString::number(oldVersion), QString ::number(oldVersion + 1),
+                     query.lastError().text()));
     }
     setMetaData(CHARM_DATABASE_VERSION_DESCRIPTOR, QString::number(oldVersion + 1), transactor);
     transactor.commit();
@@ -479,13 +460,11 @@ Task SqlStorage::makeTaskFromRecord(const QSqlRecord &record)
     task.setParent(record.field(parentField).value().toInt());
     QString from = record.field(validfromField).value().toString();
     if (!from.isEmpty()) {
-        task.setValidFrom
-            (record.field(validfromField).value().toDateTime());
+        task.setValidFrom(record.field(validfromField).value().toDateTime());
     }
     QString until = record.field(validuntilField).value().toString();
     if (!until.isEmpty()) {
-        task.setValidUntil
-            (record.field(validuntilField).value().toDateTime());
+        task.setValidUntil(record.field(validuntilField).value().toDateTime());
     }
     const QVariant trackableValue = record.field(trackableField).value();
     if (!trackableValue.isNull() && trackableValue.isValid())
@@ -517,7 +496,8 @@ QString SqlStorage::setAllTasksAndEvents(const TaskList &tasks, const EventList 
         }
     }
     for (const Event &event : events) {
-        if (!event.isValid()) continue;
+        if (!event.isValid())
+            continue;
         Task task = getTask(event.taskId());
         if (!task.isValid()) {
             // semantical error

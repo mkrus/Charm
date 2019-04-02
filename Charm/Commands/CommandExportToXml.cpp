@@ -37,9 +37,7 @@ CommandExportToXml::CommandExportToXml(const QString &filename, QObject *parent)
 {
 }
 
-CommandExportToXml::~CommandExportToXml()
-{
-}
+CommandExportToXml::~CommandExportToXml() {}
 
 bool CommandExportToXml::prepare()
 {
@@ -56,10 +54,10 @@ bool CommandExportToXml::execute(Controller *controller)
             stream << document.toString(4);
         } else {
             m_error = true;
-            m_errorString = tr("Could not open %1 for writing: %2").arg(m_filename,
-                                                                        file.errorString());
+            m_errorString =
+                tr("Could not open %1 for writing: %2").arg(m_filename, file.errorString());
         }
-    }  catch (const XmlSerializationException &e) {
+    } catch (const XmlSerializationException &e) {
         m_error = true;
         m_errorString = e.what();
     }

@@ -40,7 +40,8 @@ public:
     TaskIdList childrenIds(const Task &task) const;
 
 private:
-    struct TreeItem {
+    struct TreeItem
+    {
         TaskId id = 0;
         TreeItem *parent = nullptr;
         QVector<TreeItem *> children;

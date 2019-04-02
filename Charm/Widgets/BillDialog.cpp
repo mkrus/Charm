@@ -22,9 +22,9 @@
 */
 
 #include "BillDialog.h"
-#include <QVBoxLayout>
-#include <QPushButton>
 #include <QDialogButtonBox>
+#include <QPushButton>
+#include <QVBoxLayout>
 
 BillDialog::BillDialog(QWidget *parent, Qt::WindowFlags f)
     : QDialog(parent, f)
@@ -45,7 +45,7 @@ BillDialog::BillDialog(QWidget *parent, Qt::WindowFlags f)
     m_alreadyDone = new QPushButton(QStringLiteral("Already done"));
     connect(m_alreadyDone, &QPushButton::clicked, this, &BillDialog::slotAlreadyDone);
     m_later = new QPushButton(QStringLiteral("Later"));
-    connect(m_later,  &QPushButton::clicked, this, &BillDialog::slotLater);
+    connect(m_later, &QPushButton::clicked, this, &BillDialog::slotLater);
 
     auto layout = new QVBoxLayout(this);
     auto buttonBox = new QDialogButtonBox();

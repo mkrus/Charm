@@ -40,10 +40,7 @@ class TaskFilterProxyModel : public QSortFilterProxyModel
     Q_OBJECT
 
 public:
-    enum class FilterMode {
-        All,
-        Current
-    };
+    enum class FilterMode { All, Current };
 
 public:
     explicit TaskFilterProxyModel(QObject *parent = nullptr);

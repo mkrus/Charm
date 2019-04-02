@@ -24,17 +24,15 @@
 #ifndef CHARMDATAMODELADAPTERINTERFACE_H
 #define CHARMDATAMODELADAPTERINTERFACE_H
 
-#include "Task.h"
 #include "Event.h"
+#include "Task.h"
 #include <QList>
 
 class CharmDataModelAdapterInterface
 {
 public:
     // keep compiler happy:
-    virtual ~CharmDataModelAdapterInterface()
-    {
-    }
+    virtual ~CharmDataModelAdapterInterface() {}
 
     virtual void resetTasks() = 0;
 

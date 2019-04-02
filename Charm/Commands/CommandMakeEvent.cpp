@@ -40,9 +40,7 @@ CommandMakeEvent::CommandMakeEvent(const Event &event, QObject *parent)
 {
 }
 
-CommandMakeEvent::~CommandMakeEvent()
-{
-}
+CommandMakeEvent::~CommandMakeEvent() {}
 
 bool CommandMakeEvent::prepare()
 {
@@ -51,7 +49,7 @@ bool CommandMakeEvent::prepare()
 
 bool CommandMakeEvent::execute(Controller *controller)
 {
-    if (m_event.id()) { //if it already has an id, this is a redo operation
+    if (m_event.id()) { // if it already has an id, this is a redo operation
         int oid = m_event.id();
         m_event = controller->cloneEvent(m_event);
         int nid = m_event.id();

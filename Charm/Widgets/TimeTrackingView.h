@@ -24,9 +24,9 @@
 #ifndef TimeTrackingView_H
 #define TimeTrackingView_H
 
-#include <QWidget>
-#include <QVector>
 #include <QMenu>
+#include <QVector>
+#include <QWidget>
 
 #include "Core/Task.h"
 #include "TimeTrackingTaskSelector.h"
@@ -38,7 +38,8 @@ class TimeTrackingView : public QWidget
 {
     Q_OBJECT
 private:
-    struct DataField {
+    struct DataField
+    {
         QString text;
         QBrush background;
         bool hasHighlight = false; // QBrush does not have isValid()
@@ -48,8 +49,10 @@ private:
     };
 
     /** A struct to store the attributes used during painting.
-      The initialize function has and this class have been factored out for performance reasonsduring profiling. */
-    struct PaintAttributes {
+      The initialize function has and this class have been factored out for performance
+      reasonsduring profiling. */
+    struct PaintAttributes
+    {
         QBrush headerBrush;
         QBrush taskBrushEven;
         QBrush taskBrushOdd;
@@ -92,15 +95,9 @@ private Q_SLOTS:
 
 private:
     void data(DataField &out, int column, int row) const;
-    int columnCount() const
-    {
-        return 9;
-    }
+    int columnCount() const { return 9; }
 
-    int rowCount() const
-    {
-        return qMax(6, m_summaries.count()) + 3;
-    }
+    int rowCount() const { return qMax(6, m_summaries.count()) + 3; }
 
     int getSummaryAt(const QPoint &position);
     bool taskIsValidAndTrackable(int taskId);

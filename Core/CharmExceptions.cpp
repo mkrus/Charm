@@ -38,7 +38,7 @@ ParseError::ParseError(const QString &text)
 {
 }
 
-XmlSerializationException:: XmlSerializationException(const QString &message)
+XmlSerializationException::XmlSerializationException(const QString &message)
     : CharmException(message)
 {
 }

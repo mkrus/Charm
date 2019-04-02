@@ -24,11 +24,11 @@
 #include "TaskStructureTests.h"
 #include "TestHelpers.h"
 
-#include "Core/Task.h"
 #include "Core/CharmConstants.h"
+#include "Core/Task.h"
 
-#include <QTest>
 #include <QDebug>
+#include <QTest>
 
 TaskStructureTests::TaskStructureTests()
     : QObject()
@@ -41,8 +41,8 @@ void TaskStructureTests::checkForUniqueTaskIdsTest_data()
     QTest::addColumn<bool>("unique");
 
     for (const QDomElement &testcase :
-               TestHelpers::retrieveTestCases(QLatin1String(":/checkForUniqueTaskIdsTest/Data"),
-                                              QLatin1String("checkForUniqueTaskIdsTest"))) {
+         TestHelpers::retrieveTestCases(QLatin1String(":/checkForUniqueTaskIdsTest/Data"),
+                                        QLatin1String("checkForUniqueTaskIdsTest"))) {
         QString name = testcase.attribute(QStringLiteral("name"));
         bool expectedResult = TestHelpers::attribute(QStringLiteral("expectedResult"), testcase);
         QDomElement element = testcase.firstChildElement(Task::taskListTagName());
@@ -67,9 +67,8 @@ void TaskStructureTests::checkForTreenessTest_data()
     QTest::addColumn<TaskList>("tasks");
     QTest::addColumn<bool>("directed");
 
-    for (const QDomElement &testcase :
-               TestHelpers::retrieveTestCases(QLatin1String(":/checkForTreenessTest/Data"),
-                                              QLatin1String("checkForTreenessTest"))) {
+    for (const QDomElement &testcase : TestHelpers::retrieveTestCases(
+             QLatin1String(":/checkForTreenessTest/Data"), QLatin1String("checkForTreenessTest"))) {
         QString name = testcase.attribute(QStringLiteral("name"));
         bool expectedResult = TestHelpers::attribute(QStringLiteral("expectedResult"), testcase);
         QDomElement element = testcase.firstChildElement(Task::taskListTagName());

@@ -41,10 +41,7 @@ public:
                                      bool activeTasksOnly);
 
 protected:
-    enum SaveToXmlMode {
-        IncludeTaskList,
-        ExcludeTaskList
-    };
+    enum SaveToXmlMode { IncludeTaskList, ExcludeTaskList };
 
     virtual QString suggestedFileName() const = 0;
     virtual void update() = 0;
@@ -52,31 +49,15 @@ protected:
     virtual QByteArray saveToXml(SaveToXmlMode mode) = 0;
 
 protected:
+    inline QDate startDate() const { return m_start; }
 
-    inline QDate startDate() const
-    {
-        return m_start;
-    }
+    inline QDate endDate() const { return m_end; }
 
-    inline QDate endDate() const
-    {
-        return m_end;
-    }
+    inline TaskId rootTask() const { return m_rootTask; }
 
-    inline TaskId rootTask() const
-    {
-        return m_rootTask;
-    }
+    inline bool activeTasksOnly() const { return m_activeTasksOnly; }
 
-    inline bool activeTasksOnly() const
-    {
-        return m_activeTasksOnly;
-    }
-
-    inline const SecondsMap &secondsMap() const
-    {
-        return m_secondsMap;
-    }
+    inline const SecondsMap &secondsMap() const { return m_secondsMap; }
 
     QString getFileName(const QString &filter);
 

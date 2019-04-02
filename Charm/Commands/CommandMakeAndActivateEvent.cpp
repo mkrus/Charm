@@ -36,9 +36,7 @@ CommandMakeAndActivateEvent::CommandMakeAndActivateEvent(const Task &task, QObje
 {
 }
 
-CommandMakeAndActivateEvent::~CommandMakeAndActivateEvent()
-{
-}
+CommandMakeAndActivateEvent::~CommandMakeAndActivateEvent() {}
 
 bool CommandMakeAndActivateEvent::prepare()
 {
@@ -61,7 +59,7 @@ bool CommandMakeAndActivateEvent::finalize()
 {
     if (m_event.isValid()) {
         ModelConnector *model = dynamic_cast<ModelConnector *>(owner());
-        Q_ASSERT(model);   // this command is "owned" by the model
+        Q_ASSERT(model); // this command is "owned" by the model
         model->charmDataModel()->activateEvent(m_event);
         return true;
     } else {

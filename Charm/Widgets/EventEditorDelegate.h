@@ -24,8 +24,8 @@
 #ifndef EVENTEDITORDELEGATE_H
 #define EVENTEDITORDELEGATE_H
 
-#include <QSize>
 #include <QItemDelegate>
+#include <QSize>
 
 class QPainter;
 class QStyleOptionViewItem;
@@ -39,11 +39,7 @@ class EventEditorDelegate : public QItemDelegate
     Q_OBJECT
 
 public:
-    enum EventState {
-        EventState_Default,
-        EventState_Locked,
-        EventState_Dirty
-    };
+    enum EventState { EventState_Default, EventState_Locked, EventState_Dirty };
 
     explicit EventEditorDelegate(EventModelFilter *model, QObject *parent = nullptr);
 

@@ -36,9 +36,8 @@ SqlRaiiTransactor::SqlRaiiTransactor(QSqlDatabase &database)
         throw TransactionException(QObject::tr("Database driver does not support transactions."));
     m_active = m_database.transaction();
     if (!m_active) {
-        throw TransactionException(QObject::tr("Starting a transaction failed: %1").arg(m_database.
-                                                                                        lastError().
-                                                                                        text()));
+        throw TransactionException(
+            QObject::tr("Starting a transaction failed: %1").arg(m_database.lastError().text()));
     }
 }
 
@@ -46,7 +45,8 @@ SqlRaiiTransactor::~SqlRaiiTransactor()
 {
     if (m_active) {
         if (!m_database.rollback())
-            qCWarning(CHARM_CORE_LOG) << "Failed to rollback transaction: " << m_database.lastError().text();
+            qCWarning(CHARM_CORE_LOG)
+                << "Failed to rollback transaction: " << m_database.lastError().text();
     }
 }
 
@@ -62,8 +62,7 @@ bool SqlRaiiTransactor::commit()
             m_active = false;
             return true;
         }
-        throw TransactionException(QObject::tr(
-                                       "Failed to commit transaction: ")
+        throw TransactionException(QObject::tr("Failed to commit transaction: ")
                                    + m_database.lastError().text());
     }
     return false;

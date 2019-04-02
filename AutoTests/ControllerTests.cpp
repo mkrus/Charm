@@ -26,14 +26,14 @@
 
 #include "ControllerTests.h"
 
-#include "Core/SqlStorage.h"
 #include "Core/CharmConstants.h"
 #include "Core/Controller.h"
+#include "Core/SqlStorage.h"
 
+#include <QDebug>
 #include <QDir>
 #include <QFileInfo>
 #include <QTest>
-#include <QDebug>
 
 ControllerTests::ControllerTests()
     : QObject()
@@ -57,10 +57,9 @@ void ControllerTests::initTestCase()
     m_configuration.newDatabase = true;
     auto controller = new Controller;
     m_controller = controller;
-//    connect( controller, SIGNAL(currentEvents(EventList)),
-//             SLOT(slotCurrentEvents(EventList)) );
-    connect(controller, SIGNAL(definedTasks(TaskList)),
-            SLOT(slotDefinedTasks(TaskList)));
+    //    connect( controller, SIGNAL(currentEvents(EventList)),
+    //             SLOT(slotCurrentEvents(EventList)) );
+    connect(controller, SIGNAL(definedTasks(TaskList)), SLOT(slotDefinedTasks(TaskList)));
 }
 
 void ControllerTests::initializeConnectBackendTest()
@@ -69,16 +68,15 @@ void ControllerTests::initializeConnectBackendTest()
     QVERIFY(m_controller->connectToBackend());
 }
 
-void ControllerTests:: persistProvideMetaDataTest()
+void ControllerTests::persistProvideMetaDataTest()
 {
     Configuration configs[] = {
         Configuration(Configuration::TaskPrefilter_ShowAll, Configuration::TimeTrackerFont_Small,
-                      Configuration::Minutes, true, Qt::ToolButtonIconOnly, true, true, true,
-                      false, 5),
+                      Configuration::Minutes, true, Qt::ToolButtonIconOnly, true, true, true, false,
+                      5),
         Configuration(Configuration::TaskPrefilter_CurrentOnly,
-                      Configuration::TimeTrackerFont_Regular,
-                      Configuration::Minutes, false, Qt::ToolButtonTextOnly, false, false, false,
-                      false, 5),
+                      Configuration::TimeTrackerFont_Regular, Configuration::Minutes, false,
+                      Qt::ToolButtonTextOnly, false, false, false, false, 5),
     };
     const int NumberOfConfigurations = sizeof configs / sizeof configs[0];
 
@@ -161,7 +159,7 @@ void ControllerTests::toAndFromXmlTest()
 {
     // make sure we have some tasks and associated events:
     TaskList tasks = m_controller->storage()->getAllTasks();
-    QVERIFY(tasks.size() > 0);   // just to be sure nobody fucks it up
+    QVERIFY(tasks.size() > 0); // just to be sure nobody fucks it up
     Event e1 = m_controller->storage()->makeEvent();
     e1.setTaskId(tasks[0].id());
     e1.setComment(QStringLiteral("Event-1-Comment"));
@@ -173,7 +171,7 @@ void ControllerTests::toAndFromXmlTest()
     e2.setStartDateTime();
     m_controller->modifyEvent(e2);
 
-    Q_ASSERT(m_controller);   // just to be sure
+    Q_ASSERT(m_controller); // just to be sure
     TaskList tasksBefore = m_controller->storage()->getAllTasks();
     EventList eventsBefore = m_controller->storage()->getAllEvents();
     QVERIFY(tasksBefore == tasks);

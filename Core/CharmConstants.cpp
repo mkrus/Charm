@@ -30,19 +30,18 @@
 #include <QObject>
 #include <QTextStream>
 
-
 const QString MetaKey_EventsInLeafsOnly = QStringLiteral("EventsInLeafsOnly");
 const QString MetaKey_OneEventAtATime = QStringLiteral("OneEventAtATime");
 const QString MetaKey_MainWindowGeometry = QStringLiteral("MainWindowGeometry");
 const QString MetaKey_MainWindowVisible = QStringLiteral("MainWindowVisible");
-const QString MetaKey_MainWindowGUIStateSelectedTask = QStringLiteral(
-    "MainWindowGUIStateSelectedTask");
-const QString MetaKey_MainWindowGUIStateExpandedTasks = QStringLiteral(
-    "MainWindowGUIStateExpandedTasks");
-const QString MetaKey_MainWindowGUIStateShowExpiredTasks = QStringLiteral(
-    "MainWindowGUIStateShowExpiredTasks");
-const QString MetaKey_MainWindowGUIStateShowCurrentTasks = QStringLiteral(
-    "MainWindowGUIStateShowCurrentTasks");
+const QString MetaKey_MainWindowGUIStateSelectedTask =
+    QStringLiteral("MainWindowGUIStateSelectedTask");
+const QString MetaKey_MainWindowGUIStateExpandedTasks =
+    QStringLiteral("MainWindowGUIStateExpandedTasks");
+const QString MetaKey_MainWindowGUIStateShowExpiredTasks =
+    QStringLiteral("MainWindowGUIStateShowExpiredTasks");
+const QString MetaKey_MainWindowGUIStateShowCurrentTasks =
+    QStringLiteral("MainWindowGUIStateShowCurrentTasks");
 const QString MetaKey_TimeTrackerGeometry = QStringLiteral("TimeTrackerGeometry");
 const QString MetaKey_TimeTrackerVisible = QStringLiteral("TimeTrackerVisible");
 const QString MetaKey_EventEditorGeometry = QStringLiteral("EventEditorGeometry");
@@ -64,7 +63,8 @@ const QString MetaKey_Key_RequestEventComment = QStringLiteral("RequestEventComm
 const QString MetaKey_Key_ToolButtonStyle = QStringLiteral("ToolButtonStyle");
 const QString MetaKey_Key_ShowStatusBar = QStringLiteral("ShowStatusBar");
 const QString MetaKey_Key_EnableCommandInterface = QStringLiteral("EnableCommandInterface");
-const QString MetaKey_Key_NumberOfTaskSelectorEntries = QStringLiteral("NumberOfTaskSelectorEntries");
+const QString MetaKey_Key_NumberOfTaskSelectorEntries =
+    QStringLiteral("NumberOfTaskSelectorEntries");
 
 const QString TrueString(QStringLiteral("true"));
 const QString FalseString(QStringLiteral("false"));
@@ -76,22 +76,20 @@ const QString &stringForBool(bool val)
 
 void connectControllerAndModel(Controller *controller, CharmDataModel *model)
 {
-    QObject::connect(controller, SIGNAL(eventAdded(Event)),
-                     model, SLOT(addEvent(Event)));
-    QObject::connect(controller, SIGNAL(eventModified(Event)),
-                     model, SLOT(modifyEvent(Event)));
-    QObject::connect(controller, SIGNAL(eventDeleted(Event)),
-                     model, SLOT(deleteEvent(Event)));
-    QObject::connect(controller, SIGNAL(allEvents(EventList)),
-                     model, SLOT(setAllEvents(EventList)));
-    QObject::connect(controller, SIGNAL(definedTasks(TaskList)),
-                     model, SLOT(setAllTasks(TaskList)));
+    QObject::connect(controller, SIGNAL(eventAdded(Event)), model, SLOT(addEvent(Event)));
+    QObject::connect(controller, SIGNAL(eventModified(Event)), model, SLOT(modifyEvent(Event)));
+    QObject::connect(controller, SIGNAL(eventDeleted(Event)), model, SLOT(deleteEvent(Event)));
+    QObject::connect(controller, SIGNAL(allEvents(EventList)), model,
+                     SLOT(setAllEvents(EventList)));
+    QObject::connect(controller, SIGNAL(definedTasks(TaskList)), model,
+                     SLOT(setAllTasks(TaskList)));
 }
 
 static QString formatDecimal(double d)
 {
     const QString s = QLocale::system().toString(d, 'f', 2);
-    if (d > -10 && d < 10) { //hack to get the hours always have two decimals: e.g. 00.50 instead of 0.50
+    if (d > -10
+        && d < 10) { // hack to get the hours always have two decimals: e.g. 00.50 instead of 0.50
         return QStringLiteral("0") + s;
     } else {
         return s;
@@ -114,10 +112,10 @@ QString hoursAndMinutes(int duration)
     if (CONFIGURATION.durationFormat == Configuration::Minutes) {
         QString text;
         QTextStream stream(&text);
-        stream << qSetFieldWidth(2) << qSetPadChar(QLatin1Char('0'))
-               << hours << qSetFieldWidth(0) << ":" << qSetFieldWidth(2) << minutes;
+        stream << qSetFieldWidth(2) << qSetPadChar(QLatin1Char('0')) << hours << qSetFieldWidth(0)
+               << ":" << qSetFieldWidth(2) << minutes;
         return text;
-    } else { //Decimal
+    } else { // Decimal
         return formatDecimal(hours + minutes / 60.0);
     }
 }

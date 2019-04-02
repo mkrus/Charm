@@ -58,7 +58,8 @@ void Lotsofcake::Configuration::importFromTaskExport(const TaskExport &exporter)
                       exporter.metadata(QStringLiteral("timesheet-upload-url")));
     setValueIfNotNull(&settings, QLatin1String(s_keyProjectCodeDownloadUrl),
                       exporter.metadata(QStringLiteral("project-code-download-url")));
-    setValueIfNotNull(&settings, QLatin1String(s_keyRestUrl), exporter.metadata(QStringLiteral("rest-url")));
+    setValueIfNotNull(&settings, QLatin1String(s_keyRestUrl),
+                      exporter.metadata(QStringLiteral("rest-url")));
 }
 
 QString Lotsofcake::Configuration::username() const
@@ -73,7 +74,8 @@ QUrl Lotsofcake::Configuration::timesheetUploadUrl() const
     QSettings settings;
     settings.beginGroup(QLatin1String(s_group));
     QUrl url = settings.value(QLatin1String(s_keyTimesheetUploadUrl)).toUrl();
-    url.setPath(QLatin1String("/KdabHome/apps/timesheets/rest/upload")); // TODO don't use hardcoded path
+    url.setPath(
+        QLatin1String("/KdabHome/apps/timesheets/rest/upload")); // TODO don't use hardcoded path
     return url;
 }
 
@@ -96,7 +98,8 @@ QDate Lotsofcake::Configuration::lastStagedTimesheetUpload() const
     if (!m_lastStagedTimesheetUpload.set) {
         QSettings settings;
         settings.beginGroup(QLatin1String(s_group));
-        m_lastStagedTimesheetUpload.date = settings.value(QLatin1String(s_keyLastStagedTimesheetUpload)).toDate();
+        m_lastStagedTimesheetUpload.date =
+            settings.value(QLatin1String(s_keyLastStagedTimesheetUpload)).toDate();
         m_lastStagedTimesheetUpload.set = true;
     }
 

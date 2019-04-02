@@ -22,8 +22,8 @@
 */
 
 #include "TasksView.h"
-#include "TasksViewWidget.h"
 #include "GUIState.h"
+#include "TasksViewWidget.h"
 #include "WidgetUtils.h"
 
 #include <Core/CharmConstants.h>
@@ -42,9 +42,7 @@ TasksView::TasksView(QWidget *parent)
     WidgetUtils::restoreGeometry(this, MetaKey_TaskEditorGeometry);
 }
 
-TasksView::~TasksView()
-{
-}
+TasksView::~TasksView() {}
 
 void TasksView::hideEvent(QHideEvent *event)
 {

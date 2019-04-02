@@ -29,9 +29,7 @@ class CharmCommand;
 class CommandEmitterInterface
 {
 public:
-    virtual ~CommandEmitterInterface()
-    {
-    }
+    virtual ~CommandEmitterInterface() {}
 
     virtual void commitCommand(CharmCommand *) = 0;
 };

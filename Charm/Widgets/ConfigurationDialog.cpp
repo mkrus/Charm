@@ -72,7 +72,7 @@ void ConfigurationDialog::on_nameLineEdit_textChanged(const QString &)
 
 void ConfigurationDialog::checkInput()
 {
-    const bool ok = !m_ui.databaseLocation->text().isEmpty()
-                    && !m_ui.nameLineEdit->text().isEmpty();
+    const bool ok =
+        !m_ui.databaseLocation->text().isEmpty() && !m_ui.nameLineEdit->text().isEmpty();
     m_ui.buttonBox->button(QDialogButtonBox::Ok)->setEnabled(ok);
 }

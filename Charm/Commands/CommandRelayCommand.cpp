@@ -29,7 +29,7 @@
 
 CommandRelayCommand::CommandRelayCommand(QObject *parent)
     : CharmCommand(tr("Relay"), parent)
-{   // as long as Charm is single-threaded, this does not do anything,
+{ // as long as Charm is single-threaded, this does not do anything,
     // because there will be no repaint
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 }
@@ -46,8 +46,7 @@ void CommandRelayCommand::setCommand(CharmCommand *command)
 
 bool CommandRelayCommand::prepare()
 {
-    Q_ASSERT_X(false, Q_FUNC_INFO,
-               "Prepare should have been called by the owner instead.");
+    Q_ASSERT_X(false, Q_FUNC_INFO, "Prepare should have been called by the owner instead.");
     return true;
 }
 

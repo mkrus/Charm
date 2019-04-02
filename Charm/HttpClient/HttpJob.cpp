@@ -27,10 +27,10 @@
 
 #include <qt5keychain/keychain.h>
 
+#include <QAuthenticator>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
-#include <QAuthenticator>
 #include <QSettings>
 
 #include <QUrlQuery>
@@ -40,13 +40,11 @@ HttpJob::HttpJob(QObject *parent)
     , m_networkManager(new QNetworkAccessManager(this))
 {
     m_networkManager->setRedirectPolicy(QNetworkRequest::NoLessSafeRedirectPolicy);
-    connect(m_networkManager, &QNetworkAccessManager::authenticationRequired,
-            this, &HttpJob::authenticationRequired);
+    connect(m_networkManager, &QNetworkAccessManager::authenticationRequired, this,
+            &HttpJob::authenticationRequired);
 }
 
-HttpJob::~HttpJob()
-{
-}
+HttpJob::~HttpJob() {}
 
 QString HttpJob::username() const
 {
@@ -89,7 +87,8 @@ void HttpJob::doStart()
 {
     if (m_username.isEmpty()) {
         setErrorAndEmitFinishedOrRestart(NotConfigured,
-                                         tr("lotsofcake login data not configured. Download and import the task list manually to configure them."));
+                                         tr("lotsofcake login data not configured. Download and "
+                                            "import the task list manually to configure them."));
         return;
     }
 
@@ -104,13 +103,14 @@ void HttpJob::passwordRead(QKeychain::Job *j)
     ReadPasswordJob *job = qobject_cast<ReadPasswordJob *>(j);
     Q_ASSERT(job);
 
-    m_passwordReadError = job->error() != QKeychain::NoError
-                          && job->error() != QKeychain::EntryNotFound;
+    m_passwordReadError =
+        job->error() != QKeychain::NoError && job->error() != QKeychain::EntryNotFound;
 
     const QString oldpass = job->error() ? QString() : job->textData();
 
     if (oldpass.isEmpty() || m_lastAuthenticationFailed) {
-        emit passwordRequested(oldpass.isEmpty() ? HttpJob::NoPasswordFound : HttpJob::PasswordIncorrect);
+        emit passwordRequested(oldpass.isEmpty() ? HttpJob::NoPasswordFound
+                                                 : HttpJob::PasswordIncorrect);
         return;
     } else {
         provideRequestedPassword(oldpass);

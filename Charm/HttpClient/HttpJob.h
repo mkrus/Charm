@@ -49,10 +49,7 @@ public:
         HostNotFound
     };
 
-    enum PasswordRequestReason {
-        NoPasswordFound,
-        PasswordIncorrect
-    };
+    enum PasswordRequestReason { NoPasswordFound, PasswordIncorrect };
 
     explicit HttpJob(QObject *parent = nullptr);
     ~HttpJob() override;

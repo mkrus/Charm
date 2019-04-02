@@ -82,16 +82,16 @@ TimeTrackingTaskSelector::TimeTrackingTaskSelector(QWidget *parent)
     m_stopGoAction->setIcon(Data::goIcon());
     m_stopGoAction->setShortcut(QKeySequence(Qt::Key_Space));
     m_stopGoAction->setCheckable(true);
-    connect(m_stopGoAction, &QAction::triggered,
-            this, &TimeTrackingTaskSelector::slotGoStopToggled);
+    connect(m_stopGoAction, &QAction::triggered, this,
+            &TimeTrackingTaskSelector::slotGoStopToggled);
     m_stopGoButton->setDefaultAction(m_stopGoAction);
 
     m_editCommentAction->setText(tr("Edit Comment"));
     m_editCommentAction->setIcon(Data::editEventIcon());
     m_editCommentAction->setShortcut(Qt::Key_E);
     m_editCommentAction->setToolTip(m_editCommentAction->text());
-    connect(m_editCommentAction, &QAction::triggered,
-            this, &TimeTrackingTaskSelector::slotEditCommentClicked);
+    connect(m_editCommentAction, &QAction::triggered, this,
+            &TimeTrackingTaskSelector::slotEditCommentClicked);
     m_editCommentButton->setDefaultAction(m_editCommentAction);
 
     m_taskSelectorButton->setPopupMode(QToolButton::InstantPopup);
@@ -99,8 +99,8 @@ TimeTrackingTaskSelector::TimeTrackingTaskSelector(QWidget *parent)
     m_taskSelectorButton->setText(tr("Select Task"));
 
     m_startOtherTaskAction->setShortcut(Qt::Key_T);
-    connect(m_startOtherTaskAction, &QAction::triggered,
-            this, &TimeTrackingTaskSelector::slotManuallySelectTask);
+    connect(m_startOtherTaskAction, &QAction::triggered, this,
+            &TimeTrackingTaskSelector::slotManuallySelectTask);
 }
 
 void TimeTrackingTaskSelector::populateEditMenu(QMenu *menu)
@@ -140,8 +140,8 @@ void TimeTrackingTaskSelector::populate(const QVector<WeeklySummary> &summaries)
 
     const TaskIdList interestingTasksToAdd = DATAMODEL->mostRecentlyUsedTasks();
 
-    const int maxEntries = qMin(interestingTasksToAdd.size(),
-                                CONFIGURATION.numberOfTaskSelectorEntries);
+    const int maxEntries =
+        qMin(interestingTasksToAdd.size(), CONFIGURATION.numberOfTaskSelectorEntries);
     for (int i = 0; i < maxEntries; ++i)
         m_menu->addAction(createTaskAction(interestingTasksToAdd.at(i)));
     m_menu->addSeparator();
@@ -176,8 +176,8 @@ void TimeTrackingTaskSelector::handleActiveEvents()
 
         const Event &event = DATAMODEL->eventForId(DATAMODEL->activeEvents().first());
         const Task &task = DATAMODEL->getTask(event.taskId());
-        m_taskSelectorButton->setText(escapeAmpersands(DATAMODEL->taskIdAndSmartNameString(
-                                                           task.id())));
+        m_taskSelectorButton->setText(
+            escapeAmpersands(DATAMODEL->taskIdAndSmartNameString(task.id())));
     } else {
         m_stopGoAction->setIcon(Data::goIcon());
         m_stopGoAction->setText(tr("Start Task"));
@@ -208,15 +208,18 @@ void TimeTrackingTaskSelector::slotActionSelected()
     const bool trackable = task.trackable();
     if (!trackable || expired) {
         const bool notTrackableAndExpired = (!trackable && expired);
-        const QString expirationDate = QLocale::system().toString(task.validUntil().date(), QLocale::ShortFormat);
+        const QString expirationDate =
+            QLocale::system().toString(task.validUntil().date(), QLocale::ShortFormat);
         const auto taskName = DATAMODEL->taskIdAndSmartNameString(task.id());
 
         const auto reason = notTrackableAndExpired
-                ? tr("The task is not trackable and expired since %1.").arg(expirationDate)
-                : expired ? tr("The task is expired since %1").arg(expirationDate)
-                          : tr("The task is not trackable");
+            ? tr("The task is not trackable and expired since %1.").arg(expirationDate)
+            : expired ? tr("The task is expired since %1").arg(expirationDate)
+                      : tr("The task is not trackable");
 
-        const auto message = tr("Cannot select task <strong>%1</strong>: %2. Please choose another task.").arg(taskName.toHtmlEscaped(), reason);
+        const auto message =
+            tr("Cannot select task <strong>%1</strong>: %2. Please choose another task.")
+                .arg(taskName.toHtmlEscaped(), reason);
 
         QMessageBox::information(this, tr("Please choose another task"), message);
         return;
@@ -240,9 +243,8 @@ void TimeTrackingTaskSelector::updateThumbBar()
 
         m_stopGoThumbButton = new QWinThumbnailToolButton(toolBar);
         toolBar->addButton(m_stopGoThumbButton);
-        connect(m_stopGoThumbButton, &QWinThumbnailToolButton::clicked, [this](){
-            slotGoStopToggled(!m_stopGoButton->isChecked());
-        });
+        connect(m_stopGoThumbButton, &QWinThumbnailToolButton::clicked,
+                [this]() { slotGoStopToggled(!m_stopGoButton->isChecked()); });
     }
     if (m_stopGoThumbButton) {
         if (m_stopGoButton->isChecked()) {

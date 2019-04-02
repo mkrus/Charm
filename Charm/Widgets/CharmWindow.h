@@ -26,8 +26,8 @@
 
 #include <QMainWindow>
 
-#include "Core/UIStateInterface.h"
 #include "Core/CommandEmitterInterface.h"
+#include "Core/UIStateInterface.h"
 
 class QAction;
 class QShortcut;
@@ -55,13 +55,12 @@ protected:
     /** The window identifier is used to reference window specific configuration groups, et cetera.
      * It is generally not recommend to change it once the application is in use. */
     void setWindowIdentifier(const QString &id);
-    /** The window number is a Mac concept that allows to pull up application windows by entering CMD+<number>.
+    /** The window number is a Mac concept that allows to pull up application windows by entering
+     * CMD+<number>.
      */
     void setWindowNumber(int number);
     /** Insert the Edit menu. Empty by default. */
-    virtual void insertEditMenu()
-    {
-    }
+    virtual void insertEditMenu() {}
 
     void checkVisibility();
 

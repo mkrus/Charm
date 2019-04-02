@@ -73,8 +73,7 @@ QDomDocument createXmlTemplate(const QString &docClass)
         username.appendChild(text);
         QDomElement creationTime = doc.createElement(QStringLiteral("creation-time"));
         metadata.appendChild(creationTime);
-        QDomText time = doc.createTextNode(
-            QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
+        QDomText time = doc.createTextNode(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
         creationTime.appendChild(time);
         // FIXME installation id and stuff are probably necessary
     }
@@ -99,8 +98,8 @@ QDomElement metadataElement(const QDomDocument &document)
 
 QDateTime creationTime(const QDomElement &metaDataElement)
 {
-    QDomElement creationTimeElement
-        = metaDataElement.firstChildElement(QStringLiteral("creation-time"));
+    QDomElement creationTimeElement =
+        metaDataElement.firstChildElement(QStringLiteral("creation-time"));
     if (!creationTimeElement.isNull()) {
         return QDateTime::fromString(creationTimeElement.text(), Qt::ISODate);
     } else {
@@ -128,8 +127,8 @@ void TaskExport::readFrom(const QString &filename)
         throw XmlSerializationException(QObject::tr("File does not exist."));
     // load the XML into a DOM tree:
     if (!file.open(QIODevice::ReadOnly))
-        throw XmlSerializationException(QObject::tr("Cannot open file for reading: %1").arg(file.
-                                                                                            errorString()));
+        throw XmlSerializationException(
+            QObject::tr("Cannot open file for reading: %1").arg(file.errorString()));
 
     return readFrom(&file);
 }
@@ -141,11 +140,9 @@ void TaskExport::readFrom(QIODevice *device)
     int errorLine = 0;
     int errorColumn = 0;
     if (!document.setContent(device, &errorMessage, &errorLine, &errorColumn)) {
-        throw XmlSerializationException(QObject::tr("Invalid XML: [%1:%2] %3").arg(QString::number(
-                                                                                       errorLine),
-                                                                                   QString::number(
-                                                                                       errorColumn),
-                                                                                   errorMessage));
+        throw XmlSerializationException(
+            QObject::tr("Invalid XML: [%1:%2] %3")
+                .arg(QString::number(errorLine), QString::number(errorColumn), errorMessage));
     }
 
     // now read and check for the correct report type
@@ -153,8 +150,8 @@ void TaskExport::readFrom(QIODevice *device)
     const QString tagName = rootElement.tagName();
     const QString typeAttribute = rootElement.attribute(XmlSerialization::reportTypeAttribute());
     if (tagName != XmlSerialization::reportTagName() || typeAttribute != reportType())
-        throw XmlSerializationException(QObject::tr(
-                                            "This file is not a Charm task definition file. Please double-check."));
+        throw XmlSerializationException(
+            QObject::tr("This file is not a Charm task definition file. Please double-check."));
 
     QDomElement metadata = XmlSerialization::metadataElement(document);
     QDomElement report = XmlSerialization::reportElement(document);

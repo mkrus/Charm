@@ -24,8 +24,8 @@
 #ifndef COMMANDSETALLTASKS_H
 #define COMMANDSETALLTASKS_H
 
-#include <Core/Task.h>
 #include <Core/CharmCommand.h>
+#include <Core/Task.h>
 
 class CommandSetAllTasks : public CharmCommand
 {

@@ -30,9 +30,7 @@ CommandDeleteEvent::CommandDeleteEvent(const Event &event, QObject *parent)
 {
 }
 
-CommandDeleteEvent::~CommandDeleteEvent()
-{
-}
+CommandDeleteEvent::~CommandDeleteEvent() {}
 
 bool CommandDeleteEvent::prepare()
 {

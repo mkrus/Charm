@@ -24,13 +24,13 @@
 #include "TasksViewWidget.h"
 #include "ui_TasksViewWidget.h"
 
-#include "ViewHelpers.h"
 #include "TaskFilterProxyModel.h"
+#include "ViewHelpers.h"
 
 #include <QHeaderView>
 
-TasksViewWidget::TasksViewWidget(QWidget *parent) :
-    QWidget(parent)
+TasksViewWidget::TasksViewWidget(QWidget *parent)
+    : QWidget(parent)
     , m_ui(new Ui::TasksViewWidget())
 {
     m_ui->setupUi(this);
@@ -41,16 +41,12 @@ TasksViewWidget::TasksViewWidget(QWidget *parent) :
     m_ui->treeView->setModel(m_proxy);
     m_ui->treeView->header()->hide();
 
-    connect(m_ui->treeView->selectionModel(), &QItemSelectionModel::currentChanged,
-            this, &TasksViewWidget::slotCurrentItemChanged);
-    connect(m_ui->treeView, &QTreeView::doubleClicked,
-            this, &TasksViewWidget::slotDoubleClicked);
-    connect(m_ui->filter, &QLineEdit::textChanged,
-            this, &TasksViewWidget::slotFilterTextChanged);
-    connect(m_ui->showExpired, &QCheckBox::toggled,
-            this, &TasksViewWidget::slotFilterModeChanged);
-    connect(m_ui->filter, &QLineEdit::textChanged,
-            this, &TasksViewWidget::slotSelectTask);
+    connect(m_ui->treeView->selectionModel(), &QItemSelectionModel::currentChanged, this,
+            &TasksViewWidget::slotCurrentItemChanged);
+    connect(m_ui->treeView, &QTreeView::doubleClicked, this, &TasksViewWidget::slotDoubleClicked);
+    connect(m_ui->filter, &QLineEdit::textChanged, this, &TasksViewWidget::slotFilterTextChanged);
+    connect(m_ui->showExpired, &QCheckBox::toggled, this, &TasksViewWidget::slotFilterModeChanged);
+    connect(m_ui->filter, &QLineEdit::textChanged, this, &TasksViewWidget::slotSelectTask);
 
     m_ui->filter->setFocus();
 
@@ -58,9 +54,7 @@ TasksViewWidget::TasksViewWidget(QWidget *parent) :
     m_ui->treeView->expandToDepth(0);
 }
 
-TasksViewWidget::~TasksViewWidget()
-{
-}
+TasksViewWidget::~TasksViewWidget() {}
 
 TaskId TasksViewWidget::selectedTask() const
 {
@@ -120,12 +114,12 @@ void TasksViewWidget::slotCurrentItemChanged(const QModelIndex &first, const QMo
             m_ui->taskStatusLB->clear();
         } else {
             const bool notTrackableAndExpired = (!trackable && expired);
-            const QString expirationDate = QLocale::system().toString(
-                    task.validUntil(), QLocale::ShortFormat);
-            const QString info = notTrackableAndExpired ? tr(
-                    "The selected task is not trackable and expired since %1").arg(expirationDate)
-                         : expired ? tr("The selected task is expired since %1").arg(expirationDate)
-                         : tr("The selected task is not trackable");
+            const QString expirationDate =
+                QLocale::system().toString(task.validUntil(), QLocale::ShortFormat);
+            const QString info = notTrackableAndExpired
+                ? tr("The selected task is not trackable and expired since %1").arg(expirationDate)
+                : expired ? tr("The selected task is expired since %1").arg(expirationDate)
+                          : tr("The selected task is not trackable");
             m_ui->taskStatusLB->setText(info);
         }
     } else {

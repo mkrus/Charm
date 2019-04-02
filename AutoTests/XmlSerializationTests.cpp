@@ -31,8 +31,8 @@
 #include "Core/XmlSerialization.h"
 
 #include <QDateTime>
-#include <QTest>
 #include <QDebug>
+#include <QTest>
 
 XmlSerializationTests::XmlSerializationTests()
     : QObject()
@@ -111,14 +111,14 @@ void XmlSerializationTests::testQDateTimeToFromString()
 {
     // test regular QDate::toString:
     QTime time1(QTime::currentTime());
-    time1.setHMS(time1.hour(), time1.minute(), time1.second());   // strip milliseconds
+    time1.setHMS(time1.hour(), time1.minute(), time1.second()); // strip milliseconds
     QString time1string(time1.toString());
     QTime time2 = QTime::fromString(time1string);
     QVERIFY(time1 == time2);
 
     // test toString with ISODate:
     QTime time3(QTime::currentTime());
-    time3.setHMS(time3.hour(), time3.minute(), time3.second());   // strip milliseconds
+    time3.setHMS(time3.hour(), time3.minute(), time3.second()); // strip milliseconds
     QString time3string(time3.toString(Qt::ISODate));
     QTime time4 = QTime::fromString(time3string, Qt::ISODate);
     QVERIFY(time3 == time4);

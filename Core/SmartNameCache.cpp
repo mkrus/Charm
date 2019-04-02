@@ -23,16 +23,13 @@
 
 #include "SmartNameCache.h"
 #include <QObject>
+#include <QPair>
 #include <QSet>
 #include <QVector>
-#include <QPair>
 
 struct IdLessThan
 {
-    bool operator()(const Task &lhs, const Task &rhs) const
-    {
-        return lhs.id() < rhs.id();
-    }
+    bool operator()(const Task &lhs, const Task &rhs) const { return lhs.id() < rhs.id(); }
 };
 
 void SmartNameCache::setAllTasks(const TaskList &taskList)
@@ -47,14 +44,13 @@ void SmartNameCache::sortTasks()
     std::sort(m_tasks.begin(), m_tasks.end(), IdLessThan());
 }
 
-//single add/modify/delete rebuild the cache each time.
-//If necessary, this could be optimized by keeping the tasks in a "inverse" tree
-//with the task names below the root and their parents further down
+// single add/modify/delete rebuild the cache each time.
+// If necessary, this could be optimized by keeping the tasks in a "inverse" tree
+// with the task names below the root and their parents further down
 
 void SmartNameCache::modifyTask(const Task &task)
 {
-    auto it = std::find(m_tasks.begin(), m_tasks.end(),
-        Task(task.id(), QString()));
+    auto it = std::find(m_tasks.begin(), m_tasks.end(), Task(task.id(), QString()));
     if (it != m_tasks.end())
         *it = task;
     sortTasks();
@@ -63,8 +59,7 @@ void SmartNameCache::modifyTask(const Task &task)
 
 void SmartNameCache::deleteTask(const Task &task)
 {
-    auto it = std::find(m_tasks.begin(), m_tasks.end(),
-        Task(task.id(), QString()));
+    auto it = std::find(m_tasks.begin(), m_tasks.end(), Task(task.id(), QString()));
     if (it != m_tasks.end()) {
         m_tasks.erase(it);
         regenerateSmartNames();
@@ -79,8 +74,7 @@ void SmartNameCache::clearTasks()
 
 Task SmartNameCache::findTask(TaskId id) const
 {
-    auto it = std::find(m_tasks.begin(), m_tasks.end(),
-        Task(id, QString()));
+    auto it = std::find(m_tasks.begin(), m_tasks.end(), Task(id, QString()));
     if (it != m_tasks.end()) {
         return *it;
     } else {
@@ -102,7 +96,8 @@ QString SmartNameCache::smartName(const TaskId &id) const
 
 QString SmartNameCache::makeCombined(const Task &task) const
 {
-    Q_ASSERT(task.isValid() || task.name().isEmpty());   // an invalid task (id == 0) must not have a name
+    Q_ASSERT(task.isValid()
+             || task.name().isEmpty()); // an invalid task (id == 0) must not have a name
     if (!task.isValid())
         return QString();
     const Task parent = findTask(task.parent());
@@ -119,7 +114,7 @@ void SmartNameCache::regenerateSmartNames()
     m_smartTaskNamesById.clear();
     typedef QPair<TaskId, TaskId> TaskParentPair;
 
-    QMap<QString, QVector<TaskParentPair> > byName;
+    QMap<QString, QVector<TaskParentPair>> byName;
 
     for (const Task &task : m_tasks)
         byName[makeCombined(task)].append(qMakePair(task.id(), task.parent()));
@@ -127,10 +122,9 @@ void SmartNameCache::regenerateSmartNames()
     QSet<QString> cannotMakeUnique;
 
     while (!byName.isEmpty()) {
-        QMap<QString, QVector<TaskParentPair> > newByName;
-        for (QMap<QString, QVector<TaskParentPair> >::ConstIterator it = byName.constBegin();
-             it != byName.constEnd();
-             ++it) {
+        QMap<QString, QVector<TaskParentPair>> newByName;
+        for (QMap<QString, QVector<TaskParentPair>>::ConstIterator it = byName.constBegin();
+             it != byName.constEnd(); ++it) {
             const QString currentName = it.key();
             const auto &taskPairs = it.value();
             Q_ASSERT(!taskPairs.isEmpty());

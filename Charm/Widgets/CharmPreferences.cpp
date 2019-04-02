@@ -30,9 +30,9 @@
 #include "Lotsofcake/Configuration.h"
 
 #include <QCheckBox>
-#include <QMessageBox>
-#include <QLineEdit>
 #include <QInputDialog>
+#include <QLineEdit>
+#include <QMessageBox>
 
 CharmPreferences::CharmPreferences(const Configuration &config, QWidget *parent_)
     : QDialog(parent_)
@@ -55,8 +55,8 @@ CharmPreferences::CharmPreferences(const Configuration &config, QWidget *parent_
     m_ui.cbEnableCommandInterface->setChecked(haveCommandInterface
                                               && config.enableCommandInterface);
 
-    connect(m_ui.cbWarnUnuploadedTimesheets, &QCheckBox::toggled,
-            this, &CharmPreferences::slotWarnUnuploadedChanged);
+    connect(m_ui.cbWarnUnuploadedTimesheets, &QCheckBox::toggled, this,
+            &CharmPreferences::slotWarnUnuploadedChanged);
 
     // this would not need a switch, but i hate casting enums to int:
     switch (config.timeTrackerFontSize) {
@@ -103,9 +103,7 @@ CharmPreferences::CharmPreferences(const Configuration &config, QWidget *parent_
     // resize( minimumSize() );
 }
 
-CharmPreferences::~CharmPreferences()
-{
-}
+CharmPreferences::~CharmPreferences() {}
 
 bool CharmPreferences::detectIdling() const
 {
@@ -158,7 +156,7 @@ Configuration::TimeTrackerFontSize CharmPreferences::timeTrackerFontSize() const
         return Configuration::TimeTrackerFont_Large;
         break;
     default:
-        Q_ASSERT(false);   // somebody added an item
+        Q_ASSERT(false); // somebody added an item
     }
     // always return something, to avoid compiler warning:
     return Configuration::TimeTrackerFont_Regular;
@@ -183,7 +181,7 @@ Qt::ToolButtonStyle CharmPreferences::toolButtonStyle() const
         return Qt::ToolButtonFollowStyle;
         break;
     default:
-        Q_ASSERT(false);   // somebody added an item
+        Q_ASSERT(false); // somebody added an item
     }
     // always return something, to avoid compiler warning:
     return Qt::ToolButtonIconOnly;
@@ -195,10 +193,11 @@ void CharmPreferences::slotWarnUnuploadedChanged(bool enabled)
         return;
 
     if (!enabled) {
-        QMessageBox mbox(QMessageBox::Question,
-                         tr("Bill is sad :(."),
-                         tr("Bill has always been misunderstood. All he really wants is your reports, and even when he doesn't get them you only have to evade him once per hour. I'm sure you want to keep Bill's gentle reminders?"),
-                         QMessageBox::Yes|QMessageBox::No);
+        QMessageBox mbox(QMessageBox::Question, tr("Bill is sad :(."),
+                         tr("Bill has always been misunderstood. All he really wants is your "
+                            "reports, and even when he doesn't get them you only have to evade him "
+                            "once per hour. I'm sure you want to keep Bill's gentle reminders?"),
+                         QMessageBox::Yes | QMessageBox::No);
         auto buttonYes = mbox.button(QMessageBox::Yes);
         buttonYes->setText(tr("Mmmmkay"));
         auto buttonNo = mbox.button(QMessageBox::No);

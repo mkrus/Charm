@@ -28,15 +28,16 @@
 #include <QDate>
 #include <QSortFilterProxyModel>
 
-#include <Core/EventModelInterface.h>
 #include <Core/CommandEmitterInterface.h>
+#include <Core/EventModelInterface.h>
 
 #include "EventModelAdapter.h"
 
 class CharmDataModel;
 
-class EventModelFilter : public QSortFilterProxyModel, public CommandEmitterInterface,
-    public EventModelInterface
+class EventModelFilter : public QSortFilterProxyModel,
+                         public CommandEmitterInterface,
+                         public EventModelInterface
 {
     Q_OBJECT
 

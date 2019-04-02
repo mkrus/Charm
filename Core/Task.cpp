@@ -29,12 +29,10 @@
 
 #include "charm_core_debug.h"
 
-#include <set>
 #include <algorithm>
+#include <set>
 
-Task::Task()
-{
-}
+Task::Task() {}
 
 Task::Task(TaskId id, const QString &name, TaskId parent)
     : m_id(id)
@@ -60,14 +58,11 @@ QString Task::taskListTagName()
     return tag;
 }
 
-bool Task::operator ==(const Task &other) const
+bool Task::operator==(const Task &other) const
 {
-    return other.id() == id()
-           && other.parent() == parent()
-           && other.name() == name()
-           && other.m_trackable == m_trackable
-           && other.validFrom() == validFrom()
-           && other.validUntil() == validUntil();
+    return other.id() == id() && other.parent() == parent() && other.name() == name()
+        && other.m_trackable == m_trackable && other.validFrom() == validFrom()
+        && other.validUntil() == validUntil();
 }
 
 TaskId Task::id() const
@@ -138,17 +133,15 @@ void Task::setValidUntil(const QDateTime &stamp)
 
 bool Task::isCurrentlyValid() const
 {
-    return isValid()
-           && (!validFrom().isValid() || validFrom() < QDateTime::currentDateTime())
-           && (!validUntil().isValid() || validUntil() > QDateTime::currentDateTime());
+    return isValid() && (!validFrom().isValid() || validFrom() < QDateTime::currentDateTime())
+        && (!validUntil().isValid() || validUntil() > QDateTime::currentDateTime());
 }
 
 void Task::dump() const
 {
     qCDebug(CHARM_CORE_LOG) << "[Task " << this << "] task id:" << id() << "- name:" << name()
-             << " - parent:" << parent()
-             << " - valid from:" << validFrom() << " - valid until:"
-             << validUntil() << " - trackable:" << trackable();
+                            << " - parent:" << parent() << " - valid from:" << validFrom()
+                            << " - valid until:" << validUntil() << " - trackable:" << trackable();
 }
 
 void dumpTaskList(const TaskList &tasks)
@@ -185,12 +178,12 @@ QDomElement Task::toXml(QDomDocument document) const
 }
 
 Task Task::fromXml(const QDomElement &element, int databaseSchemaVersion)
-{   // in case any task object creates trouble with
+{ // in case any task object creates trouble with
     // serialization/deserialization, add an object of it to
     // void XmlSerializationTests::testTaskSerialization()
     if (element.tagName() != tagName())
-        throw XmlSerializationException(QObject::tr(
-                                            "Task::fromXml: judging from the tag name, this is not a task tag"));
+        throw XmlSerializationException(
+            QObject::tr("Task::fromXml: judging from the tag name, this is not a task tag"));
 
     Task task;
     bool ok;
@@ -205,15 +198,17 @@ Task Task::fromXml(const QDomElement &element, int databaseSchemaVersion)
     if (databaseSchemaVersion > CHARM_DATABASE_VERSION_BEFORE_TASK_EXPIRY) {
         if (element.hasAttribute(TaskValidFrom)) {
             QDateTime start = QDateTime::fromString(element.attribute(TaskValidFrom), Qt::ISODate);
-            if (!start.isValid()) throw XmlSerializationException(QObject::tr(
-                                                                      "Task::fromXml: invalid valid-from date"));
+            if (!start.isValid())
+                throw XmlSerializationException(
+                    QObject::tr("Task::fromXml: invalid valid-from date"));
 
             task.setValidFrom(start);
         }
         if (element.hasAttribute(TaskValidUntil)) {
             QDateTime end = QDateTime::fromString(element.attribute(TaskValidUntil), Qt::ISODate);
-            if (!end.isValid()) throw XmlSerializationException(QObject::tr(
-                                                                    "Task::fromXml: invalid valid-until date"));
+            if (!end.isValid())
+                throw XmlSerializationException(
+                    QObject::tr("Task::fromXml: invalid valid-until date"));
 
             task.setValidUntil(end);
         }
@@ -221,8 +216,8 @@ Task Task::fromXml(const QDomElement &element, int databaseSchemaVersion)
     if (databaseSchemaVersion > CHARM_DATABASE_VERSION_BEFORE_TRACKABLE) {
         task.setTrackable(element.attribute(TaskTrackable, QStringLiteral("1")).toInt(&ok) == 1);
         if (!ok)
-            throw XmlSerializationException(QObject::tr("Task::fromXml: invalid trackable settings"));
-
+            throw XmlSerializationException(
+                QObject::tr("Task::fromXml: invalid trackable settings"));
     }
     if (element.hasAttribute(TaskComment))
         task.setComment(element.attribute(TaskComment));
@@ -236,8 +231,8 @@ TaskList Task::readTasksElement(const QDomElement &element, int databaseSchemaVe
         for (QDomElement child = element.firstChildElement(); !child.isNull();
              child = child.nextSiblingElement(tagName())) {
             if (child.tagName() != tagName())
-                throw XmlSerializationException(QObject::tr(
-                                                    "Task::readTasksElement: parent-child mismatch"));
+                throw XmlSerializationException(
+                    QObject::tr("Task::readTasksElement: parent-child mismatch"));
 
             Task task = fromXml(child, databaseSchemaVersion);
             tasks << task;
@@ -245,7 +240,7 @@ TaskList Task::readTasksElement(const QDomElement &element, int databaseSchemaVe
         return tasks;
     } else {
         throw XmlSerializationException(QObject::tr(
-                                            "Task::readTasksElement: judging by the tag name, this is not a tasks element"));
+            "Task::readTasksElement: judging by the tag name, this is not a tasks element"));
     }
 }
 

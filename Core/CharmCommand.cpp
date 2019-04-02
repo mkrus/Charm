@@ -41,9 +41,7 @@ CharmCommand::CharmCommand(const QString &description, QObject *parent)
     }
 }
 
-CharmCommand::~CharmCommand()
-{
-}
+CharmCommand::~CharmCommand() {}
 
 QString CharmCommand::description() const
 {

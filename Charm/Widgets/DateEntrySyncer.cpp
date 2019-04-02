@@ -41,7 +41,8 @@ DateEntrySyncer::DateEntrySyncer(QSpinBox *week, QSpinBox *year, QDateEdit *date
         connect(m_date, SIGNAL(dateChanged(QDate)), this, SLOT(dateSelectionChanged()));
 }
 
-// number of weeks per year differs between 52 and 53, so we need to set the maximum value accordingly, and fix the value if the user flips through years
+// number of weeks per year differs between 52 and 53, so we need to set the maximum value
+// accordingly, and fix the value if the user flips through years
 static void fixWeek(QSpinBox *yearSb, QSpinBox *weekSb)
 {
     const int year = yearSb->value();
@@ -58,7 +59,7 @@ static void fixWeek(QSpinBox *yearSb, QSpinBox *weekSb)
 void DateEntrySyncer::dateSelectionChanged()
 {
     if (sender() == m_week || sender() == m_year) {
-        //spinboxes changed, update date edit
+        // spinboxes changed, update date edit
         fixWeek(m_year, m_week);
         const int week = m_week->value();
         const int year = m_year->value();
@@ -69,7 +70,7 @@ void DateEntrySyncer::dateSelectionChanged()
         }
     } else {
         Q_ASSERT(m_date);
-        //date edit changed, update spinboxes
+        // date edit changed, update spinboxes
         const QDate date = m_date->date();
         int year = 0;
         const int week = date.weekNumber(&year);
