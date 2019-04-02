@@ -100,7 +100,7 @@ OPTION(CHARM_PREPARE_DEPLOY "Deploy dependencies with install target(Windows, Ap
 
 ADD_SUBDIRECTORY( Core )
 ADD_SUBDIRECTORY( Charm )
-ADD_SUBDIRECTORY( Tests )
+ADD_SUBDIRECTORY( AutoTests )
 
 CONFIGURE_FILE( CharmCMake.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/CharmCMake.h )
 
