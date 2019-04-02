@@ -23,7 +23,7 @@
 
 #include "Event.h"
 #include "CharmExceptions.h"
-
+#include "charm_core_debug.h"
 #include <QDomElement>
 #include <QDomText>
 
@@ -125,7 +125,7 @@ int Event::duration() const
 
 void Event::dump() const
 {
-    qDebug() << "[Event" << id() << "] - task "
+    qCDebug(CHARM_CORE_LOG) << "[Event" << id() << "] - task "
              << taskId()
              << " - start: " << startDateTime()
              << " - end: " << endDateTime()

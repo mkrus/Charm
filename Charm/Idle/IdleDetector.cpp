@@ -34,7 +34,7 @@
 #include "Core/Configuration.h"
 
 #include <QtAlgorithms>
-#include <QDebug>
+#include "charm_application_debug.h"
 
 IdleDetector::IdleDetector(QObject *parent)
     : QObject(parent)
@@ -102,7 +102,7 @@ void IdleDetector::maybeIdle(IdlePeriod period)
     if (!Configuration::instance().detectIdling || DATAMODEL->activeEventCount() == 0)
         return;
 
-    qDebug() << "IdleDetector::maybeIdle: Checking for idleness";
+    qCDebug(CHARM_APPLICATION_LOG) << "IdleDetector::maybeIdle: Checking for idleness";
 
     // merge overlapping idle periods
     IdlePeriods periods(idlePeriods());
@@ -136,7 +136,7 @@ void IdleDetector::maybeIdle(IdlePeriod period)
     }
     // notify application
     if (!idlePeriods().isEmpty()) {
-        qDebug() << "IdleDetector::maybeIdle: Found idleness";
+        qCDebug(CHARM_APPLICATION_LOG) << "IdleDetector::maybeIdle: Found idleness";
         QTimer::singleShot(0, this, [=](){ emit maybeIdle(); });
     }
 }

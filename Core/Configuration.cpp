@@ -26,7 +26,7 @@
 #include "Configuration.h"
 #include "CharmConstants.h"
 
-#include <QDebug>
+#include "charm_core_debug.h"
 #include <QSettings>
 
 #ifdef NDEBUG
@@ -101,7 +101,7 @@ bool Configuration::readFrom(QSettings &settings)
         installationId = settings.value(MetaKey_Key_InstallationId).toUInt(&ok);
         if (!ok || installationId == 1) {
             const auto newId = createInstallationId();
-            qDebug() << "Migrating installationId" << installationId << "to" << newId;
+            qCDebug(CHARM_CORE_LOG) << "Migrating installationId" << installationId << "to" << newId;
             installationId = newId;
             dirty = true;
         }

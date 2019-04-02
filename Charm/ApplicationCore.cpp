@@ -26,7 +26,7 @@
 #include "CharmCMake.h"
 #include "Data.h"
 #include "ViewHelpers.h"
-
+#include "charm_application_debug.h"
 #include "Core/CharmConstants.h"
 #include "Core/CharmExceptions.h"
 #include "Core/SqLiteStorage.h"
@@ -124,7 +124,7 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
         command += '\n';
         qint64 written = uniqueApplicationSocket.write(command);
         if (written == -1 || written != command.length()) {
-            qWarning() << "Failed to pass " << command << " to running charm instance, error: "
+            qCWarning(CHARM_APPLICATION_LOG) << "Failed to pass " << command << " to running charm instance, error: "
                         << uniqueApplicationSocket.errorString();
         }
         uniqueApplicationSocket.flush();
@@ -138,7 +138,7 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
     QFile::remove(QDir::tempPath() + QLatin1Char('/') + serverName);
     bool listening = m_uniqueApplicationServer.listen(serverName);
     if (!listening)
-        qDebug() << "Failed to create QLocalServer for unique application support:"
+        qCDebug(CHARM_APPLICATION_LOG) << "Failed to create QLocalServer for unique application support:"
                  << m_uniqueApplicationServer.errorString();
 
     Q_INIT_RESOURCE(CharmResources);
@@ -297,7 +297,7 @@ void ApplicationCore::slotHandleUniqueApplicationConnection()
                 if (ok) {
                     m_timeTracker.slotStartEvent(id);
                 } else {
-                    qWarning() << "Received invalid argument:" << data;
+                    qCWarning(CHARM_APPLICATION_LOG) << "Received invalid argument:" << data;
                 }
             } else if (data.startsWith(RaiseWindowCommand)) {
                 // nothing to do, see below
@@ -393,7 +393,7 @@ void ApplicationCore::setState(State state)
 {
     if (m_state == state)
         return;
-    qDebug() << "ApplicationCore::setState: going from" << StateNames[m_state]
+    qCDebug(CHARM_APPLICATION_LOG) << "ApplicationCore::setState: going from" << StateNames[m_state]
              << "to" << StateNames[state];
     State previous = m_state;
 
@@ -555,7 +555,7 @@ void ApplicationCore::enterConnectingState()
             emit goToState(StartingUp);
         }
     } catch (const UnsupportedDatabaseVersionException &e) {
-        qDebug() << e.what();
+        qCDebug(CHARM_APPLICATION_LOG) << e.what();
         QFileInfo info(Configuration::instance().localStorageDatabase);
         QString message = QObject::tr("<html><body>"
                                       "<p>Your current Charm database is not supported by this version. "
@@ -626,7 +626,7 @@ static QString charmDataDir()
 bool ApplicationCore::configure()
 {
     if (CONFIGURATION.failure == true) {
-        qDebug()
+        qCDebug(CHARM_APPLICATION_LOG)
             << "ApplicationCore::configure: an error was found within the configuration.";
         if (!CONFIGURATION.failureMessage.isEmpty()) {
             showInformation(tr("Configuration Problem"), CONFIGURATION.failureMessage);
@@ -641,7 +641,7 @@ bool ApplicationCore::configure()
     bool configurationComplete = CONFIGURATION.readFrom(settings);
 
     if (!configurationComplete || CONFIGURATION.failure) {
-        qDebug()
+        qCDebug(CHARM_APPLICATION_LOG)
             << "ApplicationCore::configure: no complete configuration found for configuration name"
             << CONFIGURATION.configurationName;
         // FIXME maybe move to Configuration::loadDefaults
@@ -667,7 +667,7 @@ bool ApplicationCore::configure()
             CONFIGURATION.writeTo(settings);
             mainView().show();
         } else {
-            qDebug()
+            qCDebug(CHARM_APPLICATION_LOG)
                 << "ApplicationCore::configure: user cancelled configuration. Exiting.";
             // quit();
             return false;

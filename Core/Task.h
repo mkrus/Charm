@@ -28,7 +28,6 @@
 
 #include <QList>
 #include <QString>
-#include <QDebug>
 #include <QMetaType>
 #include <QDomElement>
 #include <QDomDocument>

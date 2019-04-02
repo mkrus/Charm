@@ -9,7 +9,7 @@ set(CMAKE_MODULE_PATH ${ECM_MODULE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/ECM/k
 include(KDEInstallDirs)
 include(KDECMakeSettings)
 include(KDEFrameworkCompilerSettings NO_POLICY_SCOPE)
-
+include(ECMQtDeclareLoggingCategory)
 include(ECMInstallIcons)
 
 add_definitions( -DQT_DEPRECATED_WARNINGS )

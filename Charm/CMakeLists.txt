@@ -134,7 +134,7 @@ QT5_WRAP_UI(
     Widgets/NotificationPopup.ui
     Widgets/FindAndReplaceEventsDialog.ui
 )
-
+ecm_qt_declare_logging_category(CharmApplication_SRCS HEADER charm_application_debug.h IDENTIFIER CHARM_APPLICATION_LOG CATEGORY_NAME org.kdab.charm.application)
 QT5_ADD_RESOURCES( Resources_SRCS CharmResources.qrc )
 
 ADD_LIBRARY(

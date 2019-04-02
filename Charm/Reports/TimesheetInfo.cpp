@@ -22,7 +22,7 @@
 */
 
 #include "TimesheetInfo.h"
-
+#include "charm_application_debug.h"
 #include "Core/CharmDataModel.h"
 
 TimeSheetInfo::TimeSheetInfo(int segments)
@@ -41,7 +41,7 @@ int TimeSheetInfo::total() const
 
 void TimeSheetInfo::dump()
 {
-    qDebug() << "TimeSheetInfo: (" << indentation << ")" << formattedTaskIdAndName(6) << ":"
+    qCDebug(CHARM_APPLICATION_LOG) << "TimeSheetInfo: (" << indentation << ")" << formattedTaskIdAndName(6) << ":"
              << seconds << "-" << total() << "total";
 }
 

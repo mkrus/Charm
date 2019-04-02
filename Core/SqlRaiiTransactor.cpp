@@ -24,7 +24,7 @@
 #include "SqlRaiiTransactor.h"
 #include "CharmExceptions.h"
 
-#include <QDebug>
+#include "charm_core_debug.h"
 #include <QSqlDatabase>
 #include <QSqlDriver>
 #include <QSqlError>
@@ -46,7 +46,7 @@ SqlRaiiTransactor::~SqlRaiiTransactor()
 {
     if (m_active) {
         if (!m_database.rollback())
-            qWarning() << "Failed to rollback transaction: " << m_database.lastError().text();
+            qCWarning(CHARM_CORE_LOG) << "Failed to rollback transaction: " << m_database.lastError().text();
     }
 }
 

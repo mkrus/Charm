@@ -22,6 +22,7 @@
 */
 
 #include "ViewHelpers.h"
+#include "charm_application_debug.h"
 
 #include <QtAlgorithms>
 #include <QFile>
@@ -176,9 +177,9 @@ QString Charm::reportStylesheet(const QPalette &palette)
         style.replace(QLatin1String("@event_attributes_row_background_color@"),
                       palette.midlight().color().name());
         if (style.isEmpty())
-            qWarning() << "reportStylesheet: default style sheet is empty, too bad";
+            qCWarning(CHARM_APPLICATION_LOG) << "reportStylesheet: default style sheet is empty, too bad";
     } else {
-        qCritical() << "reportStylesheet: cannot load report style sheet:"
+        qCCritical(CHARM_APPLICATION_LOG) << "reportStylesheet: cannot load report style sheet:"
                     << stylesheet.errorString();
     }
     return style;

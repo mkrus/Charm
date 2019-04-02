@@ -22,7 +22,7 @@ SET(
     SmartNameCache.cpp
     XmlSerialization.cpp
 )
-
+ecm_qt_declare_logging_category(CharmCore_SRCS HEADER charm_core_debug.h IDENTIFIER CHARM_CORE_LOG CATEGORY_NAME org.kdab.charm.core)
 ADD_LIBRARY( CharmCore STATIC ${CharmCore_SRCS} )
 
 kde_target_enable_exceptions( CharmCore PUBLIC )

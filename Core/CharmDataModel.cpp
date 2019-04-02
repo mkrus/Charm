@@ -31,7 +31,7 @@
 #include "Configuration.h"
 
 #include <QList>
-#include <QDebug>
+#include "charm_core_debug.h"
 #include <QDateTime>
 #include <QSettings>
 #include <QStringList>
@@ -139,7 +139,7 @@ void CharmDataModel::addTask(const Task &task)
         Q_FOREACH (auto adapter, m_adapters)
             adapter->taskAdded(task.id());
     } else {
-        qCritical() << "CharmDataModel::addTask: duplicate task id"
+        qCCritical(CHARM_CORE_LOG) << "CharmDataModel::addTask: duplicate task id"
                     << task.id() << "ignored. THIS IS A BUG";
     }
 }
@@ -219,7 +219,7 @@ void CharmDataModel::setAllEvents(const EventList &events)
         if (!eventExists(events[i].id())) {
             m_events[ events[i].id() ] = events[i];
         } else {
-            qCritical() << "CharmDataModel::addTask: duplicate task id"
+            qCCritical(CHARM_CORE_LOG) << "CharmDataModel::addTask: duplicate task id"
                         << m_tasks[i].task().id() << "ignored. THIS IS A BUG";
         }
     }
@@ -503,7 +503,7 @@ QString CharmDataModel::fullTaskName(const Task &task) const
         }
         return name;
     } else {
-        // qWarning() << "CharmReport::tasknameWithParents: WARNING: invalid task"
+        // qCWarning(CHARM_CORE_LOG) << "CharmReport::tasknameWithParents: WARNING: invalid task"
         //                    << task.id();
         return QString();
     }

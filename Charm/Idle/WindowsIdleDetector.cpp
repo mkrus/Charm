@@ -26,7 +26,7 @@
 
 #include "windows.h"
 
-#include <QDebug>
+#include "charm_application_debug.h"
 
 WindowsIdleDetector::WindowsIdleDetector(QObject *parent) : IdleDetector(parent)
 {
@@ -49,7 +49,7 @@ void WindowsIdleDetector::timeout()
     lif.cbSize = sizeof(lif);
     const bool ret = GetLastInputInfo(&lif);
     if (!ret) {
-        qWarning() << "Idle detection: GetLastInputInfo failed.";
+        qCWarning(CHARM_APPLICATION_LOG) << "Idle detection: GetLastInputInfo failed.";
         return;
     }
 

@@ -27,6 +27,7 @@
 #include <QList>
 #include <QString>
 #include <QVector>
+#include <QMap>
 
 #include "Core/Task.h"
 

@@ -25,7 +25,7 @@
 #define SMARTNAMECACHE_H
 
 #include "Task.h"
-
+#include <QMap>
 class SmartNameCache
 {
 public:

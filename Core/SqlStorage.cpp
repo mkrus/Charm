@@ -40,7 +40,7 @@
 #include <QSqlRecord>
 #include <QStringList>
 #include <QTextStream>
-#include <QDebug>
+#include "charm_core_debug.h"
 
 // SqlStorage class
 
@@ -360,13 +360,13 @@ bool SqlStorage::runQuery(QSqlQuery &query)
 {
 #if 0
     const auto MARKER = "============================================================";
-    qDebug() << MARKER << endl << "SqlStorage::runQuery: executing query:"
+    qCDebug(CHARM_CORE_LOG) << MARKER << endl << "SqlStorage::runQuery: executing query:"
              << endl << query.executedQuery();
     bool result = query.exec();
     if (result) {
-        qDebug() << "SqlStorage::runQuery: SUCCESS" << endl << MARKER;
+        qCDebug(CHARM_CORE_LOG) << "SqlStorage::runQuery: SUCCESS" << endl << MARKER;
     } else {
-        qDebug() << "SqlStorage::runQuery: FAILURE" << endl
+        qCDebug(CHARM_CORE_LOG) << "SqlStorage::runQuery: FAILURE" << endl
                  << "Database says: " << query.lastError().databaseText() << endl
                  << "Driver says:   " << query.lastError().driverText() << endl
                  << MARKER;

@@ -30,7 +30,7 @@
 #include "Event.h"
 
 #include <QDir>
-#include <QDebug>
+#include "charm_core_debug.h"
 #include <QFileInfo>
 #include <QSqlDatabase>
 #include <QSqlQuery>

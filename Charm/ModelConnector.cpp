@@ -28,6 +28,7 @@
 #include "ModelConnector.h"
 #include "ViewHelpers.h"
 #include "Data.h"
+#include "charm_application_debug.h"
 
 #include "Commands/CommandModifyEvent.h"
 #include "Commands/CommandMakeAndActivateEvent.h"
@@ -70,7 +71,7 @@ EventModelFilter *ModelConnector::findEventModel()
 void ModelConnector::commitCommand(CharmCommand *command)
 {
     if (!command->finalize()) {
-        qWarning() << "CharmDataModel::commitCommand:"
+        qCWarning(CHARM_APPLICATION_LOG) << "CharmDataModel::commitCommand:"
                    << command->metaObject()->className()
                    << "command has failed";
     }

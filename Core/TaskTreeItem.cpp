@@ -24,7 +24,7 @@
 
 #include "TaskTreeItem.h"
 
-#include <QDebug>
+#include "charm_core_debug.h"
 
 TaskTreeItem::TaskTreeItem()
 {

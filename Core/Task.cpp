@@ -27,7 +27,7 @@
 #include "CharmConstants.h"
 #include "CharmExceptions.h"
 
-#include <QDebug>
+#include "charm_core_debug.h"
 
 #include <set>
 #include <algorithm>
@@ -145,7 +145,7 @@ bool Task::isCurrentlyValid() const
 
 void Task::dump() const
 {
-    qDebug() << "[Task " << this << "] task id:" << id() << "- name:" << name()
+    qCDebug(CHARM_CORE_LOG) << "[Task " << this << "] task id:" << id() << "- name:" << name()
              << " - parent:" << parent()
              << " - valid from:" << validFrom() << " - valid until:"
              << validUntil() << " - trackable:" << trackable();
@@ -153,7 +153,7 @@ void Task::dump() const
 
 void dumpTaskList(const TaskList &tasks)
 {
-    qDebug() << "dumpTaskList: task list of" << tasks.size() << "elements";
+    qCDebug(CHARM_CORE_LOG) << "dumpTaskList: task list of" << tasks.size() << "elements";
     for (int i = 0; i < tasks.size(); ++i)
         tasks[i].dump();
 }
@@ -351,7 +351,7 @@ bool Task::checkForTreeness(const TaskList &tasks)
 #ifndef NDEBUG
         Q_FOREACH (const Task &task, tasks) {
             if (find(ids.begin(), ids.end(), task.id()) == ids.end()) {
-                qDebug() << "Orphan task:";
+                qCDebug(CHARM_CORE_LOG) << "Orphan task:";
                 task.dump();
             }
         }

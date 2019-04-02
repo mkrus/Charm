@@ -22,6 +22,10 @@
 */
 
 #include "SmartNameCache.h"
+#include <QObject>
+#include <QSet>
+#include <QVector>
+#include <QPair>
 
 struct IdLessThan
 {

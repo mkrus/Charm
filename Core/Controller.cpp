@@ -35,7 +35,7 @@
 #include "SqlStorage.h"
 #include "Task.h"
 
-#include <QDebug>
+#include "charm_core_debug.h"
 
 Controller::Controller(QObject *parent_)
     : QObject(parent_)
