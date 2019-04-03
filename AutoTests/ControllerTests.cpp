@@ -132,7 +132,7 @@ void ControllerTests::addTaskTest()
     const QString Task2Name(QStringLiteral("Task-2-Name"));
     Task task2;
     task2.setId(Task2Id);
-    task2.setName(Task1Name);
+    task2.setName(Task2Name);
     task2.setParent(task1.id());
     task2.setValidUntil(QDateTime::currentDateTime());
 
