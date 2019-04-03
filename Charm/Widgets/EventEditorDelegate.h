@@ -31,7 +31,6 @@ class QPainter;
 class QStyleOptionViewItem;
 class QModelIndex;
 class EventModelFilter;
-class TaskTreeItem;
 class Event;
 
 class EventEditorDelegate : public QItemDelegate

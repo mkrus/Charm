@@ -30,8 +30,6 @@
 #include "Core/Configuration.h"
 #include "Core/Task.h"
 
-class CharmDataModel;
-class CharmCommand;
 
 // ViewFilter is implemented as a decorator to avoid accidental direct
 // access to the task model with indexes of the proxy

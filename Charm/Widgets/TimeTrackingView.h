@@ -32,7 +32,6 @@
 #include "TimeTrackingTaskSelector.h"
 
 class QPalette;
-class QToolBar;
 
 class TimeTrackingView : public QWidget
 {

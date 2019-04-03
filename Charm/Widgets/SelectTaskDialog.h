@@ -29,8 +29,6 @@
 #include <QDialog>
 #include <QScopedPointer>
 
-class TaskFilterProxyModel;
-class CharmDataModel;
 
 namespace Ui {
 class SelectTaskDialog;

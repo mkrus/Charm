@@ -36,8 +36,6 @@
 class QAction;
 class QMenu;
 class QToolButton;
-class QTextEdit;
-class QToolBar;
 class QWinThumbnailToolButton;
 
 class TimeTrackingTaskSelector : public QWidget

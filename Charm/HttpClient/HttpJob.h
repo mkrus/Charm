@@ -33,7 +33,6 @@ class Job;
 
 class QNetworkAccessManager;
 class QNetworkReply;
-class QNetworkRequest;
 class QAuthenticator;
 
 class HttpJob : public QObject
