@@ -62,41 +62,18 @@ int main(int argc, char **argv)
 {
     TaskId startupTask = -1;
     bool hideAtStart = false;
-#if QT_VERSION < QT_VERSION_CHECK(5, 2, 0)
-    if (argc >= 2) {
-        if (qstrcmp(argv[1], "--version") == 0) {
-            using namespace std;
-            cout << "Charm version " << qPrintable(CharmVersion()) << endl;
-            return 0;
-        } else if (argc == 3 && qstrcmp(argv[1], "--start-task") == 0) {
-            bool ok = true;
-            startupTask = QString::fromLocal8Bit(argv[2]).toInt(&ok);
-            if (!ok || startupTask < 0) {
-                std::cerr << "Invalid task id passed: " << argv[2];
-                return 1;
-            }
-        } else if (qstrcmp(argv[1], "--hide-at-start") == 0) {
-            hideAtStart = true;
-        }
-    }
-#endif
 
     try {
 #ifdef Q_OS_WIN
         // High DPI support
-#if QT_VERSION >= QT_VERSION_CHECK(5, 1, 0)
         QGuiApplication::setAttribute(Qt::AA_UseHighDpiPixmaps, true);
-#endif
-#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
         // High DPI support
         QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
         QGuiApplication::setAttribute(Qt::AA_UseHighDpiPixmaps, true);
-#endif
 #endif // Q_OS_WIN
 
         QApplication app(argc, argv);
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
         // Now we can use more command line arguments:
         // charmtimetracker --hide-at-start --start-task 8714
         const QCommandLineOption startTaskOption(QLatin1String("start-task"),
@@ -124,7 +101,6 @@ int main(int argc, char **argv)
         }
         if (parser.isSet(hideAtStartOption))
             hideAtStart = true;
-#endif
 
         const std::shared_ptr<ApplicationCore> core(
             StartupOptions::createApplicationCore(startupTask, hideAtStart));
