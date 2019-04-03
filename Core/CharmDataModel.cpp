@@ -46,7 +46,7 @@ CharmDataModel::CharmDataModel()
     : QObject()
     , m_taskModel(new TaskModel(this))
 {
-    connect(&m_timer, SIGNAL(timeout()), SLOT(eventUpdateTimerEvent()));
+    connect(&m_timer, &QTimer::timeout, this, &CharmDataModel::eventUpdateTimerEvent);
 }
 
 CharmDataModel::~CharmDataModel()
@@ -481,7 +481,7 @@ TaskIdList CharmDataModel::mostFrequentlyUsedTasks() const
 {
     std::unordered_map<TaskId, quint32> mfuMap;
     const EventMap &events = eventMap();
-    for (auto it : events) {
+    for (const auto &it : events) {
         mfuMap[it.second.taskId()]++;
     }
 

@@ -40,7 +40,7 @@ public:
     virtual void eventAboutToBeAdded(EventId id) = 0;
     virtual void eventAdded(EventId id) = 0;
     // we only pass an event because it is an outdated object:
-    virtual void eventModified(EventId id, Event discardedEvent) = 0;
+    virtual void eventModified(EventId id, const Event &discardedEvent) = 0;
     virtual void eventAboutToBeDeleted(EventId id) = 0;
     virtual void eventDeleted(EventId id) = 0;
 

@@ -51,7 +51,7 @@ void NotificationPopup::showNotification(const QString &title, const QString &me
     setGeometry(QStyle::alignedRect(Qt::RightToLeft, Qt::AlignBottom, size(),
                                     qGuiApp->primaryScreen()->availableGeometry()));
     show();
-    QTimer::singleShot(10000, this, SLOT(slotCloseNotification()));
+    QTimer::singleShot(10000, this, &NotificationPopup::slotCloseNotification);
 }
 
 void NotificationPopup::slotCloseNotification()

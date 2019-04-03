@@ -70,7 +70,7 @@ public:
         return 0;
     }
 
-    bool operator()(const EventId &leftId, const EventId &rightId) const
+    bool operator()(EventId leftId, EventId rightId) const
     {
         const Event &left = DATAMODEL->eventForId(leftId);
         const Event &right = DATAMODEL->eventForId(rightId);
@@ -125,7 +125,7 @@ EventIdList Charm::eventIdsSortedBy(EventIdList ids, const Charm::SortOrderList 
     return ids;
 }
 
-EventIdList Charm::eventIdsSortedBy(EventIdList ids, SortOrder order)
+EventIdList Charm::eventIdsSortedBy(const EventIdList &ids, SortOrder order)
 {
     return eventIdsSortedBy(ids, SortOrderList(1) << order);
 }

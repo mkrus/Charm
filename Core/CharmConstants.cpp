@@ -76,13 +76,13 @@ const QString &stringForBool(bool val)
 
 void connectControllerAndModel(Controller *controller, CharmDataModel *model)
 {
-    QObject::connect(controller, SIGNAL(eventAdded(Event)), model, SLOT(addEvent(Event)));
-    QObject::connect(controller, SIGNAL(eventModified(Event)), model, SLOT(modifyEvent(Event)));
-    QObject::connect(controller, SIGNAL(eventDeleted(Event)), model, SLOT(deleteEvent(Event)));
-    QObject::connect(controller, SIGNAL(allEvents(EventList)), model,
-                     SLOT(setAllEvents(EventList)));
-    QObject::connect(controller, SIGNAL(definedTasks(TaskList)), model,
-                     SLOT(setAllTasks(TaskList)));
+    QObject::connect(controller, &Controller::eventAdded, model, &CharmDataModel::addEvent);
+    QObject::connect(controller, &Controller::eventModified, model, &CharmDataModel::modifyEvent);
+    QObject::connect(controller, &Controller::eventDeleted, model, &CharmDataModel::deleteEvent);
+    QObject::connect(controller, &Controller::allEvents, model,
+                     &CharmDataModel::setAllEvents);
+    QObject::connect(controller, &Controller::definedTasks, model,
+                     &CharmDataModel::setAllTasks);
 }
 
 static QString formatDecimal(double d)

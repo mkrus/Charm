@@ -131,7 +131,7 @@ EventView::EventView(QWidget *parent)
 
     m_toolBar->addWidget(m_labelTotal);
 
-    QTimer::singleShot(0, this, SLOT(delayedInitialization()));
+    QTimer::singleShot(0, this, &EventView::delayedInitialization);
 
     // I hate doing this but the stupid default view sizeHints suck badly.
     setMinimumHeight(200);
@@ -491,6 +491,6 @@ void EventView::slotEventChangesCompleted(const Event &event)
     // make event editor finished, bypass the undo stack to set its contents
     // undo will just target CommandMakeEvent instead
     auto command = new CommandModifyEvent(event, this);
-    emitCommand(command);
+    emit emitCommand(command);
     delete command;
 }

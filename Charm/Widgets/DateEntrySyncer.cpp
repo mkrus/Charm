@@ -38,7 +38,7 @@ DateEntrySyncer::DateEntrySyncer(QSpinBox *week, QSpinBox *year, QDateEdit *date
     connect(m_week, SIGNAL(valueChanged(int)), this, SLOT(dateSelectionChanged()));
     connect(m_year, SIGNAL(valueChanged(int)), this, SLOT(dateSelectionChanged()));
     if (m_date)
-        connect(m_date, SIGNAL(dateChanged(QDate)), this, SLOT(dateSelectionChanged()));
+        connect(m_date, &QDateTimeEdit::dateChanged, this, &DateEntrySyncer::dateSelectionChanged);
 }
 
 // number of weeks per year differs between 52 and 53, so we need to set the maximum value

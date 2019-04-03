@@ -264,7 +264,7 @@ void ApplicationCore::slotPopulateTrayIconMenu()
     const auto newActions = m_timeTracker.menu()->actions();
     if (m_taskActions == newActions)
         return;
-    for (const auto action : m_taskActions) {
+    for (const auto action : qAsConst(m_taskActions)) {
         m_systrayContextMenu.removeAction(action);
         if (action->associatedWidgets().isEmpty())
             delete action;
@@ -324,9 +324,9 @@ void ApplicationCore::createWindowMenu(QMenuBar *menuBar)
 {
     auto menu = new QMenu(menuBar);
     menu->setTitle(tr("Window"));
-    menu->addAction(tr("Show Tasks Window"), this, SLOT(slotShowTasksEditor()),
+    menu->addAction(tr("Show Tasks Window"), this, &ApplicationCore::slotShowTasksEditor,
                     QKeySequence(tr("Ctrl+1")));
-    menu->addAction(tr("Show Event Editor Window"), this, SLOT(slotShowEventEditor()),
+    menu->addAction(tr("Show Event Editor Window"), this, &ApplicationCore::slotShowEventEditor,
                     QKeySequence(tr("Ctrl+2")));
     menu->addSeparator();
     menu->addAction(&m_actionEnterVacation);
@@ -531,7 +531,7 @@ void ApplicationCore::enterConnectingState()
     try {
         if (m_controller.connectToBackend()) {
             // delay switch to Connected state a bit to show the start screen:
-            QTimer::singleShot(0, this, SLOT(slotGoToConnectedState()));
+            QTimer::singleShot(0, this, &ApplicationCore::slotGoToConnectedState);
         } else {
             // go back to StartingUp state and reconfigure
             emit goToState(StartingUp);

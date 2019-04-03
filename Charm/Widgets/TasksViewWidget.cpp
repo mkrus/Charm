@@ -151,7 +151,6 @@ void TasksViewWidget::slotFilterModeChanged()
     const auto filter = showCurrentOnly ? TaskFilterProxyModel::FilterMode::Current
                                         : TaskFilterProxyModel::FilterMode::All;
 
-    QHash<TaskId, bool> expansionStates;
     m_proxy->setFilterMode(filter);
 }
 

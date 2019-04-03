@@ -312,7 +312,7 @@ bool collectTaskIds(std::set<TaskId> &visitedIds, TaskId id, const TaskList &tas
     if (!foundSelf)
         return false;
 
-    for (const TaskId i : children)
+    for (const TaskId &i : children)
         collectTaskIds(visitedIds, i, tasks);
 
     return true;

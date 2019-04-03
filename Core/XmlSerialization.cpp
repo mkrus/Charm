@@ -130,7 +130,7 @@ void TaskExport::readFrom(const QString &filename)
         throw XmlSerializationException(
             QObject::tr("Cannot open file for reading: %1").arg(file.errorString()));
 
-    return readFrom(&file);
+    readFrom(&file);
 }
 
 void TaskExport::readFrom(QIODevice *device)

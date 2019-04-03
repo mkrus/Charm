@@ -107,7 +107,7 @@ TimeTrackingWindow::TimeTrackingWindow(QWidget *parent)
 #endif
     // Update tasks definitions once every 24h
     m_updateUserInfoAndTasksDefinitionsTimer.setInterval(24 * 60 * 60 * 1000);
-    QTimer::singleShot(1000, this, SLOT(slotSyncTasksAutomatic()));
+    QTimer::singleShot(1000, this, &TimeTrackingWindow::slotSyncTasksAutomatic);
     m_updateUserInfoAndTasksDefinitionsTimer.start();
 
     toolBar()->hide();
@@ -177,7 +177,7 @@ void TimeTrackingWindow::eventAdded(EventId)
     slotSelectTasksToShow();
 }
 
-void TimeTrackingWindow::eventModified(EventId, Event)
+void TimeTrackingWindow::eventModified(EventId, const Event &)
 {
     slotSelectTasksToShow();
 }
@@ -474,7 +474,7 @@ void TimeTrackingWindow::startCheckForUpdates(VerboseMode mode)
     checkForUpdates->start();
 }
 
-void TimeTrackingWindow::slotCheckForUpdates(CheckForUpdatesJob::JobData data)
+void TimeTrackingWindow::slotCheckForUpdates(const CheckForUpdatesJob::JobData &data)
 {
     const QString errorString = data.errorString;
     if (data.verbose && (data.error != 0 || !errorString.isEmpty())) {

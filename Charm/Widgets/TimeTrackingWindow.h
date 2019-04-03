@@ -63,7 +63,7 @@ public:
     void resetEvents() override;
     void eventAboutToBeAdded(EventId id) override;
     void eventAdded(EventId id) override;
-    void eventModified(EventId id, Event discardedEvent) override;
+    void eventModified(EventId id, const Event &discardedEvent) override;
     void eventAboutToBeDeleted(EventId id) override;
     void eventDeleted(EventId id) override;
     void eventActivated(EventId id) override;
@@ -97,7 +97,7 @@ private Q_SLOTS:
     void slotCheckUploadedTimesheets();
     void slotBillGone(int result);
     void slotCheckForUpdatesAutomatic();
-    void slotCheckForUpdates(CheckForUpdatesJob::JobData);
+    void slotCheckForUpdates(const CheckForUpdatesJob::JobData &);
     void slotSyncTasksAutomatic();
     void slotGetUserInfo();
 

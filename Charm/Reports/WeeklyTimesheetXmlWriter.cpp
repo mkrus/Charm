@@ -27,7 +27,7 @@
 #include <QDomDocument>
 
 WeeklyTimesheetXmlWriter::WeeklyTimesheetXmlWriter()
-    : TimesheetXmlWriter(QLatin1String("weekly-timesheet"))
+    : TimesheetXmlWriter(QStringLiteral("weekly-timesheet"))
 {
 }
 

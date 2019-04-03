@@ -97,7 +97,7 @@ int IdleDetector::idlenessDuration() const
     return m_idlenessDuration;
 }
 
-void IdleDetector::maybeIdle(IdlePeriod period)
+void IdleDetector::maybeIdle(const IdlePeriod &period)
 {
     if (!Configuration::instance().detectIdling || DATAMODEL->activeEventCount() == 0)
         return;

@@ -92,7 +92,7 @@ void XmlSerializationTests::testEventSerialization()
 void XmlSerializationTests::testTaskSerialization()
 {
     QDomDocument document(QStringLiteral("testdocument"));
-    for (Task task : tasksToTest()) {
+    for (const Task &task : tasksToTest()) {
         QDomElement element = task.toXml(document);
         try {
             Task readTask = Task::fromXml(element, CHARM_DATABASE_VERSION);

@@ -78,7 +78,7 @@ protected:
     virtual void onIdlenessDurationChanged() {}
 
     explicit IdleDetector(QObject *parent = nullptr);
-    void maybeIdle(IdlePeriod period);
+    void maybeIdle(const IdlePeriod &period);
     void setAvailable(bool available);
 
 private:

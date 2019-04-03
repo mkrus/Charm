@@ -56,7 +56,7 @@ public:
     void resetEvents() override;
     void eventAboutToBeAdded(EventId id) override;
     void eventAdded(EventId id) override;
-    void eventModified(EventId id, Event) override;
+    void eventModified(EventId id, const Event&) override;
     void eventAboutToBeDeleted(EventId id) override;
     void eventDeleted(EventId id) override;
 

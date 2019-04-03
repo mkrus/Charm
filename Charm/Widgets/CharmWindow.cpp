@@ -171,7 +171,7 @@ void CharmWindow::sendCommand(CharmCommand *cmd)
     cmd->prepare();
     auto relay = new CommandRelayCommand(this);
     relay->setCommand(cmd);
-    emit emitCommand(relay);
+    emitCommand(relay);
 }
 
 void CharmWindow::handleShow(bool visible)

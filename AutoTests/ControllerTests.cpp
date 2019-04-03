@@ -59,7 +59,7 @@ void ControllerTests::initTestCase()
     m_controller = controller;
     //    connect( controller, SIGNAL(currentEvents(EventList)),
     //             SLOT(slotCurrentEvents(EventList)) );
-    connect(controller, SIGNAL(definedTasks(TaskList)), SLOT(slotDefinedTasks(TaskList)));
+    connect(controller, &Controller::definedTasks, this, &ControllerTests::slotDefinedTasks);
 }
 
 void ControllerTests::initializeConnectBackendTest()

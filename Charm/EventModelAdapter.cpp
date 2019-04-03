@@ -93,12 +93,12 @@ void EventModelAdapter::eventAdded(EventId id)
     endInsertRows();
 }
 
-void EventModelAdapter::eventModified(EventId id, Event)
+void EventModelAdapter::eventModified(EventId id, const Event&)
 {
     // nothing to do, except:
     int row = m_events.indexOf(id);
     Q_ASSERT(row != -1); // inconsistency between model and adapter
-    emit(dataChanged(index(row), index(row)));
+    emit dataChanged(index(row), index(row));
 }
 
 void EventModelAdapter::eventAboutToBeDeleted(EventId id)

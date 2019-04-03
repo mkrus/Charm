@@ -112,7 +112,7 @@ bool SqlStorage::setAllTasks(const TaskList &tasks)
     // clear tasks
     deleteAllTasks(transactor);
     // add tasks
-    for (Task task : tasks) {
+    for (const Task &task : tasks) {
         addTask(task, transactor);
     }
     transactor.commit();
@@ -133,7 +133,7 @@ bool SqlStorage::addTask(const Task &task)
 bool SqlStorage::addTask(const Task &task, const SqlRaiiTransactor &)
 {
     QSqlQuery query(database());
-    query.prepare(QLatin1String(
+    query.prepare(QStringLiteral(
         "INSERT into Tasks (task_id, name, parent, validfrom, validuntil, trackable, comment) "
         "values ( :task_id, :name, :parent, :validfrom, :validuntil, :trackable, :comment);"));
     query.bindValue(QStringLiteral(":task_id"), task.id());
@@ -231,7 +231,7 @@ Event SqlStorage::makeEvent(const SqlRaiiTransactor &)
 
     { // insert a new record in the database
         QSqlQuery query(database());
-        query.prepare(QLatin1String("INSERT INTO Events DEFAULT VALUES;"));
+        query.prepare(QStringLiteral("INSERT INTO Events DEFAULT VALUES;"));
         result = runQuery(query);
         Q_ASSERT(result); // this has to suceed
     }
@@ -253,7 +253,7 @@ Event SqlStorage::makeEvent(const SqlRaiiTransactor &)
         // modify the created record to make sure event_id is unique
         // within the installation:
         QSqlQuery query(database());
-        query.prepare(QLatin1String(
+        query.prepare(QStringLiteral(
             "UPDATE Events SET event_id = :event_id, "
             "installation_id = :installation_id, report_id = :report_id WHERE id = :id;"));
         query.bindValue(QStringLiteral(":event_id"), event.id());
@@ -303,7 +303,7 @@ bool SqlStorage::modifyEvent(const Event &event)
 bool SqlStorage::modifyEvent(const Event &event, const SqlRaiiTransactor &)
 {
     QSqlQuery query(database());
-    query.prepare(QLatin1String("UPDATE Events set task = :task, comment = :comment, "
+    query.prepare(QStringLiteral("UPDATE Events set task = :task, comment = :comment, "
                                 "start = :start, end = :end, report_id = :report "
                                 "where event_id = :id;"));
     query.bindValue(QStringLiteral(":id"), event.id());

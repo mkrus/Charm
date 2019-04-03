@@ -35,7 +35,6 @@
 #include <QString>
 #include <QTest>
 
-const int UserId = 1;
 const int InstallationId = 1;
 
 TestApplication::TestApplication(const QString &databasePath, QObject *parent)
