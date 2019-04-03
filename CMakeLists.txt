@@ -46,7 +46,7 @@ MESSAGE( STATUS "Building Charm ${Charm_VERSION} in ${CMAKE_BUILD_TYPE} mode" )
 
 set(QT_REQUIRED_VERSION "5.10")
 
-find_package(Qt5Core ${${QT_REQUIRED_VERSION}} REQUIRED)
+find_package(Qt5Core ${QT_REQUIRED_VERSION} REQUIRED)
 find_package(Qt5Widgets ${QT_REQUIRED_VERSION} REQUIRED)
 find_package(Qt5Xml ${QT_REQUIRED_VERSION} REQUIRED)
 find_package(Qt5Network ${QT_REQUIRED_VERSION} REQUIRED)
