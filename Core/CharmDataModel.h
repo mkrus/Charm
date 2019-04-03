@@ -36,7 +36,6 @@
 #include "State.h"
 #include "Task.h"
 #include "TaskModel.h"
-#include "TaskTreeItem.h"
 #include "TimeSpans.h"
 
 class QAbstractItemModel;

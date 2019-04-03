@@ -17,7 +17,6 @@ SET(
     TaskModel.cpp
     State.cpp
     CharmDataModel.cpp
-    TaskTreeItem.cpp
     TimeSpans.cpp
     CharmCommand.cpp
     SmartNameCache.cpp

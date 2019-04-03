@@ -29,7 +29,6 @@
 #include "Commands/CommandMakeEvent.h"
 #include "Core/CharmConstants.h"
 #include "Core/CharmDataModel.h"
-#include "Core/TaskTreeItem.h"
 
 #include <QCalendarWidget>
 #include <QSettings>

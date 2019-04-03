@@ -26,7 +26,6 @@
 
 #include "Core/CharmDataModel.h"
 #include "Core/Task.h"
-#include "Core/TaskTreeItem.h"
 
 #include <QDebug>
 #include <QTest>

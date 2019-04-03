@@ -41,7 +41,6 @@
 #include "Core/CharmDataModel.h"
 #include "Core/Configuration.h"
 #include "Core/Event.h"
-#include "Core/TaskTreeItem.h"
 
 #include <QAbstractButton>
 #include <QCloseEvent>

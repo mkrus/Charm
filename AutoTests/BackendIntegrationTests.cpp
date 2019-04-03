@@ -28,7 +28,6 @@
 #include "Core/Configuration.h"
 #include "Core/Controller.h"
 #include "Core/SqlStorage.h"
-#include "Core/TaskTreeItem.h"
 
 #include <QDebug>
 #include <QDir>
