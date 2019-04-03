@@ -67,7 +67,7 @@ void TaskTreeItem::makeChildOf(TaskTreeItem &parent)
 
         // if there is an existing parent, unregister with it:
         // parent can only be zero if there never was a parent so far
-        if (m_parent != 0) {
+        if (m_parent) {
             m_parent->m_children.removeAt(row());
             m_parent = nullptr;
         }
@@ -93,7 +93,7 @@ const Task &TaskTreeItem::task() const
 
 bool TaskTreeItem::isValid() const
 {
-    return m_parent != 0 && m_task.isValid();
+    return m_parent && m_task.isValid();
 }
 
 const TaskTreeItem &TaskTreeItem::child(int row) const

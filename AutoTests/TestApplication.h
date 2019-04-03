@@ -51,7 +51,7 @@ protected:
 private:
     Controller *m_controller = nullptr;
     CharmDataModel *m_model = nullptr;
-    Configuration *m_configuration;
+    Configuration *m_configuration = nullptr;
     QString m_localPath;
 };
 

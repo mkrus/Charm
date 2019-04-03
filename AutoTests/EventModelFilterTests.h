@@ -49,7 +49,7 @@ private Q_SLOTS:
 
 private:
     CharmDataModel *m_referenceModel = nullptr;
-    EventModelFilter *m_eventModelFilter;
+    EventModelFilter *m_eventModelFilter = nullptr;
 
     NamedTimeSpan m_thisYearSpan;
     NamedTimeSpan m_theMonthBeforeLastSpan;

@@ -126,7 +126,7 @@ void EventEditor::startDateChanged(const QDate &date)
 {
     QDateTime start = m_event.startDateTime();
     start.setDate(date);
-    int delta = m_event.startDateTime().secsTo(m_event.endDateTime());
+    qint64 delta = m_event.startDateTime().secsTo(m_event.endDateTime());
     m_event.setStartDateTime(start);
     if (!m_endDateChanged)
         m_event.setEndDateTime(start.addSecs(delta));

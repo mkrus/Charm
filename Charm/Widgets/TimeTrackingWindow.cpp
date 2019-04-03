@@ -409,7 +409,7 @@ void TimeTrackingWindow::slotImportTasks()
                                      tr("Task definitions (*.xml);;All Files (*)"));
     if (filename.isNull())
         return;
-    importTasksFromDeviceOrFile(0, filename);
+    importTasksFromDeviceOrFile(nullptr, filename);
 }
 
 void TimeTrackingWindow::slotCheckUploadedTimesheets()

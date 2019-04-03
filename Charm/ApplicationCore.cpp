@@ -141,7 +141,7 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
             << m_uniqueApplicationServer.errorString();
 
     Q_INIT_RESOURCE(CharmResources);
-    Q_ASSERT_X(m_instance == 0, "Application ctor",
+    Q_ASSERT_X(m_instance == nullptr, "Application ctor",
                "Application is a singleton and cannot be created more than once");
     m_instance = this;
     qRegisterMetaType<State>("State");

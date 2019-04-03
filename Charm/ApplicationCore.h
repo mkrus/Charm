@@ -169,7 +169,7 @@ private:
     // All statics are created as members of Application. This is
     // supposed to help on Windows, where constructors for statics
     // do not seem to called correctly.
-    DateChangeWatcher *m_dateChangeWatcher;
+    DateChangeWatcher *m_dateChangeWatcher = nullptr;
     static ApplicationCore *m_instance;
 };
 

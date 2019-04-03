@@ -64,8 +64,8 @@ private:
     TaskId m_taskToSearch = {};
     TaskId m_taskToReplaceWith = {};
     TimeSpan m_timeSpan;
-    QPushButton *m_replace;
-    QPushButton *m_cancel;
+    QPushButton *m_replace = nullptr;
+    QPushButton *m_cancel = nullptr;
     QList<Event> m_foundEvents;
     QList<Event> m_modifiedEvents;
     QScopedPointer<EventModelFilter> m_model;

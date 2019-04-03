@@ -98,7 +98,7 @@ private Q_SLOTS:
     void authenticationRequired(QNetworkReply *reply, QAuthenticator *authenticator);
 
 private:
-    QNetworkAccessManager *m_networkManager;
+    QNetworkAccessManager *m_networkManager = nullptr;
     QString m_username;
     QString m_password;
     int m_errorCode = NoError;

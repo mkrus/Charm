@@ -61,7 +61,6 @@ QVariant EventModelAdapter::data(const QModelIndex &index, int role) const
         stream << event.taskId() << " - " << event.comment();
 
         return text;
-        break;
     }
 
     default:

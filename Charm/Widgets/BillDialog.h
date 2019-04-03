@@ -35,7 +35,7 @@ public:
         AsYouWish,
         AlreadyDone,
     };
-    explicit BillDialog(QWidget *parent = nullptr, Qt::WindowFlags f = 0);
+    explicit BillDialog(QWidget *parent = nullptr, Qt::WindowFlags f = {});
     void setReport(int year, int week);
     int year() const;
     int week() const;
@@ -45,9 +45,9 @@ private Q_SLOTS:
     void slotLater();
 
 private:
-    QPushButton *m_asYouWish;
-    QPushButton *m_alreadyDone;
-    QPushButton *m_later;
+    QPushButton *m_asYouWish = nullptr;
+    QPushButton *m_alreadyDone = nullptr;
+    QPushButton *m_later = nullptr;
     int m_year = 0;
     int m_week = 0;
 };

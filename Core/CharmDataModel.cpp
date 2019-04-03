@@ -488,7 +488,7 @@ TaskIdList CharmDataModel::mostFrequentlyUsedTasks() const
     const auto comp = [](quint32 a, quint32 b) { return a > b; };
 
     std::map<quint32, TaskId, decltype(comp)> mfu(comp);
-    for (const auto kv : mfuMap) {
+    for (const auto &kv : mfuMap) {
         mfu[kv.second] = kv.first;
     }
 
@@ -519,7 +519,7 @@ TaskIdList CharmDataModel::mostRecentlyUsedTasks() const
     }
     const auto comp = [](const QDateTime &a, const QDateTime &b) { return a > b; };
     std::map<QDateTime, TaskId, decltype(comp)> mru(comp);
-    for (const auto kv : mruMap) {
+    for (const auto &kv : mruMap) {
         mru[kv.second] = kv.first;
     }
     TaskIdList out;

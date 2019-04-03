@@ -148,13 +148,10 @@ Configuration::TimeTrackerFontSize CharmPreferences::timeTrackerFontSize() const
     switch (m_ui.cbTimeTrackerFontSize->currentIndex()) {
     case 0:
         return Configuration::TimeTrackerFont_Small;
-        break;
     case 1:
         return Configuration::TimeTrackerFont_Regular;
-        break;
     case 2:
         return Configuration::TimeTrackerFont_Large;
-        break;
     default:
         Q_ASSERT(false); // somebody added an item
     }
@@ -167,19 +164,14 @@ Qt::ToolButtonStyle CharmPreferences::toolButtonStyle() const
     switch (m_ui.cbToolButtonStyle->currentIndex()) {
     case 0:
         return Qt::ToolButtonIconOnly;
-        break;
     case 1:
         return Qt::ToolButtonTextOnly;
-        break;
     case 2:
         return Qt::ToolButtonTextUnderIcon;
-        break;
     case 3:
         return Qt::ToolButtonTextBesideIcon;
-        break;
     case 4:
         return Qt::ToolButtonFollowStyle;
-        break;
     default:
         Q_ASSERT(false); // somebody added an item
     }

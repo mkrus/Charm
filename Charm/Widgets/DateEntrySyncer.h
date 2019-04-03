@@ -40,9 +40,9 @@ private Q_SLOTS:
     void dateSelectionChanged();
 
 private:
-    QSpinBox *m_week;
-    QSpinBox *m_year;
-    QDateEdit *m_date;
+    QSpinBox *m_week = nullptr;
+    QSpinBox *m_year = nullptr;
+    QDateEdit *m_date = nullptr;
     int m_weekDay;
 };
 

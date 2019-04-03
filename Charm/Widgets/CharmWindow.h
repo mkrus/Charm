@@ -76,7 +76,7 @@ public:
     static void showView(QWidget *w);
     static bool showHideView(QWidget *w);
 
-    void setHideAtStartup(const bool &);
+    void setHideAtStartup(bool);
 
 Q_SIGNALS:
     void visibilityChanged(bool);
@@ -95,12 +95,12 @@ private Q_SLOTS:
 
 private:
     QString m_windowName;
-    QAction *m_openCharmAction;
-    QAction *m_showAction;
+    QAction *m_openCharmAction = nullptr;
+    QAction *m_showAction = nullptr;
     int m_windowNumber = -1; // Mac numerical window number, used for shortcut etc
     QString m_windowIdentifier;
     QShortcut *m_shortcut = nullptr;
-    QToolBar *m_toolBar;
+    QToolBar *m_toolBar = nullptr;
     bool m_isVisibility = false;
     bool m_hideAtStartUp = false;
 };

@@ -52,9 +52,9 @@ private Q_SLOTS:
 private:
     QUrl m_link;
     QString m_version;
-    QPushButton *m_skipUpdate;
-    QPushButton *m_remindMeLater;
-    QPushButton *m_update;
+    QPushButton *m_skipUpdate = nullptr;
+    QPushButton *m_remindMeLater = nullptr;
+    QPushButton *m_update = nullptr;
     QScopedPointer<Ui::CharmNewReleaseDialog> m_ui;
 };
 

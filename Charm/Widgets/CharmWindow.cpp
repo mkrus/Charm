@@ -266,7 +266,7 @@ void CharmWindow::restoreGuiState()
     setVisible(visible);
 }
 
-void CharmWindow::setHideAtStartup(const bool &value)
+void CharmWindow::setHideAtStartup(bool value)
 {
     m_hideAtStartUp = value;
 }

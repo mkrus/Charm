@@ -37,7 +37,7 @@ public:
     ~SqLiteStorageTests() override;
 
 private:
-    SqlStorage *m_storage;
+    SqlStorage *m_storage = nullptr;
     Configuration m_configuration;
     QString m_localPath;
 

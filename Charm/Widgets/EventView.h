@@ -105,9 +105,9 @@ private:
     QAction m_actionDeleteEvent;
     QAction m_actionCreateTimeSheet;
     QAction m_actionFindAndReplace;
-    QComboBox *m_comboBox;
-    QLabel *m_labelTotal;
-    QListView *m_listView;
+    QComboBox *m_comboBox = nullptr;
+    QLabel *m_labelTotal = nullptr;
+    QListView *m_listView = nullptr;
 };
 
 #endif
