@@ -51,6 +51,7 @@
 
 #ifdef Q_OS_WIN
 #include <QtWinExtras/QWinJumpList>
+#include <QtWinExtras/QWinJumpListCategory>
 #include <QtWinExtras/QWinThumbnailToolBar>
 #endif
 
