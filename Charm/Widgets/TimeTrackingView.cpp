@@ -409,12 +409,12 @@ bool TimeTrackingView::taskIsValidAndTrackable(int taskId)
 {
     const Task &task = DATAMODEL->getTask(taskId);
 
-    bool expired = !task.isCurrentlyValid();
-    bool trackable = task.trackable();
+    bool expired = !task.isValid();
+    bool trackable = task.trackable;
     bool notTrackableAndExpired = (!trackable && expired);
-    const auto id = QString::number(task.id());
-    const QString name = task.name();
-    QString expirationDate = QLocale::system().toString(task.validUntil(), QLocale::ShortFormat);
+    const auto id = QString::number(task.id);
+    const QString name = task.name;
+    QString expirationDate = QLocale::system().toString(task.validUntil, QLocale::ShortFormat);
 
     if (!trackable || expired) {
         QString message = notTrackableAndExpired

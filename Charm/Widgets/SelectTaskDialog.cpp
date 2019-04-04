@@ -87,10 +87,10 @@ void SelectTaskDialog::slotTaskDoubleClicked(TaskId id)
 bool SelectTaskDialog::isValid(TaskId id) const
 {
     const Task &task = MODEL.charmDataModel()->getTask(id);
-    if (!task.isValid() || !task.trackable())
+    if (task.isNull() || !task.trackable)
         return false;
 
-    return m_nonValidSelectable || task.isCurrentlyValid();
+    return m_nonValidSelectable || task.isValid();
 }
 
 void SelectTaskDialog::showEvent(QShowEvent *event)

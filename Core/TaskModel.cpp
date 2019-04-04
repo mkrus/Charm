@@ -19,6 +19,7 @@ const TaskList &TaskModel::tasks() const
 void TaskModel::setTasks(const TaskList &tasks)
 {
     Q_ASSERT(!tasks.isEmpty());
+    Q_ASSERT(std::is_sorted(tasks.cbegin(), tasks.cend()));
 
     beginResetModel();
 
@@ -26,8 +27,7 @@ void TaskModel::setTasks(const TaskList &tasks)
     m_taskMap.clear();
     m_items.clear();
 
-    std::sort(m_tasks.begin(), m_tasks.end());
-    const auto bigId = m_tasks.last().id();
+    const auto bigId = m_tasks.last().id;
 
     // Copmute how many digits do we need to display all task ids
     // For example, should return 4 if bigId is 9999.
@@ -40,11 +40,11 @@ void TaskModel::setTasks(const TaskList &tasks)
 
     for (int i = 0; i < m_tasks.size(); ++i) {
         const auto &task = m_tasks.at(i);
-        m_taskMap[task.id()] = i;
+        m_taskMap[task.id] = i;
 
-        auto &item = m_items[task.id()];
-        auto &parent = m_items[task.parent()];
-        item.id = task.id();
+        auto &item = m_items[task.id];
+        auto &parent = m_items[task.parent];
+        item.id = task.id;
         item.parent = &parent;
         parent.children.push_back(&item);
     }
@@ -83,7 +83,7 @@ QVariant TaskModel::data(const QModelIndex &index, int role) const
 
     switch (role) {
     case Qt::BackgroundRole:
-        if (!task.isCurrentlyValid()) {
+        if (!task.isValid()) {
             QColor color("crimson");
             color.setAlphaF(0.25);
             return color;
@@ -91,13 +91,13 @@ QVariant TaskModel::data(const QModelIndex &index, int role) const
         return {};
     case Qt::DisplayRole:
         return QStringLiteral("%1 %2")
-            .arg(task.id(), m_idPadding, 10, QLatin1Char('0'))
-            .arg(task.name());
+            .arg(task.id, m_idPadding, 10, QLatin1Char('0'))
+            .arg(task.name);
     case TaskRole:
         return QVariant::fromValue(task);
     case FilterRole:
         return QStringLiteral("%1 %2")
-            .arg(task.id(), m_idPadding, 10, QLatin1Char('0'))
+            .arg(task.id, m_idPadding, 10, QLatin1Char('0'))
             .arg(fullTaskName(task));
     }
 
@@ -128,18 +128,6 @@ QModelIndex TaskModel::indexForTaskId(TaskId id) const
     return indexForTreeItem(const_cast<TreeItem *>(&m_items[id]));
 }
 
-Task TaskModel::taskForIndex(const QModelIndex &index) const
-{
-    Q_ASSERT(index.isValid());
-
-    auto item = treeItemForIndex(index);
-    auto it = std::find_if(m_tasks.cbegin(), m_tasks.cend(),
-                           [id = item->id](const auto &task) { return task.id() == id; });
-    if (it != m_tasks.cend())
-        return *it;
-    return {};
-}
-
 const Task &TaskModel::taskForId(TaskId id) const
 {
     Q_ASSERT(m_taskMap.contains(id));
@@ -148,15 +136,15 @@ const Task &TaskModel::taskForId(TaskId id) const
 
 QString TaskModel::fullTaskName(const Task &task) const
 {
-    Q_ASSERT(task.isValid());
-    auto item = &(m_items.at(task.id()));
+    Q_ASSERT(!task.isNull());
+    auto item = &(m_items.at(task.id));
 
-    QString name = task.name().simplified();
+    QString name = task.name.simplified();
     item = item->parent;
 
     while (item->parent != nullptr) {
         const auto &task = taskForItem(item);
-        name = task.name().simplified() + QLatin1Char('/') + name;
+        name = task.name.simplified() + QLatin1Char('/') + name;
         item = item->parent;
     }
     return name;
@@ -164,7 +152,7 @@ QString TaskModel::fullTaskName(const Task &task) const
 
 TaskIdList TaskModel::childrenIds(const Task &task) const
 {
-    auto item = m_items.at(task.id());
+    auto item = m_items.at(task.id);
 
     TaskIdList ids;
     for (auto child : item.children)

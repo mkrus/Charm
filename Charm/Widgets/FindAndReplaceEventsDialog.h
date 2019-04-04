@@ -32,7 +32,6 @@
 
 class Event;
 class EventModelFilter;
-class Task;
 
 namespace Ui {
 class FindAndReplaceEventsDialog;

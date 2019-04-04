@@ -209,9 +209,9 @@ void EventView::slotNewEvent()
     SelectTaskDialog dialog(this);
     if (dialog.exec()) {
         const Task &task = MODEL.charmDataModel()->getTask(dialog.selectedTask());
-        if (task.isValid()) {
+        if (!task.isNull()) {
             Event e;
-            e.setTaskId(task.id());
+            e.setTaskId(task.id);
             slotEditEvent(e);
         }
     }

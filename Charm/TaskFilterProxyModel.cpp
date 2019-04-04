@@ -55,7 +55,7 @@ bool TaskFilterProxyModel::filterAcceptsRow(int source_row, const QModelIndex &s
         if (!source_index.isValid())
             return false;
         const Task task = source_index.data(TaskModel::TaskRole).value<Task>();
-        if (!task.isCurrentlyValid())
+        if (!task.isValid())
             return false;
     }
 

@@ -23,6 +23,8 @@
 
 #include "SqLiteStorageTests.h"
 
+#include "TestHelpers.h"
+
 #include "Core/CharmConstants.h"
 #include "Core/SqLiteStorage.h"
 
@@ -67,30 +69,18 @@ void SqLiteStorageTests::connectAndCreateDatabaseTest()
 void SqLiteStorageTests::makeModifyDeleteTasksTest()
 {
     // make two tasks
-    const int Task1Id = 1;
-    const QString Task1Name(QStringLiteral("Task-1-Name"));
-    const int Task2Id = 2;
-    const QString Task2Name(QStringLiteral("Task-2-Name"));
-    Task task1;
-    task1.setId(Task1Id);
-    task1.setName(Task1Name);
-    task1.setValidFrom(QDateTime::currentDateTime());
-    Task task2;
-    task2.setId(Task2Id);
-    task2.setName(Task2Name);
-    task2.setValidUntil(QDateTime::currentDateTime());
+    Task task1 = TestHelpers::createTask(1, QStringLiteral("Task-1-Name"));
+    task1.validFrom = QDateTime::currentDateTime();
+    Task task2 = TestHelpers::createTask(2, QStringLiteral("Task-2-Name"));
+    task2.validUntil = QDateTime::currentDateTime();
     QVERIFY(m_storage->getAllTasks().size() == 0);
     QVERIFY(m_storage->addTask(task1));
     QVERIFY(m_storage->addTask(task2));
     QVERIFY(m_storage->getAllTasks().size() == 2);
 
     // verify task database entries
-    Task task1_1 = m_storage->getTask(task1.id());
-    Task task2_1 = m_storage->getTask(task2.id());
-    if (task1 != task1_1) {
-        task1.dump();
-        task1_1.dump();
-    }
+    Task task1_1 = m_storage->getTask(task1.id);
+    Task task2_1 = m_storage->getTask(task2.id);
     QVERIFY(task1 == task1_1);
     QVERIFY(task2 == task2_1);
 }
@@ -100,18 +90,18 @@ void SqLiteStorageTests::makeModifyDeleteEventsTest()
     // make two events
     Task task = m_storage->getTask(1);
     // WARNING: depends on leftover task created in previous test
-    QVERIFY(task.isValid());
+    QVERIFY(!task.isNull());
 
     Event event1 = m_storage->makeEvent();
     QVERIFY(event1.isValid());
-    event1.setTaskId(task.id());
+    event1.setTaskId(task.id);
     event1.setReportId(42);
     const QString Event1Comment(QStringLiteral("Event-1-Comment"));
     event1.setComment(Event1Comment);
 
     Event event2 = m_storage->makeEvent();
     QVERIFY(event2.isValid());
-    event2.setTaskId(task.id());
+    event2.setTaskId(task.id);
     const QString Event2Comment(QStringLiteral("Event-2-Comment"));
     event2.setComment(Event2Comment);
 
@@ -140,20 +130,14 @@ void SqLiteStorageTests::makeModifyDeleteEventsTest()
 void SqLiteStorageTests::deleteTaskWithEventsTest()
 {
     // make a task
-    const int TaskId = 1;
-    const QString Task1Name(QStringLiteral("Task-Name"));
-    Task task;
-    task.setId(TaskId);
-    task.setName(Task1Name);
-    task.setValidFrom(QDateTime::currentDateTime());
+    Task task = TestHelpers::createTask(1, QStringLiteral("Task-Name"));
+    task.validFrom = QDateTime::currentDateTime();
     QVERIFY(m_storage->deleteAllTasks());
     QVERIFY(m_storage->deleteAllEvents());
     QVERIFY(m_storage->getAllTasks().size() == 0);
     QVERIFY(m_storage->addTask(task));
     QVERIFY(m_storage->getAllTasks().size() == 1);
-    Task task2;
-    task2.setId(2);
-    task2.setName(QStringLiteral("Task-2-Name"));
+    Task task2 = TestHelpers::createTask(2, QStringLiteral("Task-2-Name"));
     QVERIFY(m_storage->addTask(task2));
     QVERIFY(m_storage->getAllTasks().size() == 2);
 
@@ -161,7 +145,7 @@ void SqLiteStorageTests::deleteTaskWithEventsTest()
     {
         Event event = m_storage->makeEvent();
         QVERIFY(event.isValid());
-        event.setTaskId(task.id());
+        event.setTaskId(task.id);
         event.setReportId(42);
         const QString EventComment(QStringLiteral("Event-Comment"));
         event.setComment(EventComment);
@@ -170,7 +154,7 @@ void SqLiteStorageTests::deleteTaskWithEventsTest()
     {
         Event event = m_storage->makeEvent();
         QVERIFY(event.isValid());
-        event.setTaskId(task.id());
+        event.setTaskId(task.id);
         event.setReportId(43);
         const QString EventComment(QStringLiteral("Event-Comment 2"));
         event.setComment(EventComment);
@@ -179,7 +163,7 @@ void SqLiteStorageTests::deleteTaskWithEventsTest()
     {
         Event event = m_storage->makeEvent();
         QVERIFY(event.isValid());
-        event.setTaskId(task2.id());
+        event.setTaskId(task2.id);
         event.setReportId(43);
         const QString EventComment(QStringLiteral("Event-Comment 2"));
         event.setComment(EventComment);

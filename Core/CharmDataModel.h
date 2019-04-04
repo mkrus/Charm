@@ -133,7 +133,7 @@ Q_SIGNALS:
     void resetGUIState();
 
 public Q_SLOTS:
-    void setAllTasks(const TaskList &tasks);
+    void setAllTasks(TaskList tasks);
     void clearTasks();
 
     void setAllEvents(const EventList &events);

@@ -25,6 +25,8 @@
 
 #include "XmlSerializationTests.h"
 
+#include "TestHelpers.h"
+
 #include "Core/CharmConstants.h"
 #include "Core/CharmExceptions.h"
 #include "Core/Event.h"
@@ -41,18 +43,15 @@ XmlSerializationTests::XmlSerializationTests()
 
 TaskList XmlSerializationTests::tasksToTest() const
 {
+    auto dateTime = QDateTime::currentDateTime();
+    const auto time = dateTime.time();
+    dateTime.setTime(QTime(time.hour(), time.minute(), time.second()));
     // set up test candidates:
     TaskList tasks;
-    Task task;
-    task.setName(QStringLiteral("A task"));
-    task.setId(42);
-    task.setParent(4711);
-    task.setValidFrom(QDateTime::currentDateTime());
-    Task task2;
-    task2.setName(QStringLiteral("Another task"));
-    task2.setId(-1);
-    task2.setParent(1000000000);
-    task2.setValidUntil(QDateTime::currentDateTime());
+    Task task = TestHelpers::createTask(42, QStringLiteral("A task"), 4711);
+    task.validFrom = dateTime;
+    Task task2 = TestHelpers::createTask(-1, QStringLiteral("Another task"), 1000000000);
+    task2.validUntil = dateTime;
     Task task3;
 
     tasks << Task() << task << task2;
@@ -96,8 +95,6 @@ void XmlSerializationTests::testTaskSerialization()
         QDomElement element = task.toXml(document);
         try {
             Task readTask = Task::fromXml(element, CHARM_DATABASE_VERSION);
-            if (task != readTask)
-                task.dump();
             QVERIFY(task == readTask);
         } catch (const CharmException &e) {
             qDebug() << "XmlSerializationTests::testTaskSerialization: exception caught ("
@@ -151,7 +148,7 @@ void XmlSerializationTests::testTaskListSerialization()
     //
     // just making sure:
     for (const Task &task : tasks)
-        QVERIFY(task.isValid());
+        QVERIFY(!task.isNull());
 
     // the next test fails because tasks contains orphan elements (the
     // parent they have assigned does not exist)
@@ -162,12 +159,6 @@ void XmlSerializationTests::testTaskListSerialization()
     try {
         TaskList result = Task::readTasksElement(element, CHARM_DATABASE_VERSION);
         QVERIFY(tasks.count() == result.count());
-        for (int i = 0; i < tasks.count(); ++i) {
-            if (tasks[i] != result[i]) {
-                tasks[i].dump();
-                result[i].dump();
-            }
-        }
         QVERIFY(tasks == result);
     } catch (const XmlSerializationException &e) {
         qCritical() << "Failure reading tasks:" << e.what();

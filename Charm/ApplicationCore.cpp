@@ -56,8 +56,8 @@
 #endif
 
 #ifdef Q_OS_WIN
-#include <windows.h>
-#include <winuser.h>
+#include <Windows.h>
+#include <WinUser.h>
 #endif
 
 #include <algorithm>
@@ -755,7 +755,7 @@ void ApplicationCore::updateTaskList()
     for (const auto &id : recentData) {
         if (count++ > 5)
             break;
-        recentJumpList->addLink(Data::goIcon(), DATAMODEL->getTask(id).name(),
+        recentJumpList->addLink(Data::goIcon(), DATAMODEL->getTask(id).name,
                                 qApp->applicationFilePath(),
                                 {QLatin1String("--start-task"), QString::number(id)});
     }

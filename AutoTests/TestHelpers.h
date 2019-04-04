@@ -25,6 +25,7 @@
 #define TESTHELPERS_H
 
 #include "Core/CharmExceptions.h"
+#include "Core/Task.h"
 
 #include <QDebug>
 #include <QDir>
@@ -32,6 +33,16 @@
 #include <QDomDocument>
 
 namespace TestHelpers {
+
+Task createTask(TaskId id, const QString &name, TaskId parentId = 0)
+{
+    Task task;
+    task.id = id;
+    task.name = name;
+    task.parent = parentId;
+    return task;
+}
+
 QList<QDomElement> retrieveTestCases(const QString &path, const QString &type)
 {
     const QString tagName(QStringLiteral("testcase"));

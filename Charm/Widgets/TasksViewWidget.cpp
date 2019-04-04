@@ -76,9 +76,9 @@ TaskIdList TasksViewWidget::expandedTasks() const
     TaskList tasks = MODEL.charmDataModel()->getAllTasks();
     TaskIdList expandedTasks;
     for (const auto &task : qAsConst(tasks)) {
-        QModelIndex index(m_proxy->indexForTaskId(task.id()));
+        QModelIndex index(m_proxy->indexForTaskId(task.id));
         if (m_ui->treeView->isExpanded(index))
-            expandedTasks << task.id();
+            expandedTasks << task.id;
     }
     return expandedTasks;
 }
@@ -105,17 +105,17 @@ void TasksViewWidget::setExpiredVisible(bool visible)
 void TasksViewWidget::slotCurrentItemChanged(const QModelIndex &first, const QModelIndex &)
 {
     const Task task = first.data(TaskModel::TaskRole).value<Task>();
-    m_selectedTask = task.id();
+    m_selectedTask = task.id;
 
     if (m_selectedTask != 0) {
-        const bool expired = !task.isCurrentlyValid();
-        const bool trackable = task.trackable();
+        const bool expired = !task.isValid();
+        const bool trackable = task.trackable;
         if (!expired && trackable) {
             m_ui->taskStatusLB->clear();
         } else {
             const bool notTrackableAndExpired = (!trackable && expired);
             const QString expirationDate =
-                QLocale::system().toString(task.validUntil(), QLocale::ShortFormat);
+                QLocale::system().toString(task.validUntil, QLocale::ShortFormat);
             const QString info = notTrackableAndExpired
                 ? tr("The selected task is not trackable and expired since %1").arg(expirationDate)
                 : expired ? tr("The selected task is expired since %1").arg(expirationDate)

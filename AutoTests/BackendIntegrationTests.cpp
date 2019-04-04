@@ -23,6 +23,8 @@
 
 #include "BackendIntegrationTests.h"
 
+#include "TestHelpers.h"
+
 #include "Core/CharmConstants.h"
 #include "Core/CharmDataModel.h"
 #include "Core/Configuration.h"
@@ -52,18 +54,18 @@ void BackendIntegrationTests::initialValuesTest()
 
 void BackendIntegrationTests::simpleCreateTaskTest()
 {
-    Task task1(1000, QStringLiteral("Task 1"));
-    Task task1b(10001, QStringLiteral("Task 1, modified"));
+    Task task1 = TestHelpers::createTask(1000, QStringLiteral("Task 1"));
+    Task task1b = TestHelpers::createTask(10001, QStringLiteral("Task 1, modified"));
     // add:
     controller()->setAllTasks({task1, task1b});
     QVERIFY(controller()->storage()->getAllTasks().size() == 2);
     QVERIFY(controller()->storage()->getAllTasks().first() == task1);
-    QVERIFY(model()->getTask(task1.id()) == task1);
+    QVERIFY(model()->getTask(task1.id) == task1);
 }
 
 void BackendIntegrationTests::biggerCreateModifyDeleteTaskTest()
 {
-    const TaskList &tasks = referenceTasks();
+    const TaskList tasks = referenceTasks();
     // make sure everything is cleaned up:
     controller()->storage()->deleteAllTasks();
     model()->clearTasks();
@@ -79,25 +81,23 @@ void BackendIntegrationTests::cleanupTestCase()
     destroy();
 }
 
-const TaskList &BackendIntegrationTests::referenceTasks()
+const TaskList BackendIntegrationTests::referenceTasks()
 {
-    static TaskList Tasks;
-    if (Tasks.isEmpty()) {
-        Task task1(1000, QStringLiteral("Task 1"));
-        Task task1_1(1001, QStringLiteral("Task 1-1"), task1.id());
-        Task task1_2(1002, QStringLiteral("Task 1-2"), task1.id());
-        Task task1_3(1003, QStringLiteral("Task 1-3"), task1.id());
-        Task task2(2000, QStringLiteral("Task 2"));
-        Task task2_1(2100, QStringLiteral("Task 2-1"), task2.id());
-        Task task2_1_1(2110, QStringLiteral("Task 2-1-1"), task2_1.id());
-        Task task2_1_2(2120, QStringLiteral("Task 2-1-2"), task2_1.id());
-        Task task2_2(2200, QStringLiteral("Task 2-2"), task2.id());
-        Task task2_2_1(2210, QStringLiteral("Task 2-2-1"), task2_2.id());
-        Task task2_2_2(2220, QStringLiteral("Task 2-2-2"), task2_2.id());
-        Tasks << task1 << task1_1 << task1_2 << task1_3 << task2 << task2_1 << task2_1_1
-              << task2_1_2 << task2_2 << task2_2_1 << task2_2_2;
-    }
-    return Tasks;
+    Task task1 = TestHelpers::createTask(1000, QStringLiteral("Task 1"));
+    Task task1_1 = TestHelpers::createTask(1001, QStringLiteral("Task 1-1"), task1.id);
+    Task task1_2 = TestHelpers::createTask(1002, QStringLiteral("Task 1-2"), task1.id);
+    Task task1_3 = TestHelpers::createTask(1003, QStringLiteral("Task 1-3"), task1.id);
+    Task task2 = TestHelpers::createTask(2000, QStringLiteral("Task 2"));
+    Task task2_1 = TestHelpers::createTask(2100, QStringLiteral("Task 2-1"), task2.id);
+    Task task2_1_1 = TestHelpers::createTask(2110, QStringLiteral("Task 2-1-1"), task2_1.id);
+    Task task2_1_2 = TestHelpers::createTask(2120, QStringLiteral("Task 2-1-2"), task2_1.id);
+    Task task2_2 = TestHelpers::createTask(2200, QStringLiteral("Task 2-2"), task2.id);
+    Task task2_2_1 = TestHelpers::createTask(2210, QStringLiteral("Task 2-2-1"), task2_2.id);
+    Task task2_2_2 = TestHelpers::createTask(2220, QStringLiteral("Task 2-2-2"), task2_2.id);
+
+    TaskList tasks = {task1,     task1_1,   task1_2, task1_3,   task2,    task2_1,
+                      task2_1_1, task2_1_2, task2_2, task2_2_1, task2_2_2};
+    return tasks;
 }
 
 bool BackendIntegrationTests::contentsEqual(const TaskList &listref1, const TaskList &listref2)

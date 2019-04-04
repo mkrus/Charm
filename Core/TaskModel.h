@@ -32,7 +32,6 @@ public:
     QModelIndex parent(const QModelIndex &index) const override;
 
     QModelIndex indexForTaskId(TaskId id) const;
-    Task taskForIndex(const QModelIndex &index) const;
 
     const Task &taskForId(TaskId id) const;
 

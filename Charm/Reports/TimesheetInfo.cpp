@@ -64,15 +64,15 @@ TimeSheetInfoList TimeSheetInfo::taskWithSubTasks(const CharmDataModel *dataMode
     TimeSheetInfo myInformation(segments);
     const Task &task = dataModel->getTask(id);
     // real task or virtual root item
-    Q_ASSERT(task.isValid() || id == 0);
+    Q_ASSERT(!task.isNull() || id == 0);
 
     if (id != 0) {
         // add totals for task itself:
         if (secondsMap.contains(id))
             myInformation.seconds = secondsMap.value(id);
         // add name and id:
-        myInformation.taskId = task.id();
-        myInformation.taskName = task.name();
+        myInformation.taskId = task.id;
+        myInformation.taskName = task.name;
 
         if (addTo)
             myInformation.indentation = addTo->indentation + 1;

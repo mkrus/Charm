@@ -130,13 +130,13 @@ bool SqlStorage::addTask(const Task &task, const SqlRaiiTransactor &)
     query.prepare(QStringLiteral(
         "INSERT into Tasks (task_id, name, parent, validfrom, validuntil, trackable, comment) "
         "values ( :task_id, :name, :parent, :validfrom, :validuntil, :trackable, :comment);"));
-    query.bindValue(QStringLiteral(":task_id"), task.id());
-    query.bindValue(QStringLiteral(":name"), task.name());
-    query.bindValue(QStringLiteral(":parent"), task.parent());
-    query.bindValue(QStringLiteral(":validfrom"), task.validFrom());
-    query.bindValue(QStringLiteral(":validuntil"), task.validUntil());
-    query.bindValue(QStringLiteral(":trackable"), task.trackable() ? 1 : 0);
-    query.bindValue(QStringLiteral(":comment"), task.comment());
+    query.bindValue(QStringLiteral(":task_id"), task.id);
+    query.bindValue(QStringLiteral(":name"), task.name);
+    query.bindValue(QStringLiteral(":parent"), task.parent);
+    query.bindValue(QStringLiteral(":validfrom"), task.validFrom);
+    query.bindValue(QStringLiteral(":validuntil"), task.validUntil);
+    query.bindValue(QStringLiteral(":trackable"), task.trackable ? 1 : 0);
+    query.bindValue(QStringLiteral(":comment"), task.comment);
     return runQuery(query);
 }
 
@@ -449,23 +449,23 @@ Task SqlStorage::makeTaskFromRecord(const QSqlRecord &record)
     int trackableField = record.indexOf(QStringLiteral("trackable"));
     int commentField = record.indexOf(QStringLiteral("comment"));
 
-    task.setId(record.field(idField).value().toInt());
-    task.setName(record.field(nameField).value().toString());
-    task.setParent(record.field(parentField).value().toInt());
+    task.id = record.field(idField).value().toInt();
+    task.name = record.field(nameField).value().toString();
+    task.parent = record.field(parentField).value().toInt();
     QString from = record.field(validfromField).value().toString();
     if (!from.isEmpty()) {
-        task.setValidFrom(record.field(validfromField).value().toDateTime());
+        task.validFrom = record.field(validfromField).value().toDateTime();
     }
     QString until = record.field(validuntilField).value().toString();
     if (!until.isEmpty()) {
-        task.setValidUntil(record.field(validuntilField).value().toDateTime());
+        task.validUntil = record.field(validuntilField).value().toDateTime();
     }
     const QVariant trackableValue = record.field(trackableField).value();
     if (!trackableValue.isNull() && trackableValue.isValid())
-        task.setTrackable(trackableValue.toInt() == 1);
+        task.trackable = trackableValue.toInt() == 1;
     const QVariant commentValue = record.field(commentField).value();
     if (!commentValue.isNull() && commentValue.isValid())
-        task.setComment(commentValue.toString());
+        task.comment = commentValue.toString();
     return task;
 }
 
@@ -493,7 +493,7 @@ QString SqlStorage::setAllTasksAndEvents(const TaskList &tasks, const EventList 
         if (!event.isValid())
             continue;
         Task task = getTask(event.taskId());
-        if (!task.isValid()) {
+        if (task.isNull()) {
             // semantical error
             continue;
         }

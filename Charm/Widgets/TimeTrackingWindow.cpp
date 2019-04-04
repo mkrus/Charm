@@ -237,11 +237,11 @@ void TimeTrackingWindow::slotStartEvent(TaskId id)
 {
     const Task &task = DATAMODEL->getTask(id);
 
-    if (task.isCurrentlyValid()) {
+    if (task.isValid()) {
         DATAMODEL->startEventRequested(task);
     } else {
         QString nm = DATAMODEL->taskIdAndSmartNameString(id);
-        if (task.isValid())
+        if (!task.isNull())
             QMessageBox::critical(this, tr("Invalid task"),
                                   tr("Task '%1' is no longer valid, so can't be started").arg(nm));
         else if (id > 0)
@@ -529,8 +529,8 @@ void TimeTrackingWindow::handleIdleEvents(IdleDetector *detector, bool restart)
             emit emitCommand(cmd);
             if (restart) {
                 Task task;
-                task.setId(event.taskId());
-                if (task.isValid())
+                task.id = event.taskId();
+                if (!task.isNull())
                     DATAMODEL->startEventRequested(task);
             }
         }

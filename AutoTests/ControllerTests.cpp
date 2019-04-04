@@ -125,16 +125,16 @@ void ControllerTests::addTaskTest()
     const int Task1Id = 1000;
     const QString Task1Name(QStringLiteral("Task-1-Name"));
     Task task1;
-    task1.setId(Task1Id);
-    task1.setName(Task1Name);
-    task1.setValidFrom(QDateTime::currentDateTime());
+    task1.id = Task1Id;
+    task1.name = Task1Name;
+    task1.validFrom = QDateTime::currentDateTime();
     const int Task2Id = 2000;
     const QString Task2Name(QStringLiteral("Task-2-Name"));
     Task task2;
-    task2.setId(Task2Id);
-    task2.setName(Task2Name);
-    task2.setParent(task1.id());
-    task2.setValidUntil(QDateTime::currentDateTime());
+    task2.id = Task2Id;
+    task2.name = Task2Name;
+    task2.parent = task1.id;
+    task2.validUntil = QDateTime::currentDateTime();
 
     m_controller->setAllTasks({task1, task2});
 
@@ -143,7 +143,7 @@ void ControllerTests::addTaskTest()
 
     // both tasks must be in the list, but the order is unspecified:
     int task1Position, task2Position;
-    if (m_definedTasks[0].id() == task1.id()) {
+    if (m_definedTasks[0].id == task1.id) {
         task1Position = 0;
         task2Position = 1;
     } else {
@@ -161,12 +161,12 @@ void ControllerTests::toAndFromXmlTest()
     TaskList tasks = m_controller->storage()->getAllTasks();
     QVERIFY(tasks.size() > 0); // just to be sure nobody fucks it up
     Event e1 = m_controller->storage()->makeEvent();
-    e1.setTaskId(tasks[0].id());
+    e1.setTaskId(tasks[0].id);
     e1.setComment(QStringLiteral("Event-1-Comment"));
     e1.setStartDateTime();
     m_controller->modifyEvent(e1);
     Event e2 = m_controller->storage()->makeEvent();
-    e2.setTaskId(tasks.last().id());
+    e2.setTaskId(tasks.last().id);
     e2.setComment(QStringLiteral("Event-2-Comment"));
     e2.setStartDateTime();
     m_controller->modifyEvent(e2);

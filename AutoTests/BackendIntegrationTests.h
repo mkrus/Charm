@@ -46,7 +46,7 @@ private Q_SLOTS:
     void cleanupTestCase();
 
 private:
-    const TaskList &referenceTasks();
+    const TaskList referenceTasks();
     // returns true if both lists contain the same tasks, even if not
     // in the same order:
     bool contentsEqual(const TaskList &list1, const TaskList &list2);

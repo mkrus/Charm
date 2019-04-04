@@ -22,6 +22,9 @@
 */
 
 #include "SmartNameCacheTests.h"
+
+#include "TestHelpers.h"
+
 #include "Core/SmartNameCache.h"
 
 #include <QTest>
@@ -29,24 +32,20 @@
 void SmartNameCacheTests::testCache()
 {
     SmartNameCache cache;
-    Task projects(1, QStringLiteral("Projects"));
-    Task charm(2, QStringLiteral("Charm"));
-    charm.setParent(projects.id());
-    Task charmDevelopment(3, QStringLiteral("Development"));
-    charmDevelopment.setParent(charm.id());
-    Task charmOverhead(4, QStringLiteral("Overhead"));
-    charmOverhead.setParent(charm.id());
-    Task lotsofcake(5, QStringLiteral("Lotsofcake"));
-    lotsofcake.setParent(projects.id());
-    Task lotsofcakeDevelopment(6, QStringLiteral("Development"));
-    lotsofcakeDevelopment.setParent(lotsofcake.id());
-    const TaskList tasks = TaskList() << projects << charm << charmDevelopment << charmOverhead
-                                      << lotsofcake << lotsofcakeDevelopment;
+    Task projects = TestHelpers::createTask(1, QStringLiteral("Projects"));
+    Task charm = TestHelpers::createTask(2, QStringLiteral("Charm"), projects.id);
+    Task charmDevelopment = TestHelpers::createTask(3, QStringLiteral("Development"), charm.id);
+    Task charmOverhead = TestHelpers::createTask(4, QStringLiteral("Overhead"), charm.id);
+    Task lotsofcake = TestHelpers::createTask(5, QStringLiteral("Lotsofcake"), charm.id);
+    Task lotsofcakeDevelopment =
+        TestHelpers::createTask(6, QStringLiteral("Development"), lotsofcake.id);
+    const TaskList tasks = {projects,      charm,      charmDevelopment,
+                            charmOverhead, lotsofcake, lotsofcakeDevelopment};
     cache.setAllTasks(tasks);
-    QCOMPARE(cache.smartName(charmDevelopment.id()), QLatin1String("Charm/Development"));
-    QCOMPARE(cache.smartName(charmOverhead.id()), QLatin1String("Charm/Overhead"));
-    QCOMPARE(cache.smartName(projects.id()), QLatin1String("Projects"));
-    QCOMPARE(cache.smartName(lotsofcakeDevelopment.id()), QLatin1String("Lotsofcake/Development"));
+    QCOMPARE(cache.smartName(charmDevelopment.id), QLatin1String("Charm/Development"));
+    QCOMPARE(cache.smartName(charmOverhead.id), QLatin1String("Charm/Overhead"));
+    QCOMPARE(cache.smartName(projects.id), QLatin1String("Projects"));
+    QCOMPARE(cache.smartName(lotsofcakeDevelopment.id), QLatin1String("Lotsofcake/Development"));
 }
 
 QTEST_MAIN(SmartNameCacheTests)

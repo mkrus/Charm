@@ -60,7 +60,7 @@ void CharmDataModel::stateChanged(State previous, State next)
         for (EventId id : m_activeEventIds) {
             const Event &event = findEvent(id);
             const Task &task = m_taskModel->taskForId(event.taskId());
-            Q_ASSERT(task.isValid());
+            Q_ASSERT(!task.isNull());
             endEventRequested(task);
         }
     }
@@ -83,19 +83,20 @@ TaskModel *CharmDataModel::taskModel() const
     return m_taskModel;
 }
 
-void CharmDataModel::setAllTasks(const TaskList &tasks)
+void CharmDataModel::setAllTasks(TaskList tasks)
 {
     Q_ASSERT(Task::checkForTreeness(tasks));
     Q_ASSERT(Task::checkForUniqueTaskIds(tasks));
 
-    m_nameCache.clearTasks();
+    std::sort(tasks.begin(), tasks.end());
 
-    if (!tasks.isEmpty())
-        m_taskModel->setTasks(tasks);
-    else
+    if (tasks.isEmpty()) {
+        m_nameCache.clearTasks();
         m_taskModel->clearTasks();
-
-    m_nameCache.setAllTasks(tasks);
+    } else {
+        m_nameCache.setAllTasks(tasks);
+        m_taskModel->setTasks(tasks);
+    }
 
     // notify adapters of changes
     for_each(m_adapters.begin(), m_adapters.end(),
@@ -293,7 +294,7 @@ void CharmDataModel::endEventRequested(const Task &task)
 
     // find the event in the list of active events and remove it:
     for (int i = 0; i < m_activeEventIds.size(); ++i) {
-        if (eventForId(m_activeEventIds[i]).taskId() == task.id()) {
+        if (eventForId(m_activeEventIds[i]).taskId() == task.id) {
             eventId = m_activeEventIds[i];
             m_activeEventIds.removeAt(i);
             for (auto adapter : m_adapters)
@@ -351,12 +352,12 @@ void CharmDataModel::eventUpdateTimerEvent()
 
 QString CharmDataModel::fullTaskName(const Task &task) const
 {
-    if (task.isValid()) {
-        QString name = task.name().simplified();
+    if (!task.isNull()) {
+        QString name = task.name.simplified();
 
-        if (task.parent() != 0) {
-            const Task &parent = getTask(task.parent());
-            if (parent.isValid())
+        if (task.parent != 0) {
+            const Task &parent = getTask(task.parent);
+            if (!parent.isNull())
                 name = fullTaskName(parent) + QLatin1Char('/') + name;
         }
         return name;
@@ -369,7 +370,7 @@ QString CharmDataModel::fullTaskName(const Task &task) const
 
 QString CharmDataModel::smartTaskName(const Task &task) const
 {
-    return m_nameCache.smartName(task.id());
+    return m_nameCache.smartName(task.id);
 }
 
 QString CharmDataModel::eventsString() const
@@ -382,7 +383,7 @@ QString CharmDataModel::eventsString() const
             const int taskIdLength = CONFIGURATION.taskPaddingLength;
             eStrList << tr("%1 - %2 %3")
                             .arg(hoursAndMinutes(event.duration()))
-                            .arg(task.id(), taskIdLength, 10, QLatin1Char('0'))
+                            .arg(task.id, taskIdLength, 10, QLatin1Char('0'))
                             .arg(fullTaskName(task));
         }
     }

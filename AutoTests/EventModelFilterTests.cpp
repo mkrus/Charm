@@ -22,6 +22,9 @@
 */
 
 #include "EventModelFilterTests.h"
+
+#include "TestHelpers.h"
+
 #include "Charm/EventModelFilter.h"
 #include "Core/CharmDataModel.h"
 #include "Core/Event.h"
@@ -41,7 +44,7 @@ void EventModelFilterTests::initTestCase()
     m_referenceModel = new CharmDataModel;
 
     // add tasks
-    Task task1(1000, QStringLiteral("Task 1"));
+    Task task1 = TestHelpers::createTask(1000, QStringLiteral("Task 1"));
     TaskList task;
     task << task1;
     m_referenceModel->setAllTasks(task);

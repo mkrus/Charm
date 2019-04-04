@@ -33,59 +33,34 @@
 #include <QString>
 #include <QVector>
 
-typedef int TaskId;
+using TaskId = int;
 Q_DECLARE_METATYPE(TaskId)
 
-class Task;
 /** A task list is a list of tasks that belong together.
     Example: All tasks for one user. */
-typedef QVector<Task> TaskList;
-typedef QVector<TaskId> TaskIdList;
+struct Task;
+using TaskList = QVector<Task>;
+using TaskIdList = QVector<TaskId>;
 
 /** A task is a category under which events are filed.
     It has a unique identifier and a name. */
-class Task
+struct Task
 {
-public:
-    Task();
-    /** Convenience constructor. */
-    Task(TaskId id, const QString &name, TaskId parent = 0);
+    int id = 0;
+    int parent = 0;
+    QString name;
+    bool trackable = true;
+    /** The timestamp from which the task is valid. */
+    QDateTime validFrom;
+    /** The timestamp after which the task becomes invalid. */
+    QDateTime validUntil;
+    QString comment;
 
+    bool isNull() const;
     bool isValid() const;
 
-    bool operator==(const Task &other) const;
-    bool operator!=(const Task &other) const { return !operator==(other); }
-    bool operator<(const Task &other) const { return m_id < other.id(); }
-
-    TaskId id() const;
-
-    void setId(TaskId id);
-
-    QString name() const;
-
-    void setName(const QString &name);
-
-    TaskId parent() const;
-
-    void setParent(TaskId parent);
-
-    QDateTime validFrom() const;
-
-    void setValidFrom(const QDateTime &);
-
-    QDateTime validUntil() const;
-
-    void setValidUntil(const QDateTime &);
-
-    bool isCurrentlyValid() const;
-
-    void setTrackable(bool trackable);
-    bool trackable() const;
-
-    QString comment() const;
-    void setComment(const QString &comment);
-
-    void dump() const;
+    // TODO: All the following methods shouldn't be in the Task struct
+    // Keep them here for simplicity, before refactoring the XML usage
 
     static QString tagName();
     static QString taskListTagName();
@@ -101,25 +76,14 @@ public:
     static bool checkForUniqueTaskIds(const TaskList &tasks);
 
     static bool checkForTreeness(const TaskList &tasks);
-
-    static bool lowerTaskId(const Task &left, const Task &right);
-
-private:
-    int m_id = 0;
-    int m_parent = 0;
-    QString m_name;
-    bool m_trackable = true;
-    /** The timestamp from which the task is valid. */
-    QDateTime m_validFrom;
-    /** The timestamp after which the task becomes invalid. */
-    QDateTime m_validUntil;
-    QString m_comment;
 };
+
+bool operator==(const Task &lhs, const Task &rhs) noexcept;
+bool operator!=(const Task &lhs, const Task &rhs) noexcept;
+bool operator<(const Task &lhs, const Task &rhs) noexcept;
 
 Q_DECLARE_METATYPE(TaskIdList)
 Q_DECLARE_METATYPE(TaskList)
 Q_DECLARE_METATYPE(Task)
-
-void dumpTaskList(const TaskList &tasks);
 
 #endif

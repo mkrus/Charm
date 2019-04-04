@@ -49,7 +49,7 @@ Event Controller::makeEvent(const Task &task)
     Event event = m_storage->makeEvent();
     Q_ASSERT(event.isValid());
 
-    event.setTaskId(task.id());
+    event.setTaskId(task.id);
     if (m_storage->modifyEvent(event)) {
         emit eventAdded(event);
     } else {

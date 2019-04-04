@@ -142,7 +142,7 @@ void EnterVacationDialog::createEvents()
 
     const QString htmlStartDate = startDate.toHtmlEscaped();
     const QString htmlEndDate = endDate.toHtmlEscaped();
-    const QString htmlTaskName = task.name().toHtmlEscaped();
+    const QString htmlTaskName = task.name.toHtmlEscaped();
 
     QString html = QStringLiteral("<html><body>");
     html += QStringLiteral("<h1>%1</h1>").arg(tr("Vacation"));
@@ -195,10 +195,10 @@ void EnterVacationDialog::updateTaskLabel()
 {
     const Task task = DATAMODEL->getTask(m_selectedTaskId);
 
-    if (!task.isValid()) {
+    if (task.isNull()) {
         m_ui->taskLabel->setText(tr("(No task selected)"));
     } else {
-        m_ui->taskLabel->setText(task.name());
+        m_ui->taskLabel->setText(task.name);
     }
     updateGeometry();
 }

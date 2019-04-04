@@ -47,7 +47,7 @@ bool CommandMakeAndActivateEvent::execute(Controller *controller)
 {
     m_event = controller->makeEvent(m_task);
     if (m_event.isValid()) {
-        m_event.setTaskId(m_task.id());
+        m_event.setTaskId(m_task.id);
         m_event.setStartDateTime(QDateTime::currentDateTime());
         return controller->modifyEvent(m_event);
     } else {
