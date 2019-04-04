@@ -25,7 +25,6 @@
 #define HTTPJOB_H
 
 #include <QObject>
-#include <QUrl>
 
 namespace QKeychain {
 class Job;

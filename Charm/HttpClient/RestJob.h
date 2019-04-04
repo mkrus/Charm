@@ -27,7 +27,6 @@
 #include "HttpJob.h"
 #include <QUrl>
 #include <QVariant>
-#include <QVariantMap>
 
 class RestJob : public HttpJob
 {

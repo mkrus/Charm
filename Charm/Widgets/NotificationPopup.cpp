@@ -24,7 +24,6 @@
 #include "NotificationPopup.h"
 #include "ui_NotificationPopup.h"
 
-#include <QGuiApplication>
 #include <QScreen>
 #include <QStyle>
 #include <QTimer>

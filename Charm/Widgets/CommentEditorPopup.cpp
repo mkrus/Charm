@@ -27,7 +27,6 @@
 #include <QMessageBox>
 #include <QPointer>
 #include <QPushButton>
-#include <QTextEdit>
 
 #include "ViewHelpers.h"
 

@@ -43,7 +43,6 @@
 #include "Core/Event.h"
 
 #include <QAbstractButton>
-#include <QCloseEvent>
 #include <QComboBox>
 #include <QDateTimeEdit>
 #include <QLabel>

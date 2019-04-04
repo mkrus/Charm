@@ -23,7 +23,7 @@
 #ifndef WIDGETUTILS_H
 #define WIDGETUTILS_H
 
-#include <QSettings>
+#include <QString>
 
 class QWidget;
 

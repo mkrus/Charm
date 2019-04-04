@@ -39,7 +39,6 @@
 #include <QSettings>
 #include <QShortcut>
 #include <QToolBar>
-#include <QToolButton>
 
 CharmWindow::CharmWindow(const QString &name, QWidget *parent)
     : QMainWindow(parent)

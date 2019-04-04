@@ -24,8 +24,6 @@
 #ifndef TASKSTRUCTURETESTS_H
 #define TASKSTRUCTURETESTS_H
 
-#include <QDomElement>
-#include <QList>
 #include <QObject>
 
 class TaskStructureTests : public QObject

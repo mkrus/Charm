@@ -27,7 +27,6 @@
 #include "Core/CharmDataModel.h"
 #include "Core/Task.h"
 
-#include <QDebug>
 #include <QTest>
 
 CharmDataModelTests::CharmDataModelTests()

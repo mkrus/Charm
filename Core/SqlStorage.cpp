@@ -31,18 +31,12 @@
 #include "Task.h"
 
 #include "charm_core_debug.h"
-#include <QDateTime>
 #include <QFile>
 #include <QFileInfo>
-#include <QSqlDatabase>
-#include <QSqlError>
-#include <QSqlField>
 #include <QSqlQuery>
 #include <QSqlRecord>
-#include <QStringList>
-#include <QTextStream>
-
-// SqlStorage class
+#include <QSqlField>
+#include <QSqlError>
 
 SqlStorage::SqlStorage() {}
 

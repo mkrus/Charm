@@ -27,8 +27,6 @@
 
 #include <QSqlDatabase>
 #include <QSqlDriver>
-#include <QSqlError>
-#include <QSqlQuery>
 #include <QTest>
 
 SqlTransactionTests::SqlTransactionTests()

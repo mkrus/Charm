@@ -28,6 +28,8 @@
 
 #include <QDebug>
 #include <QDir>
+#include <QDomElement>
+#include <QDomDocument>
 
 namespace TestHelpers {
 QList<QDomElement> retrieveTestCases(const QString &path, const QString &type)

@@ -29,9 +29,6 @@
 #include "Core/Controller.h"
 #include "Core/SqlStorage.h"
 
-#include <QDebug>
-#include <QDir>
-#include <QFileInfo>
 #include <QTest>
 
 BackendIntegrationTests::BackendIntegrationTests()

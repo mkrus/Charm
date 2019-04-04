@@ -26,7 +26,6 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
-#include <QSettings>
 
 GetProjectCodesJob::GetProjectCodesJob(QObject *parent)
     : HttpJob(parent)

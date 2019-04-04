@@ -32,7 +32,6 @@
 #include "Commands/CommandModifyEvent.h"
 
 #include <QCalendarWidget>
-#include <QMessageBox>
 
 FindAndReplaceEventsDialog::FindAndReplaceEventsDialog(QWidget *parent)
     : QDialog(parent)

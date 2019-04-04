@@ -23,7 +23,6 @@
 
 #include "MonthlyTimesheetConfigurationDialog.h"
 
-#include <QSettings>
 
 #include "DateEntrySyncer.h"
 #include "SelectTaskDialog.h"

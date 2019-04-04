@@ -30,8 +30,6 @@
 #include "Lotsofcake/Configuration.h"
 
 #include <QCheckBox>
-#include <QInputDialog>
-#include <QLineEdit>
 #include <QMessageBox>
 
 CharmPreferences::CharmPreferences(const Configuration &config, QWidget *parent_)

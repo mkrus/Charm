@@ -30,7 +30,6 @@
 
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QUrlQuery>
 
 UploadTimesheetJob::UploadTimesheetJob(QObject *parent)
     : HttpJob(parent)

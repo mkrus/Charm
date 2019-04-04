@@ -32,7 +32,6 @@
 
 #include "charm_core_debug.h"
 #include <QDateTime>
-#include <QList>
 #include <QSettings>
 #include <QStringList>
 

@@ -25,8 +25,8 @@
 #ifndef EVENTMODELADAPTER_H
 #define EVENTMODELADAPTER_H
 
-#include <QAbstractItemModel>
 #include <QPointer>
+#include <QAbstractListModel>
 
 #include "Core/CharmDataModelAdapterInterface.h"
 #include "Core/CommandEmitterInterface.h"

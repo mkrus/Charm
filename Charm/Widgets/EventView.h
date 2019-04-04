@@ -26,7 +26,6 @@
 
 #include <QAction>
 #include <QDialog>
-#include <QUndoStack>
 #include <QWidget>
 
 #include "Core/CommandEmitterInterface.h"

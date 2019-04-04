@@ -28,9 +28,7 @@
 
 #include <QApplication>
 #include <QCommandLineParser>
-#include <QFile>
 #include <QMessageBox>
-#include <QSettings>
 #include <QString>
 
 #include "ApplicationCore.h"

@@ -24,7 +24,6 @@
 #include "MonthlyTimesheet.h"
 #include "Reports/MonthlyTimesheetXmlWriter.h"
 
-#include <QFile>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QSettings>

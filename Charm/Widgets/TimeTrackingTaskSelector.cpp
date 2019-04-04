@@ -33,19 +33,14 @@
 #include "Core/Task.h"
 
 #include <QAction>
-#include <QDialogButtonBox>
 #include <QHBoxLayout>
-#include <QMap>
 #include <QMenu>
 #include <QMessageBox>
-#include <QPointer>
 #include <QPushButton>
-#include <QTextEdit>
 #include <QToolButton>
 
 #ifdef Q_OS_WIN
 #include <QtWinExtras/QWinJumpList>
-#include <QtWinExtras/QWinJumpListCategory>
 #include <QtWinExtras/QWinThumbnailToolBar>
 #include <QtWinExtras/QWinThumbnailToolButton>
 #endif

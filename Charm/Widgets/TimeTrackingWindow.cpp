@@ -58,16 +58,14 @@
 #include "Widgets/HttpJobProgressDialog.h"
 
 #include <QBuffer>
-#include <QDir>
 #include <QFileDialog>
-#include <QFileInfo>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QSettings>
-#include <QToolBar>
 #include <QUrlQuery>
+#include <QToolBar>
 #include <QtAlgorithms>
 
 #include <algorithm>
