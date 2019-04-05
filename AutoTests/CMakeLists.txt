@@ -1,9 +1,5 @@
 INCLUDE_DIRECTORIES( ${Charm_SOURCE_DIR} )
 
-if(POLICY CMP0020)
-    CMAKE_POLICY(SET CMP0020 NEW)
-endif()
-
 SET( TEST_LIBRARIES CharmCore Qt5::Test Qt5::Network)
 
 QT5_ADD_RESOURCES( TestDataResources_SRCS TestData.qrc )

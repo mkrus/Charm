@@ -1,7 +1,3 @@
-if(POLICY CMP0020)
-    CMAKE_POLICY(SET CMP0020 NEW)
-endif()
-
 SET(
     CharmCore_SRCS
     CharmConstants.cpp
