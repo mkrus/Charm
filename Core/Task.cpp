@@ -69,11 +69,6 @@ bool operator!=(const Task &lhs, const Task &rhs) noexcept
         || lhs.validUntil != rhs.validUntil;
 }
 
-bool operator<(const Task &lhs, const Task &rhs) noexcept
-{
-    return lhs.id < rhs.id;
-}
-
 QString taskTagName()
 {
     static const QString tag(QStringLiteral("task"));

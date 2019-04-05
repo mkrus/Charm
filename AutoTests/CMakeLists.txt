@@ -4,8 +4,6 @@ if(POLICY CMP0020)
     CMAKE_POLICY(SET CMP0020 NEW)
 endif()
 
-SET( TestApplication_SRCS TestApplication.cpp )
-
 SET( TEST_LIBRARIES CharmCore Qt5::Test Qt5::Network)
 
 QT5_ADD_RESOURCES( TestDataResources_SRCS TestData.qrc )
@@ -49,11 +47,16 @@ ADD_TEST( NAME CharmDataModelTests COMMAND CharmDataModelTests )
 SET(
     BackendIntegrationTests_SRCS
     BackendIntegrationTests.cpp
-    ${TestApplication_SRCS}
+    TestApplication.cpp
 )
 ADD_EXECUTABLE( BackendIntegrationTests ${BackendIntegrationTests_SRCS} )
 TARGET_LINK_LIBRARIES( BackendIntegrationTests ${TEST_LIBRARIES} )
 ADD_TEST( NAME BackendIntegrationTests COMMAND BackendIntegrationTests )
+
+SET( TaskModelTests_SRCS TaskModelTests.cpp )
+ADD_EXECUTABLE( TaskModelTests ${TaskModelTests_SRCS} )
+TARGET_LINK_LIBRARIES( TaskModelTests ${TEST_LIBRARIES} )
+ADD_TEST( NAME TaskModelTests COMMAND TaskModelTests )
 
 SET( TaskStructureTests_SRCS TaskStructureTests.cpp )
 ADD_EXECUTABLE(

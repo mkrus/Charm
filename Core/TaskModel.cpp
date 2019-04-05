@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cmath>
 
+
 TaskModel::TaskModel(QObject *parent)
     : QAbstractItemModel(parent)
 {
@@ -16,38 +17,26 @@ const TaskList &TaskModel::tasks() const
     return m_tasks;
 }
 
+static bool taskIdLessThan(const Task &left, const Task &right) {
+    return left.id < right.id;
+};
+
 void TaskModel::setTasks(const TaskList &tasks)
 {
     Q_ASSERT(!tasks.isEmpty());
-    Q_ASSERT(std::is_sorted(tasks.cbegin(), tasks.cend()));
 
     beginResetModel();
 
     m_tasks = tasks;
-    m_taskMap.clear();
     m_items.clear();
+    std::sort(m_tasks.begin(), m_tasks.end(), taskIdLessThan);
 
-    const auto bigId = m_tasks.last().id;
-
+    const auto maxId = m_tasks.last().id;
     // Copmute how many digits do we need to display all task ids
     // For example, should return 4 if bigId is 9999.
-    m_idPadding = static_cast<int>(ceil(log10(static_cast<double>(bigId))));
+    m_idPadding = static_cast<int>(ceil(log10(static_cast<double>(maxId))));
 
-    // We assume that a task id is always lower than the ids of its children
-    // This allow to construct the tree in one pass only
-    m_items.resize(bigId + 1);
-    m_taskMap[0] = 0;
-
-    for (int i = 0; i < m_tasks.size(); ++i) {
-        const auto &task = m_tasks.at(i);
-        m_taskMap[task.id] = i;
-
-        auto &item = m_items[task.id];
-        auto &parent = m_items[task.parent];
-        item.id = task.id;
-        item.parent = &parent;
-        parent.children.push_back(&item);
-    }
+    computeTree(maxId);
 
     endResetModel();
 }
@@ -57,7 +46,6 @@ void TaskModel::clearTasks()
     beginResetModel();
 
     m_tasks = {};
-    m_taskMap.clear();
     m_items.clear();
 
     endResetModel();
@@ -65,7 +53,7 @@ void TaskModel::clearTasks()
 
 int TaskModel::rowCount(const QModelIndex &parent) const
 {
-    return treeItemForIndex(parent)->children.size();
+    return treeItemForIndex(parent).children.size();
 }
 
 int TaskModel::columnCount(const QModelIndex &parent) const
@@ -95,6 +83,8 @@ QVariant TaskModel::data(const QModelIndex &index, int role) const
             .arg(task.name);
     case TaskRole:
         return QVariant::fromValue(task);
+    case IdRole:
+        return QVariant::fromValue(task.id);
     case FilterRole:
         return QStringLiteral("%1 %2")
             .arg(task.id, m_idPadding, 10, QLatin1Char('0'))
@@ -106,79 +96,94 @@ QVariant TaskModel::data(const QModelIndex &index, int role) const
 
 QModelIndex TaskModel::index(int row, int column, const QModelIndex &parent) const
 {
-    auto parentItem = treeItemForIndex(parent);
-    return createIndex(row, column, parentItem->children[row]);
+    const auto &parentItem = treeItemForIndex(parent);
+    return createIndex(row, column, static_cast<quintptr>(parentItem.children[row]));
 }
 
 QModelIndex TaskModel::parent(const QModelIndex &index) const
 {
-    auto item = treeItemForIndex(index);
-    if (!item->parent)
+    const auto &item = treeItemForIndex(index);
+    if (item.parentId == 0)
         return {};
-    auto parentItem = item->parent;
-    if (!parentItem->parent)
-        return {};
-    const int row = parentItem->parent->children.indexOf(parentItem);
-    return createIndex(row, 0, parentItem);
+
+    const auto &parentItem = m_items.at(item.parentId);
+    const auto &grandParent = m_items.at(parentItem.parentId);
+    const int row = grandParent.children.indexOf(parentItem.id);
+    return createIndex(row, 0, static_cast<quintptr>(parentItem.id));
 }
 
 QModelIndex TaskModel::indexForTaskId(TaskId id) const
 {
     Q_ASSERT(id >= 0 && id < m_items.size());
-    return indexForTreeItem(const_cast<TreeItem *>(&m_items[id]));
+    return indexForTreeItem(m_items.at(id));
 }
 
 const Task &TaskModel::taskForId(TaskId id) const
 {
-    Q_ASSERT(m_taskMap.contains(id));
-    return m_tasks.at(m_taskMap.value(id));
+    const auto &item = m_items.at(id);
+    Q_ASSERT(item.id != 0);
+    return *(item.task);
 }
 
 QString TaskModel::fullTaskName(const Task &task) const
 {
     Q_ASSERT(!task.isNull());
-    auto item = &(m_items.at(task.id));
 
     QString name = task.name.simplified();
-    item = item->parent;
+    TaskId id = task.parent;
 
-    while (item->parent != nullptr) {
-        const auto &task = taskForItem(item);
-        name = task.name.simplified() + QLatin1Char('/') + name;
-        item = item->parent;
+    while (id != 0) {
+        const auto &item = m_items.at(id);
+        name = item.task->name + QLatin1Char('/') + name;
+        id = item.parentId;
     }
     return name;
 }
 
 TaskIdList TaskModel::childrenIds(const Task &task) const
 {
-    auto item = m_items.at(task.id);
-
-    TaskIdList ids;
-    for (auto child : item.children)
-        ids.push_back(child->id);
-
-    return ids;
+    const auto &item = m_items.at(task.id);
+    return item.children;
 }
 
-QModelIndex TaskModel::indexForTreeItem(TreeItem *item) const
+QModelIndex TaskModel::indexForTreeItem(const TreeItem &item) const
 {
-    if (item->id == 0)
+    if (item.id == 0)
         return {};
 
-    const int row = item->parent->children.indexOf(item);
-    return createIndex(row, 0, item);
+    const auto &parentItem = m_items.at(item.parentId);
+    const int row = parentItem.children.indexOf(item.id);
+    return createIndex(row, 0, static_cast<quintptr>(item.id));
 }
 
-const TaskModel::TreeItem *TaskModel::treeItemForIndex(const QModelIndex &index) const
+const TaskModel::TreeItem &TaskModel::treeItemForIndex(const QModelIndex &index) const
 {
     if (index.isValid())
-        return static_cast<TreeItem *>(index.internalPointer());
+        return m_items.at(static_cast<int>(index.internalId()));
     else
-        return &m_items[0];
+        return m_items[0];
 }
 
-const Task &TaskModel::taskForItem(const TaskModel::TreeItem *item) const
+const Task &TaskModel::taskForItem(const TreeItem &item) const
 {
-    return m_tasks.at(m_taskMap.value(item->id));
+    return *(item.task);
+}
+
+void TaskModel::computeTree(int maxId)
+{
+    // We can build the tree in one pass, as all the item already exists
+    // It doesn't mean that a child has an id bigger than its parent
+    m_items.resize(maxId + 1);
+
+    for (int i = 0; i < m_tasks.size(); ++i) {
+        const auto &task = m_tasks.at(i);
+
+        auto &item = m_items[task.id];
+        auto &parent = m_items[task.parent];
+
+        item.id = task.id;
+        item.parentId = task.parent;
+        item.task = &task;
+        parent.children.push_back(task.id);
+    }
 }

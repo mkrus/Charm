@@ -88,14 +88,14 @@ void CharmDataModel::setAllTasks(TaskList tasks)
     Q_ASSERT(Task::checkForTreeness(tasks));
     Q_ASSERT(Task::checkForUniqueTaskIds(tasks));
 
-    std::sort(tasks.begin(), tasks.end());
-
     if (tasks.isEmpty()) {
-        m_nameCache.clearTasks();
         m_taskModel->clearTasks();
+        m_nameCache.clearTasks();
     } else {
-        m_nameCache.setAllTasks(tasks);
         m_taskModel->setTasks(tasks);
+        // TODO: remove m_namedCache
+        // Move the smart names inside the model (will be easier to compute)
+        m_nameCache.setAllTasks(m_taskModel->tasks());
     }
 
     // notify adapters of changes

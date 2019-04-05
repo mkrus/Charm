@@ -14,6 +14,7 @@ class TaskModel : public QAbstractItemModel
 public:
     enum Roles {
         TaskRole = Qt::UserRole + 1,
+        IdRole,
         FilterRole,
     };
 
@@ -42,18 +43,21 @@ private:
     struct TreeItem
     {
         TaskId id = 0;
-        TreeItem *parent = nullptr;
-        QVector<TreeItem *> children;
+        TaskId parentId = 0;
+        TaskIdList children;
+        const Task *task = nullptr;
     };
-    QModelIndex indexForTreeItem(TreeItem *item) const;
-    const TreeItem *treeItemForIndex(const QModelIndex &index) const;
-    const Task &taskForItem(const TreeItem *item) const;
+
+    QModelIndex indexForTreeItem(const TreeItem &item) const;
+    const TreeItem &treeItemForIndex(const QModelIndex &index) const;
+    const Task &taskForItem(const TreeItem &item) const;
+
+    void computeTree(int maxId);
 
 private:
     TaskList m_tasks;
-    QHash<TaskId, int> m_taskMap;
 
-    // The first item is the hidden root item
+    // The first item is the hidden root item, with id == 0
     // The vector is bigger than the number of tasks, but it allows very fast lookup
     QVector<TreeItem> m_items;
 

@@ -31,7 +31,6 @@
 
 void SmartNameCache::setAllTasks(const TaskList &taskList)
 {
-    Q_ASSERT(std::is_sorted(taskList.cbegin(), taskList.cend()));
     m_tasks = taskList;
     regenerateSmartNames();
 }

@@ -80,7 +80,6 @@ struct Task
 
 bool operator==(const Task &lhs, const Task &rhs) noexcept;
 bool operator!=(const Task &lhs, const Task &rhs) noexcept;
-bool operator<(const Task &lhs, const Task &rhs) noexcept;
 
 Q_DECLARE_METATYPE(TaskIdList)
 Q_DECLARE_METATYPE(TaskList)
