@@ -126,7 +126,7 @@ private:
     QTimer m_checkUploadedSheetsTimer;
     QTimer m_checkCharmReleaseVersionTimer;
     QTimer m_updateUserInfoAndTasksDefinitionsTimer;
-    BillDialog *m_billDialog;
+    BillDialog *m_billDialog = nullptr;
     bool m_idleCorrectionDialogVisible = false;
     bool m_uploadingStagedTimesheet = false;
 };

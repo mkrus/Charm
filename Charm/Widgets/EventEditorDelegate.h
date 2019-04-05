@@ -46,7 +46,7 @@ public:
     void paint(QPainter *, const QStyleOptionViewItem &, const QModelIndex &) const override;
 
 private:
-    EventModelFilter *m_model;
+    EventModelFilter *m_model = nullptr;
     mutable QSize m_cachedSizeHint;
 
     QString dateAndDuration(const Event &event) const;

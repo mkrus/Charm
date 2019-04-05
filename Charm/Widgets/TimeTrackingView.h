@@ -110,7 +110,7 @@ private:
     mutable QRect m_cachedDayFieldRect;
     mutable QFont m_fixedFont;
     mutable QFont m_narrowFont;
-    TimeTrackingTaskSelector *m_taskSelector;
+    TimeTrackingTaskSelector *m_taskSelector = nullptr;
     QList<QRect> m_activeFieldRects;
     PaintAttributes m_paintAttributes;
     DataField m_defaultField;

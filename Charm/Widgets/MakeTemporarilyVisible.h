@@ -43,7 +43,7 @@ public:
     }
 
 private:
-    QWidget *m_widget = {};
+    QWidget *m_widget  = nullptr;
     bool m_wasVisible = false;
 };
 

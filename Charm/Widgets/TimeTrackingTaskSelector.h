@@ -68,13 +68,13 @@ protected:
 private:
     void updateThumbBar();
     void taskSelected(TaskId id);
-    QToolButton *m_stopGoButton;
-    QAction *m_stopGoAction;
-    QToolButton *m_editCommentButton;
-    QAction *m_editCommentAction;
-    QToolButton *m_taskSelectorButton;
-    QAction *m_startOtherTaskAction;
-    QMenu *m_menu;
+    QToolButton *m_stopGoButton = nullptr;
+    QAction *m_stopGoAction = nullptr;
+    QToolButton *m_editCommentButton = nullptr;
+    QAction *m_editCommentAction = nullptr;
+    QToolButton *m_taskSelectorButton = nullptr;
+    QAction *m_startOtherTaskAction = nullptr;
+    QMenu *m_menu = nullptr;
     /** The task that has been selected from the menu. */
     TaskId m_selectedTask = {};
     /** If the user selected a task through the "Select other task..." menu action,

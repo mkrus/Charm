@@ -95,7 +95,7 @@ private:
     void setCurrentEvent(const Event &);
     void stageCommand(CharmCommand *);
 
-    QToolBar *m_toolBar;
+    QToolBar *m_toolBar = nullptr;
     QList<NamedTimeSpan> m_timeSpans;
     Event m_event;
     EventModelFilter *m_model = nullptr;
