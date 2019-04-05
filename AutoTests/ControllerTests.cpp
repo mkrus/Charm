@@ -133,7 +133,7 @@ void ControllerTests::addTaskTest()
     Task task2;
     task2.id = Task2Id;
     task2.name = Task2Name;
-    task2.parent = task1.id;
+    task2.parentId = task1.id;
     task2.validUntil = QDateTime::currentDateTime();
 
     m_controller->setAllTasks({task1, task2});

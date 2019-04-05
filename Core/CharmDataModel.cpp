@@ -355,8 +355,8 @@ QString CharmDataModel::fullTaskName(const Task &task) const
     if (!task.isNull()) {
         QString name = task.name.simplified();
 
-        if (task.parent != 0) {
-            const Task &parent = getTask(task.parent);
+        if (task.parentId != 0) {
+            const Task &parent = getTask(task.parentId);
             if (!parent.isNull())
                 name = fullTaskName(parent) + QLatin1Char('/') + name;
         }

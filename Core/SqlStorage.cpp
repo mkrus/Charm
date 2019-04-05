@@ -135,7 +135,7 @@ bool SqlStorage::addTask(const Task &task, const SqlRaiiTransactor &)
         "values ( :task_id, :name, :parent, :validfrom, :validuntil, :trackable, :comment);"));
     query.bindValue(QStringLiteral(":task_id"), task.id);
     query.bindValue(QStringLiteral(":name"), task.name);
-    query.bindValue(QStringLiteral(":parent"), task.parent);
+    query.bindValue(QStringLiteral(":parent"), task.parentId);
     query.bindValue(QStringLiteral(":validfrom"), task.validFrom);
     query.bindValue(QStringLiteral(":validuntil"), task.validUntil);
     query.bindValue(QStringLiteral(":trackable"), task.trackable ? 1 : 0);
@@ -454,7 +454,7 @@ Task SqlStorage::makeTaskFromRecord(const QSqlRecord &record)
 
     task.id = record.field(idField).value().toInt();
     task.name = record.field(nameField).value().toString();
-    task.parent = record.field(parentField).value().toInt();
+    task.parentId = record.field(parentField).value().toInt();
     QString from = record.field(validfromField).value().toString();
     if (!from.isEmpty()) {
         task.validFrom = record.field(validfromField).value().toDateTime();

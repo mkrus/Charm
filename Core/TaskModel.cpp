@@ -130,7 +130,7 @@ QString TaskModel::fullTaskName(const Task &task) const
     Q_ASSERT(!task.isNull());
 
     QString name = task.name.simplified();
-    TaskId id = task.parent;
+    TaskId id = task.parentId;
 
     while (id != 0) {
         const auto &item = m_items.at(id);
@@ -179,10 +179,10 @@ void TaskModel::computeTree(int maxId)
         const auto &task = m_tasks.at(i);
 
         auto &item = m_items[task.id];
-        auto &parent = m_items[task.parent];
+        auto &parent = m_items[task.parentId];
 
         item.id = task.id;
-        item.parentId = task.parent;
+        item.parentId = task.parentId;
         item.task = &task;
         parent.children.push_back(task.id);
     }

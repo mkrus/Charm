@@ -57,14 +57,14 @@ QString Task::taskListTagName()
 
 bool operator==(const Task &lhs, const Task &rhs) noexcept
 {
-    return lhs.id == rhs.id && lhs.parent == rhs.parent && lhs.name == rhs.name
+    return lhs.id == rhs.id && lhs.parentId == rhs.parentId && lhs.name == rhs.name
         && lhs.trackable == rhs.trackable && lhs.validFrom == rhs.validFrom
         && lhs.validUntil == rhs.validUntil;
 }
 
 bool operator!=(const Task &lhs, const Task &rhs) noexcept
 {
-    return lhs.id != rhs.id || lhs.parent != rhs.parent || lhs.name != rhs.name
+    return lhs.id != rhs.id || lhs.parentId != rhs.parentId || lhs.name != rhs.name
         || lhs.trackable != rhs.trackable || lhs.validFrom != rhs.validFrom
         || lhs.validUntil != rhs.validUntil;
 }
@@ -84,7 +84,7 @@ QString taskListTagName()
 static void dumpTask(const Task &task)
 {
     qCDebug(CHARM_CORE_LOG) << "[Task " << &task << "] task id:" << task.id
-                            << "- name:" << task.name << " - parent:" << task.parent
+                            << "- name:" << task.name << " - parent:" << task.parentId
                             << " - valid from:" << task.validFrom
                             << " - valid until:" << task.validUntil
                             << " - trackable:" << task.trackable;
@@ -103,7 +103,7 @@ QDomElement Task::toXml(QDomDocument document) const
 {
     QDomElement element = document.createElement(tagName());
     element.setAttribute(TaskIdElement, id);
-    element.setAttribute(TaskParentId, parent);
+    element.setAttribute(TaskParentId, parentId);
     element.setAttribute(TaskTrackable, (trackable ? 1 : 0));
     if (!name.isEmpty()) {
         QDomText taskName = document.createTextNode(name);
@@ -130,7 +130,7 @@ Task Task::fromXml(const QDomElement &element, int databaseSchemaVersion)
     task.id = element.attribute(TaskIdElement).toInt(&ok);
     if (!ok)
         throw XmlSerializationException(QObject::tr("Task::fromXml: invalid task id"));
-    task.parent = element.attribute(TaskParentId).toInt(&ok);
+    task.parentId = element.attribute(TaskParentId).toInt(&ok);
     if (!ok)
         throw XmlSerializationException(QObject::tr("Task::fromXml: invalid parent task id"));
 
@@ -216,7 +216,7 @@ bool collectTaskIds(std::set<TaskId> &visitedIds, TaskId id, const TaskList &tas
 
     // find children and the task itself (the parameter tasks is not sorted)
     for (TaskList::const_iterator it = tasks.begin(); it != tasks.end(); ++it) {
-        if ((*it).parent == id)
+        if ((*it).parentId == id)
             children << (*it).id;
         if ((*it).id == id) {
             // just checking that it really exists...
@@ -257,7 +257,7 @@ bool Task::checkForTreeness(const TaskList &tasks)
     for (TaskList::const_iterator it = tasks.begin(); it != tasks.end(); ++it) {
         if ((*it).isNull())
             return false;
-        if ((*it).parent == 0) {
+        if ((*it).parentId == 0) {
             if (!collectTaskIds(ids, (*it).id, tasks))
                 return false;
         }

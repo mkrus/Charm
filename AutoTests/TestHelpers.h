@@ -39,7 +39,7 @@ Task createTask(TaskId id, const QString &name, TaskId parentId = 0)
     Task task;
     task.id = id;
     task.name = name;
-    task.parent = parentId;
+    task.parentId = parentId;
     return task;
 }
 

@@ -63,7 +63,7 @@ QString SmartNameCache::makeCombined(const Task &task) const
              || task.name.isEmpty()); // an invalid task (id == 0) must not have a name
     if (task.isNull())
         return QString();
-    const Task parent = findTask(task.parent);
+    const Task parent = findTask(task.parentId);
 
     if (!parent.isNull()) {
         return QObject::tr("%1/%2", "parent task name/task name").arg(parent.name, task.name);
@@ -80,7 +80,7 @@ void SmartNameCache::regenerateSmartNames()
     QHash<QString, QVector<TaskParentPair>> byName;
 
     for (const Task &task : m_tasks)
-        byName[makeCombined(task)].append(qMakePair(task.id, task.parent));
+        byName[makeCombined(task)].append(qMakePair(task.id, task.parentId));
 
     QSet<QString> cannotMakeUnique;
 
@@ -99,7 +99,7 @@ void SmartNameCache::regenerateSmartNames()
                     const Task parent = findTask(taskPair.second);
                     if (!parent.isNull()) {
                         const QString newName = parent.name + QLatin1Char('/') + currentName;
-                        newByName[newName].append(qMakePair(taskPair.first, parent.parent));
+                        newByName[newName].append(qMakePair(taskPair.first, parent.parentId));
                     } else {
                         const auto existing = newByName.constFind(currentName);
                         if (existing != newByName.constEnd())

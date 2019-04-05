@@ -47,7 +47,7 @@ using TaskIdList = QVector<TaskId>;
 struct Task
 {
     int id = 0;
-    int parent = 0;
+    int parentId = 0;
     QString name;
     bool trackable = true;
     /** The timestamp from which the task is valid. */
