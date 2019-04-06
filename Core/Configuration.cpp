@@ -77,7 +77,6 @@ bool Configuration::operator==(const Configuration &other) const
 
 void Configuration::writeTo(QSettings &settings)
 {
-    settings.setValue(MetaKey_Key_InstallationId, installationId);
     settings.setValue(MetaKey_Key_LocalStorageType, localStorageType);
     settings.setValue(MetaKey_Key_LocalStorageDatabase, localStorageDatabase);
     dump(QStringLiteral("(Configuration::writeTo stored configuration)"));
@@ -86,20 +85,6 @@ void Configuration::writeTo(QSettings &settings)
 bool Configuration::readFrom(QSettings &settings)
 {
     bool complete = true;
-    bool dirty = false;
-    if (settings.contains(MetaKey_Key_InstallationId)) {
-        bool ok;
-        installationId = settings.value(MetaKey_Key_InstallationId).toUInt(&ok);
-        if (!ok || installationId == 1) {
-            const auto newId = createInstallationId();
-            qCDebug(CHARM_CORE_LOG)
-                << "Migrating installationId" << installationId << "to" << newId;
-            installationId = newId;
-            dirty = true;
-        }
-    } else {
-        complete = false;
-    }
     if (settings.contains(MetaKey_Key_LocalStorageType)) {
         localStorageType = settings.value(MetaKey_Key_LocalStorageType).toString();
     } else {
@@ -111,7 +96,7 @@ bool Configuration::readFrom(QSettings &settings)
         complete = false;
     }
     dump(QStringLiteral("(Configuration::readFrom loaded configuration)"));
-    if (dirty && complete) {
+    if (complete) {
         writeTo(settings);
     }
     return complete;

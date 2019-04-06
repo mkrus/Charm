@@ -37,6 +37,7 @@
 #include <QSqlField>
 #include <QSqlQuery>
 #include <QSqlRecord>
+#include <QSettings>
 
 SqlStorage::SqlStorage() {}
 
@@ -87,6 +88,26 @@ bool SqlStorage::verifyDatabase()
             "CREATE TABLE `Events` ( `id` INTEGER PRIMARY KEY, `event_id` INTEGER, `task` INTEGER, `comment` varchar(256), `start` date, `end` date);"
             "INSERT INTO `Events` SELECT `id`, `event_id`, `task`, `comment`, `start`, `end` FROM `EventsB`;"
             "DROP TABLE `EventsB`"), CHARM_DATABASE_VERSION_BEFORE_EVENT_CLEANUP);
+    } else if (version == CHARM_DATABASE_VERSION_BEFORE_INSTALLATION_ID_ADDED_TO_DATABASE) {
+        QString installationId;
+        QSettings settings;
+        settings.beginGroup(CONFIGURATION.configurationName);
+        if (settings.contains(MetaKey_Key_InstallationId)) {
+            installationId = settings.value(MetaKey_Key_InstallationId).toString();
+            settings.remove(MetaKey_Key_InstallationId);
+        } else {
+            installationId = QString::number(CONFIGURATION.createInstallationId());
+            CONFIGURATION.installationId = installationId.toInt();
+        }
+
+        SqlRaiiTransactor transactor(database());
+        setMetaData(MetaKey_Key_InstallationId, installationId, transactor);
+        setMetaData(CHARM_DATABASE_VERSION_DESCRIPTOR,
+            QString::number(CHARM_DATABASE_VERSION_BEFORE_INSTALLATION_ID_ADDED_TO_DATABASE + 1),
+            transactor);
+        transactor.commit();
+
+        return verifyDatabase();
     }
 
     throw UnsupportedDatabaseVersionException(QObject::tr("Database version is not supported."));
