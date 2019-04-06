@@ -155,28 +155,6 @@ void ControllerTests::addTaskTest()
     QVERIFY(m_definedTasks.size() == 2);
 }
 
-void ControllerTests::toAndFromXmlTest()
-{
-    // make sure we have some tasks and associated events:
-    TaskList tasks = m_controller->storage()->getAllTasks();
-    QVERIFY(tasks.size() > 0); // just to be sure nobody fucks it up
-    Event e1 = m_controller->storage()->makeEvent();
-    e1.setTaskId(tasks[0].id);
-    e1.setComment(QStringLiteral("Event-1-Comment"));
-    e1.setStartDateTime();
-    m_controller->modifyEvent(e1);
-    Event e2 = m_controller->storage()->makeEvent();
-    e2.setTaskId(tasks.last().id);
-    e2.setComment(QStringLiteral("Event-2-Comment"));
-    e2.setStartDateTime();
-    m_controller->modifyEvent(e2);
-
-    Q_ASSERT(m_controller); // just to be sure
-    TaskList tasksBefore = m_controller->storage()->getAllTasks();
-    EventList eventsBefore = m_controller->storage()->getAllEvents();
-    QVERIFY(tasksBefore == tasks);
-}
-
 void ControllerTests::disconnectFromBackendTest()
 {
     QVERIFY(m_controller->disconnectFromBackend());

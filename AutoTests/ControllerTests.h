@@ -52,8 +52,6 @@ private Q_SLOTS:
 
     void addTaskTest();
 
-    void toAndFromXmlTest();
-
     // this is now done by the model:
     // void startModifyEndEventTest();
 

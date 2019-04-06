@@ -51,10 +51,6 @@ public:
 
     void setId(EventId id);
 
-    int reportId() const;
-
-    void setReportId(int userId);
-
     bool isValid() const;
 
     TaskId taskId() const;
@@ -84,10 +80,6 @@ public:
     static QString tagName();
 
 private:
-    /** The report id. This field is only useful
-     * if the event is imported from a report.
-     */
-    int m_reportid = {};
     int m_id = {};
     /** The task this event belongs to. */
     TaskId m_taskId = {};

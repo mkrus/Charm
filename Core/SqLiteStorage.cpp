@@ -70,10 +70,7 @@ static const Fields Tasks_Fields[] = {{QStringLiteral("id"), QStringLiteral("INT
 
 static const Fields Event_Fields[] = {
     {QStringLiteral("id"), QStringLiteral("INTEGER PRIMARY KEY")},
-    {QStringLiteral("user_id"), QStringLiteral("INTEGER")},
     {QStringLiteral("event_id"), QStringLiteral("INTEGER")},
-    {QStringLiteral("installation_id"), QStringLiteral("INTEGER")},
-    {QStringLiteral("report_id"), QStringLiteral("INTEGER NULL")},
     {QStringLiteral("task"), QStringLiteral("INTEGER")},
     {QStringLiteral("comment"), QStringLiteral("varchar(256)")},
     {QStringLiteral("start"), QStringLiteral("date")},

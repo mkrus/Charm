@@ -79,6 +79,14 @@ bool SqlStorage::verifyDatabase()
     } else if (version == CHARM_DATABASE_VERSION_BEFORE_INSTALLATIONS_REMOVAL) {
         return migrateDB(QStringLiteral("DROP TABLE Installations"),
                          CHARM_DATABASE_VERSION_BEFORE_INSTALLATIONS_REMOVAL);
+    } else if (version == CHARM_DATABASE_VERSION_BEFORE_EVENT_CLEANUP) {
+        return migrateDB(QStringLiteral(
+            "CREATE TEMPORARY TABLE `EventsB` ( `id` INTEGER PRIMARY KEY, `event_id` INTEGER, `task` INTEGER, `comment` varchar(256), `start` date, `end` date);"
+            "INSERT INTO `EventsB` SELECT `id`, `event_id`, `task`, `comment`, `start`, `end` FROM `Events`;"
+            "DROP TABLE `Events`;"
+            "CREATE TABLE `Events` ( `id` INTEGER PRIMARY KEY, `event_id` INTEGER, `task` INTEGER, `comment` varchar(256), `start` date, `end` date);"
+            "INSERT INTO `Events` SELECT `id`, `event_id`, `task`, `comment`, `start`, `end` FROM `EventsB`;"
+            "DROP TABLE `EventsB`"), CHARM_DATABASE_VERSION_BEFORE_EVENT_CLEANUP);
     }
 
     throw UnsupportedDatabaseVersionException(QObject::tr("Database version is not supported."));
@@ -180,14 +188,12 @@ Event SqlStorage::makeEventFromRecord(const QSqlRecord &record)
     Event event;
 
     int idField = record.indexOf(QStringLiteral("event_id"));
-    int reportIdField = record.indexOf(QStringLiteral("report_id"));
     int taskField = record.indexOf(QStringLiteral("task"));
     int commentField = record.indexOf(QStringLiteral("comment"));
     int startField = record.indexOf(QStringLiteral("start"));
     int endField = record.indexOf(QStringLiteral("end"));
 
     event.setId(record.field(idField).value().toInt());
-    event.setReportId(record.field(reportIdField).value().toInt());
     event.setTaskId(record.field(taskField).value().toInt());
     event.setComment(record.field(commentField).value().toString());
     if (!record.field(startField).isNull()) {
@@ -251,11 +257,8 @@ Event SqlStorage::makeEvent(const SqlRaiiTransactor &)
         // within the installation:
         QSqlQuery query(database());
         query.prepare(QStringLiteral(
-            "UPDATE Events SET event_id = :event_id, "
-            "installation_id = :installation_id, report_id = :report_id WHERE id = :id;"));
+            "UPDATE Events SET event_id = :event_id WHERE id = :id;"));
         query.bindValue(QStringLiteral(":event_id"), event.id());
-        query.bindValue(QStringLiteral(":installation_id"), 1);
-        query.bindValue(QStringLiteral(":report_id"), event.reportId());
         query.bindValue(QStringLiteral(":id"), event.id());
         result = runQuery(query);
         Q_ASSERT_X(result, Q_FUNC_INFO, "database implementation error (UPDATE)");
@@ -301,11 +304,10 @@ bool SqlStorage::modifyEvent(const Event &event, const SqlRaiiTransactor &)
 {
     QSqlQuery query(database());
     query.prepare(QStringLiteral("UPDATE Events set task = :task, comment = :comment, "
-                                 "start = :start, end = :end, report_id = :report "
-                                 "where event_id = :id;"));
+                                "start = :start, end = :end "
+                                "where event_id = :id;"));
     query.bindValue(QStringLiteral(":id"), event.id());
     query.bindValue(QStringLiteral(":task"), event.taskId());
-    query.bindValue(QStringLiteral(":report"), event.reportId());
     query.bindValue(QStringLiteral(":comment"), event.comment());
     query.bindValue(QStringLiteral(":start"), event.startDateTime());
     query.bindValue(QStringLiteral(":end"), event.endDateTime());
@@ -370,13 +372,18 @@ bool SqlStorage::migrateDB(const QString &queryString, int oldVersion)
     }
     SqlRaiiTransactor transactor(database());
     QSqlQuery query(database());
-    query.prepare(queryString);
-    if (!runQuery(query)) {
-        throw UnsupportedDatabaseVersionException(
-            QObject::tr("Could not upgrade database from version %1 to version %2: %3")
-                .arg(QString::number(oldVersion), QString ::number(oldVersion + 1),
-                     query.lastError().text()));
+
+    const QStringList queryStrings = queryString.split(QStringLiteral(";"));
+    for (const QString singleQuery : queryStrings) {
+        query.prepare(singleQuery);
+        if (!runQuery(query)) {
+            throw UnsupportedDatabaseVersionException(
+                QObject::tr("Could not upgrade database from version %1 to version %2: %3")
+                    .arg(QString::number(oldVersion), QString ::number(oldVersion + 1),
+                         query.lastError().text()));
+        }
     }
+
     setMetaData(CHARM_DATABASE_VERSION_DESCRIPTOR, QString::number(oldVersion + 1), transactor);
     transactor.commit();
     return verifyDatabase();

@@ -52,8 +52,6 @@ private Q_SLOTS:
 
     void setGetMetaDataTest();
 
-    void deleteTaskWithEventsTest();
-
     void cleanupTestCase();
 };
 
