@@ -76,6 +76,9 @@ bool SqlStorage::verifyDatabase()
     } else if (version == CHARM_DATABASE_VERSION_BEFORE_USER_REMOVAL) {
         return migrateDB(QStringLiteral("DROP TABLE Users"),
                          CHARM_DATABASE_VERSION_BEFORE_USER_REMOVAL);
+    } else if (version == CHARM_DATABASE_VERSION_BEFORE_INSTALLATIONS_REMOVAL) {
+        return migrateDB(QStringLiteral("DROP TABLE Installations"),
+                         CHARM_DATABASE_VERSION_BEFORE_INSTALLATIONS_REMOVAL);
     }
 
     throw UnsupportedDatabaseVersionException(QObject::tr("Database version is not supported."));

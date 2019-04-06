@@ -38,7 +38,7 @@
 #include <cerrno>
 
 // DATABASE STRUCTURE DEFINITION
-static const QString Tables[] = {QStringLiteral("MetaData"), QStringLiteral("Installations"),
+static const QString Tables[] = {QStringLiteral("MetaData"),
                                  QStringLiteral("Tasks"), QStringLiteral("Events")};
 
 static const int NumberOfTables = sizeof Tables / sizeof Tables[0];
@@ -56,12 +56,6 @@ static const Fields MetaData_Fields[] = {
     {QStringLiteral("id"), QStringLiteral("INTEGER PRIMARY KEY")},
     {QStringLiteral("key"), QStringLiteral("VARCHAR( 128 ) NOT NULL")},
     {QStringLiteral("value"), QStringLiteral("VARCHAR( 128 )")},
-    LastField};
-
-static const Fields Installations_Fields[] = {
-    {QStringLiteral("id"), QStringLiteral("INTEGER PRIMARY KEY")},
-    {QStringLiteral("inst_id"), QStringLiteral("INTEGER")},
-    {QStringLiteral("name"), QStringLiteral("varchar(256)")},
     LastField};
 
 static const Fields Tasks_Fields[] = {{QStringLiteral("id"), QStringLiteral("INTEGER PRIMARY KEY")},
@@ -86,7 +80,7 @@ static const Fields Event_Fields[] = {
     {QStringLiteral("end"), QStringLiteral("date")},
     LastField};
 
-static const Fields *Database_Fields[NumberOfTables] = {MetaData_Fields, Installations_Fields,
+static const Fields *Database_Fields[NumberOfTables] = {MetaData_Fields,
                                                         Tasks_Fields, Event_Fields};
 
 const QString DatabaseName = QStringLiteral("charm.kdab.com");
