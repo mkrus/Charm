@@ -32,7 +32,6 @@
 
 #include "CharmDataModelAdapterInterface.h"
 #include "Event.h"
-#include "SmartNameCache.h"
 #include "State.h"
 #include "Task.h"
 #include "TaskModel.h"
@@ -112,15 +111,14 @@ public:
      */
     TaskIdList mostRecentlyUsedTasks() const;
 
-    /** Create a full task name from the specified TaskId. */
-    QString fullTaskName(const Task &) const;
+    /** Return the task name and the task id. */
+    QString taskName(TaskId id) const;
 
-    /** Create a "smart" task name (name and shortest path that makes the name unique) from the
-     * specified TaskId. */
-    QString smartTaskName(const Task &) const;
+    /** Return the full task name based on the task id. */
+    QString fullTaskName(TaskId id) const;
 
-    /** Get the task id and smart name as a single string. */
-    QString taskIdAndSmartNameString(TaskId id) const;
+    /** Return the smart task name based on the task id. */
+    QString smartTaskName(TaskId id) const;
 
     bool operator==(const CharmDataModel &other) const;
 
@@ -159,7 +157,6 @@ private:
 
     // event update timer:
     QTimer m_timer;
-    SmartNameCache m_nameCache;
 
     TaskModel *m_taskModel = nullptr;
 

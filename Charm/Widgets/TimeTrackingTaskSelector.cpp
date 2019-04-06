@@ -119,7 +119,7 @@ void TimeTrackingTaskSelector::populate(const QVector<WeeklySummary> &summaries)
         return;
 
     const auto createTaskAction = [this](TaskId id) {
-        auto action = new QAction(DATAMODEL->taskIdAndSmartNameString(id), m_menu);
+        auto action = new QAction(DATAMODEL->smartTaskName(id), m_menu);
         action->setProperty(CUSTOM_TASK_PROPERTY_NAME, QVariant::fromValue(id));
         connect(action, &QAction::triggered, this, &TimeTrackingTaskSelector::slotActionSelected);
         return action;
@@ -172,7 +172,7 @@ void TimeTrackingTaskSelector::handleActiveEvents()
         const Event &event = DATAMODEL->eventForId(DATAMODEL->activeEvents().first());
         const Task &task = DATAMODEL->getTask(event.taskId());
         m_taskSelectorButton->setText(
-            escapeAmpersands(DATAMODEL->taskIdAndSmartNameString(task.id)));
+            escapeAmpersands(DATAMODEL->smartTaskName(task.id)));
     } else {
         m_stopGoAction->setIcon(Data::goIcon());
         m_stopGoAction->setText(tr("Start Task"));
@@ -205,7 +205,7 @@ void TimeTrackingTaskSelector::slotActionSelected()
         const bool notTrackableAndExpired = (!trackable && expired);
         const QString expirationDate =
             QLocale::system().toString(task.validUntil.date(), QLocale::ShortFormat);
-        const auto taskName = DATAMODEL->taskIdAndSmartNameString(task.id);
+        const auto taskName = DATAMODEL->smartTaskName(task.id);
 
         const auto reason = notTrackableAndExpired
             ? tr("The task is not trackable and expired since %1.").arg(expirationDate)
@@ -258,7 +258,7 @@ void TimeTrackingTaskSelector::taskSelected(TaskId id)
 {
     m_selectedTask = id;
     m_stopGoAction->setEnabled(true);
-    const auto taskname = DATAMODEL->taskIdAndSmartNameString(id);
+    const auto taskname = DATAMODEL->smartTaskName(id);
     m_taskSelectorButton->setText(escapeAmpersands(taskname));
 }
 

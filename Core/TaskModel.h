@@ -36,8 +36,10 @@ public:
 
     const Task &taskForId(TaskId id) const;
 
-    QString fullTaskName(const Task &task) const;
-    TaskIdList childrenIds(const Task &task) const;
+    QString taskName(TaskId id) const;
+    QString fullTaskName(TaskId id) const;
+    QString smartTaskName(TaskId id) const;
+    TaskIdList childrenIds(TaskId id) const;
 
 private:
     struct TreeItem
@@ -46,6 +48,7 @@ private:
         TaskId parentId = 0;
         TaskIdList children;
         const Task *task = nullptr;
+        QString smartName;
     };
 
     QModelIndex indexForTreeItem(const TreeItem &item) const;
@@ -53,6 +56,7 @@ private:
     const Task &taskForItem(const TreeItem &item) const;
 
     void computeTree(int maxId);
+    void computeSmartName();
 
 private:
     TaskList m_tasks;

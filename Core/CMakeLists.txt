@@ -15,7 +15,6 @@ SET(
     CharmDataModel.cpp
     TimeSpans.cpp
     CharmCommand.cpp
-    SmartNameCache.cpp
     XmlSerialization.cpp
 )
 ecm_qt_declare_logging_category(CharmCore_SRCS HEADER charm_core_debug.h IDENTIFIER CHARM_CORE_LOG CATEGORY_NAME org.kdab.charm.core)

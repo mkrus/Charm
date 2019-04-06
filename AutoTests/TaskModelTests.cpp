@@ -53,13 +53,13 @@ public:
                 TestHelpers::createTask(8000, QStringLiteral("Administration"), 1),
                 TestHelpers::createTask(8300, QStringLiteral("Research and Development"), 8000),
                 TestHelpers::createTask(8311, QStringLiteral("Research A"), 8300),
-                TestHelpers::createTask(8312, QStringLiteral("Research"), 8301),
-                TestHelpers::createTask(8313, QStringLiteral("Development"), 8301),
+                TestHelpers::createTask(8312, QStringLiteral("Research"), 8311),
+                TestHelpers::createTask(8313, QStringLiteral("Development"), 8311),
                 TestHelpers::createTask(8314, QStringLiteral("Research B"), 8300),
                 TestHelpers::createTask(8700, QStringLiteral("Internal Tools"), 8000),
                 TestHelpers::createTask(8701, QStringLiteral("Tool A"), 8700),
                 TestHelpers::createTask(9300, QStringLiteral("Organization, Operations, Coordination"), 8000),
-                TestHelpers::createTask(9301, QStringLiteral("Something else"), 9300),
+                TestHelpers::createTask(9301, QStringLiteral("Something"), 9300),
                 TestHelpers::createTask(9302, QStringLiteral("And more"), 9301),
                 TestHelpers::createTask(9500, QStringLiteral("Public Relations, Marketing"), 8000),
                 TestHelpers::createTask(9501, QStringLiteral("Something else"), 9500),
@@ -70,7 +70,7 @@ public:
                 TestHelpers::createTask(8302, QStringLiteral("Learning Material"), 8301),
                 TestHelpers::createTask(8303, QStringLiteral("Education Time"), 8301),
                 TestHelpers::createTask(8304, QStringLiteral("Qt Contributions"), 8303),
-                TestHelpers::createTask(9701, QStringLiteral("Somthing else"), 9700),
+                TestHelpers::createTask(9701, QStringLiteral("Else"), 9700),
                 TestHelpers::createTask(9990, QStringLiteral("Unproductive Time"), 1),
                 TestHelpers::createTask(9991, QStringLiteral("Vacations"), 9990),
             };
@@ -78,36 +78,58 @@ public:
     }
 
 private Q_SLOTS:
+    void initTestCase() {
+        m_model.setTasks(createTasks());
+    }
+
     void checkTreeTest() {
-        TaskModel model;
-        model.setTasks(createTasks());
+        QVERIFY(m_model.rowCount() == 1);
+        QVERIFY(m_model.rowCount(m_model.indexForTaskId(1)) == 4);
+        QVERIFY(m_model.rowCount(m_model.indexForTaskId(8000)) == 6);
+        QVERIFY(m_model.rowCount(m_model.indexForTaskId(9700)) == 2);
 
-        QVERIFY(model.rowCount() == 1);
-        QVERIFY(model.rowCount(model.indexForTaskId(1)) == 4);
-        QVERIFY(model.rowCount(model.indexForTaskId(8000)) == 6);
-        QVERIFY(model.rowCount(model.indexForTaskId(9700)) == 2);
-
-        const auto index = model.indexForTaskId(9700);
+        const auto index = m_model.indexForTaskId(9700);
         QVERIFY(index.data(TaskModel::IdRole).toInt() == 9700);
         QVERIFY(index.parent().data(TaskModel::IdRole).toInt() == 8000);
-        QVERIFY(model.rowCount(index.parent()) == 6);
+        QVERIFY(m_model.rowCount(index.parent()) == 6);
     }
 
     void checkTaskIndex() {
-        TaskModel model;
-        model.setTasks(createTasks());
-
         const auto &task = TestHelpers::createTask(9700, QStringLiteral("HR Investments"), 8000);
-        const auto index = model.indexForTaskId(9700);
+        const auto index = m_model.indexForTaskId(9700);
         QVERIFY(index.data(TaskModel::TaskRole).value<Task>() == task);
         QVERIFY(index.data(Qt::DisplayRole).toString() == QStringLiteral("9700 HR Investments"));
         QVERIFY(index.data(TaskModel::FilterRole).toString() == QStringLiteral("9700 KDAB/Administration/HR Investments"));
 
-        const auto index2 = model.indexForTaskId(21);
+        const auto index2 = m_model.indexForTaskId(21);
         QVERIFY(index2.data(TaskModel::TaskRole).value<Task>().id == 21);
         QVERIFY(index2.data(Qt::DisplayRole).toString() == QStringLiteral("0021 Project Y"));
         QVERIFY(index2.data(TaskModel::FilterRole).toString() == QStringLiteral("0021 KDAB/Customer Projects/Customer B/Project Y"));
     }
+
+    void checkSmartName() {
+        QVERIFY(m_model.smartTaskName(12) == QStringLiteral("0012 Customer A/Project X/Development"));
+        QVERIFY(m_model.smartTaskName(21) == QStringLiteral("0021 Customer B/Project Y"));
+
+        QVERIFY(m_model.smartTaskName(2003) == QStringLiteral("2003 Training is done by a trainer"));
+
+        QVERIFY(m_model.smartTaskName(8312) == QStringLiteral("8312 R&D/Research A/Research"));
+
+        QVERIFY(m_model.smartTaskName(8701) == QStringLiteral("8701 Internal Tools/Tool A"));
+
+        QVERIFY(m_model.smartTaskName(9301) == QStringLiteral("9301 OOC/Something"));
+        QVERIFY(m_model.smartTaskName(9302) == QStringLiteral("9302 OOC/Something/And more"));
+
+        QVERIFY(m_model.smartTaskName(9501) == QStringLiteral("9501 PRM/Something else"));
+
+        QVERIFY(m_model.smartTaskName(8304) == QStringLiteral("8304 Education/Education Time/Qt Contributions"));
+        QVERIFY(m_model.smartTaskName(9701) == QStringLiteral("9701 HR Investments/Else"));
+
+        QVERIFY(m_model.smartTaskName(9991) == QStringLiteral("9991 Unproductive Time/Vacations"));
+    }
+
+private:
+    TaskModel m_model;
 };
 
 QTEST_MAIN(TaskModelTests)

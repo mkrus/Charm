@@ -53,8 +53,6 @@ QVector<WeeklySummary> WeeklySummary::summariesForTimespan(CharmDataModel *dataM
     QVector<WeeklySummary> summaries(uniqueTaskIds.size());
     for (int i = 0; i < uniqueTaskIds.size(); ++i) {
         summaries[i].task = uniqueTaskIds.at(i);
-        const Task &task = dataModel->getTask(uniqueTaskIds[i]);
-        summaries[i].taskname = dataModel->fullTaskName(task);
     }
     // now add the times to the tasks:
     for (const Event &event : events) {

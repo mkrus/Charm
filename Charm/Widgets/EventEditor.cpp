@@ -243,7 +243,7 @@ void EventEditor::updateValues(bool all)
         m_ui->spinBoxMinutes->setValue(durationMinutes);
     }
 
-    QString name = MODEL.charmDataModel()->taskIdAndSmartNameString(m_event.taskId());
+    QString name = MODEL.charmDataModel()->smartTaskName(m_event.taskId());
     m_ui->labelTaskName->setText(name);
 
     QString format = m_ui->dateEditStart->displayFormat()

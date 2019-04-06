@@ -219,7 +219,7 @@ void EventView::slotNewEvent()
 
 void EventView::slotDeleteEvent()
 {
-    const QString name = MODEL.charmDataModel()->taskIdAndSmartNameString(m_event.taskId());
+    const QString name = MODEL.charmDataModel()->smartTaskName(m_event.taskId());
     const QDate startDate = m_event.startDateTime().date();
     const QTime startTime = m_event.startDateTime().time();
     const QDate endDate = m_event.endDateTime().date();

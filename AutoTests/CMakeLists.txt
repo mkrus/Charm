@@ -31,10 +31,6 @@ SET( DatesTests_SRCS DatesTests.cpp )
 ADD_EXECUTABLE( DatesTests ${DatesTests_SRCS} )
 TARGET_LINK_LIBRARIES( DatesTests ${TEST_LIBRARIES} )
 
-SET( SmartNameCacheTests_SRCS SmartNameCacheTests.cpp )
-ADD_EXECUTABLE( SmartNameCacheTests ${SmartNameCacheTests_SRCS} )
-TARGET_LINK_LIBRARIES( SmartNameCacheTests ${TEST_LIBRARIES} )
-
 SET( CharmDataModelTests_SRCS CharmDataModelTests.cpp )
 ADD_EXECUTABLE( CharmDataModelTests ${CharmDataModelTests_SRCS} )
 TARGET_LINK_LIBRARIES( CharmDataModelTests ${TEST_LIBRARIES} )

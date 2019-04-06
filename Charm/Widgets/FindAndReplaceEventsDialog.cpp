@@ -140,11 +140,11 @@ void FindAndReplaceEventsDialog::selectTask(SelectTaskType type)
     const int taskId = dialog.selectedTask();
     if (type == TaskToSearch) {
         m_taskToSearch = taskId;
-        m_ui->findTaskLB->setText(DATAMODEL->taskIdAndSmartNameString(taskId));
+        m_ui->findTaskLB->setText(DATAMODEL->smartTaskName(taskId));
         m_model->setFilterTaskId(taskId);
     } else {
         m_taskToReplaceWith = taskId;
-        m_ui->replaceWithTaskLB->setText(DATAMODEL->taskIdAndSmartNameString(taskId));
+        m_ui->replaceWithTaskLB->setText(DATAMODEL->smartTaskName(taskId));
     }
 
     m_replace->setEnabled(m_taskToReplaceWith > 0 && m_taskToSearch > 0);

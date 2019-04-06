@@ -88,15 +88,10 @@ void CharmDataModel::setAllTasks(TaskList tasks)
     Q_ASSERT(Task::checkForTreeness(tasks));
     Q_ASSERT(Task::checkForUniqueTaskIds(tasks));
 
-    if (tasks.isEmpty()) {
+    if (tasks.isEmpty())
         m_taskModel->clearTasks();
-        m_nameCache.clearTasks();
-    } else {
+    else
         m_taskModel->setTasks(tasks);
-        // TODO: remove m_namedCache
-        // Move the smart names inside the model (will be easier to compute)
-        m_nameCache.setAllTasks(m_taskModel->tasks());
-    }
 
     // notify adapters of changes
     for_each(m_adapters.begin(), m_adapters.end(),
@@ -107,7 +102,6 @@ void CharmDataModel::setAllTasks(TaskList tasks)
 
 void CharmDataModel::clearTasks()
 {
-    m_nameCache.clearTasks();
     m_taskModel->clearTasks();
 
     for (auto adapter : m_adapters)
@@ -193,7 +187,7 @@ TaskList CharmDataModel::getAllTasks() const
 
 TaskIdList CharmDataModel::childrenTaskIds(TaskId id) const
 {
-    return m_taskModel->childrenIds(getTask(id));
+    return m_taskModel->childrenIds(id);
 }
 
 const Event &CharmDataModel::eventForId(EventId id) const
@@ -350,27 +344,9 @@ void CharmDataModel::eventUpdateTimerEvent()
     updateToolTip();
 }
 
-QString CharmDataModel::fullTaskName(const Task &task) const
+QString CharmDataModel::fullTaskName(TaskId id) const
 {
-    if (!task.isNull()) {
-        QString name = task.name.simplified();
-
-        if (task.parentId != 0) {
-            const Task &parent = getTask(task.parentId);
-            if (!parent.isNull())
-                name = fullTaskName(parent) + QLatin1Char('/') + name;
-        }
-        return name;
-    } else {
-        // qCWarning(CHARM_CORE_LOG) << "CharmReport::tasknameWithParents: WARNING: invalid task"
-        //                    << task.id();
-        return QString();
-    }
-}
-
-QString CharmDataModel::smartTaskName(const Task &task) const
-{
-    return m_nameCache.smartName(task.id);
+    return m_taskModel->fullTaskName(id);
 }
 
 QString CharmDataModel::eventsString() const
@@ -380,21 +356,17 @@ QString CharmDataModel::eventsString() const
         Event event = eventForId(eventId);
         if (event.isValid()) {
             const Task &task = getTask(event.taskId());
-            const int taskIdLength = CONFIGURATION.taskPaddingLength;
-            eStrList << tr("%1 - %2 %3")
+            eStrList << tr("%1 - %2")
                             .arg(hoursAndMinutes(event.duration()))
-                            .arg(task.id, taskIdLength, 10, QLatin1Char('0'))
-                            .arg(fullTaskName(task));
+                            .arg(m_taskModel->fullTaskName(task.id));
         }
     }
     return eStrList.join(QLatin1Char('\n'));
 }
 
-QString CharmDataModel::taskIdAndSmartNameString(TaskId id) const
+QString CharmDataModel::smartTaskName(TaskId id) const
 {
-    return QStringLiteral("%1 %2")
-        .arg(id, CONFIGURATION.taskPaddingLength, 10, QLatin1Char('0'))
-        .arg(smartTaskName(getTask(id)));
+    return m_taskModel->smartTaskName(id);
 }
 
 int CharmDataModel::totalDuration() const
@@ -527,6 +499,11 @@ TaskIdList CharmDataModel::mostRecentlyUsedTasks() const
     std::transform(mru.cbegin(), mru.cend(), std::inserter(out, out.begin()),
                    [](const std::pair<const QDateTime, TaskId> &in) { return in.second; });
     return out;
+}
+
+QString CharmDataModel::taskName(TaskId id) const
+{
+    return m_taskModel->taskName(id);
 }
 
 bool CharmDataModel::operator==(const CharmDataModel &other) const

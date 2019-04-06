@@ -99,7 +99,7 @@ QByteArray MonthlyTimeSheetReport::saveToText()
     }
 
     for (int i = 0; i < timeSheetInfo.size(); ++i)
-        stream << timeSheetInfo[i].formattedTaskIdAndName(CONFIGURATION.taskPaddingLength) << "\t"
+        stream << MODEL.charmDataModel()->taskName(timeSheetInfo[i].taskId) << "\t"
                << hoursAndMinutes(timeSheetInfo[i].total()) << '\n';
     stream << '\n';
     stream << "Month total: " << hoursAndMinutes(totalsLine.total()) << '\n';
@@ -268,7 +268,7 @@ void MonthlyTimeSheetReport::update()
             table.appendChild(row);
 
             QDomElement taskCell = addTblCell(
-                row, timeSheetInfo[i].formattedTaskIdAndName(CONFIGURATION.taskPaddingLength));
+                row, MODEL.charmDataModel()->taskName(timeSheetInfo[i].taskId));
             taskCell.setAttribute(QStringLiteral("align"), QStringLiteral("left"));
             taskCell.setAttribute(
                 QStringLiteral("style"),

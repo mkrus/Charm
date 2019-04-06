@@ -379,8 +379,7 @@ void WeeklyTimeSheetReport::update()
             table.appendChild(row);
 
             QString texts[NumberOfColumns];
-            texts[Column_Task] =
-                timeSheetInfo[i].formattedTaskIdAndName(CONFIGURATION.taskPaddingLength);
+            texts[Column_Task] = MODEL.charmDataModel()->taskName(timeSheetInfo[i].taskId);
             texts[Column_Monday] = hoursAndMinutes(timeSheetInfo[i].seconds[0]);
             texts[Column_Tuesday] = hoursAndMinutes(timeSheetInfo[i].seconds[1]);
             texts[Column_Wednesday] = hoursAndMinutes(timeSheetInfo[i].seconds[2]);
@@ -485,7 +484,7 @@ QByteArray WeeklyTimeSheetReport::saveToText()
     }
 
     for (int i = 0; i < timeSheetInfo.size(); ++i)
-        stream << timeSheetInfo[i].formattedTaskIdAndName(CONFIGURATION.taskPaddingLength) << "\t"
+        stream << MODEL.charmDataModel()->taskName(timeSheetInfo[i].taskId) << "\t"
                << hoursAndMinutes(timeSheetInfo[i].total()) << '\n';
     stream << '\n';
     stream << "Week total: " << hoursAndMinutes(totalsLine.total()) << '\n';

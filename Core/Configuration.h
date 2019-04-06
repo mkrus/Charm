@@ -86,8 +86,6 @@ public:
     QString
         failureMessage; // a message to show the user if something is wrong with the configuration
 
-    // appearance properties
-    int taskPaddingLength = 6; // arbitrary
 private:
     // allow test classes to create configuration objects (tests are
     // the only  application that can have (test) multiple
