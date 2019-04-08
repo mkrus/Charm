@@ -267,8 +267,8 @@ void MonthlyTimeSheetReport::update()
                 row.setAttribute(QStringLiteral("class"), QStringLiteral("alternate_row"));
             table.appendChild(row);
 
-            QDomElement taskCell = addTblCell(
-                row, MODEL.charmDataModel()->taskName(timeSheetInfo[i].taskId));
+            QDomElement taskCell =
+                addTblCell(row, MODEL.charmDataModel()->taskName(timeSheetInfo[i].taskId));
             taskCell.setAttribute(QStringLiteral("align"), QStringLiteral("left"));
             taskCell.setAttribute(
                 QStringLiteral("style"),

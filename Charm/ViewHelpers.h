@@ -43,7 +43,7 @@ typedef QVarLengthArray<SortOrder, 5> SortOrderList;
 void connectControllerAndView(Controller *, CharmWindow *);
 int collatorCompare(const QString &left, const QString &right);
 EventIdList eventIdsSortedBy(EventIdList, const SortOrderList &orders);
-EventIdList eventIdsSortedBy(const EventIdList&, SortOrder order);
+EventIdList eventIdsSortedBy(const EventIdList &, SortOrder order);
 QString elidedTaskName(const QString &text, const QFont &font, int width);
 QString reportStylesheet(const QPalette &palette);
 }

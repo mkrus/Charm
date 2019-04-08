@@ -33,10 +33,10 @@
 #include "charm_core_debug.h"
 #include <QFile>
 #include <QFileInfo>
+#include <QSqlError>
+#include <QSqlField>
 #include <QSqlQuery>
 #include <QSqlRecord>
-#include <QSqlField>
-#include <QSqlError>
 
 SqlStorage::SqlStorage() {}
 
@@ -301,8 +301,8 @@ bool SqlStorage::modifyEvent(const Event &event, const SqlRaiiTransactor &)
 {
     QSqlQuery query(database());
     query.prepare(QStringLiteral("UPDATE Events set task = :task, comment = :comment, "
-                                "start = :start, end = :end, report_id = :report "
-                                "where event_id = :id;"));
+                                 "start = :start, end = :end, report_id = :report "
+                                 "where event_id = :id;"));
     query.bindValue(QStringLiteral(":id"), event.id());
     query.bindValue(QStringLiteral(":task"), event.taskId());
     query.bindValue(QStringLiteral(":report"), event.reportId());

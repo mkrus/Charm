@@ -79,10 +79,8 @@ void connectControllerAndModel(Controller *controller, CharmDataModel *model)
     QObject::connect(controller, &Controller::eventAdded, model, &CharmDataModel::addEvent);
     QObject::connect(controller, &Controller::eventModified, model, &CharmDataModel::modifyEvent);
     QObject::connect(controller, &Controller::eventDeleted, model, &CharmDataModel::deleteEvent);
-    QObject::connect(controller, &Controller::allEvents, model,
-                     &CharmDataModel::setAllEvents);
-    QObject::connect(controller, &Controller::definedTasks, model,
-                     &CharmDataModel::setAllTasks);
+    QObject::connect(controller, &Controller::allEvents, model, &CharmDataModel::setAllEvents);
+    QObject::connect(controller, &Controller::definedTasks, model, &CharmDataModel::setAllTasks);
 }
 
 static QString formatDecimal(double d)

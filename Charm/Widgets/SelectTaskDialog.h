@@ -29,7 +29,6 @@
 #include <QDialog>
 #include <QScopedPointer>
 
-
 namespace Ui {
 class SelectTaskDialog;
 }

@@ -6,7 +6,6 @@
 #include <algorithm>
 #include <cmath>
 
-
 TaskModel::TaskModel(QObject *parent)
     : QAbstractItemModel(parent)
 {
@@ -17,7 +16,8 @@ const TaskList &TaskModel::tasks() const
     return m_tasks;
 }
 
-static bool taskIdLessThan(const Task &left, const Task &right) {
+static bool taskIdLessThan(const Task &left, const Task &right)
+{
     return left.id < right.id;
 };
 
@@ -146,9 +146,7 @@ QString TaskModel::fullTaskName(TaskId id) const
         name = item.task->name + QLatin1Char('/') + name;
         parentId = item.parentId;
     }
-    return QStringLiteral("%1 %2")
-        .arg(id, m_idPadding, 10, QLatin1Char('0'))
-        .arg(name);
+    return QStringLiteral("%1 %2").arg(id, m_idPadding, 10, QLatin1Char('0')).arg(name);
 }
 
 QString TaskModel::smartTaskName(TaskId id) const
@@ -226,7 +224,7 @@ void TaskModel::computeSmartName()
         case 2000: // Training
             item.smartName = QStringLiteral("Training");
             break;
-        case 8300: //Research and Development
+        case 8300: // Research and Development
             item.smartName = QStringLiteral("R&D");
             break;
         case 9300: // Organization, Operations, Coordination

@@ -171,8 +171,7 @@ void TimeTrackingTaskSelector::handleActiveEvents()
 
         const Event &event = DATAMODEL->eventForId(DATAMODEL->activeEvents().first());
         const Task &task = DATAMODEL->getTask(event.taskId());
-        m_taskSelectorButton->setText(
-            escapeAmpersands(DATAMODEL->smartTaskName(task.id)));
+        m_taskSelectorButton->setText(escapeAmpersands(DATAMODEL->smartTaskName(task.id)));
     } else {
         m_stopGoAction->setIcon(Data::goIcon());
         m_stopGoAction->setText(tr("Start Task"));

@@ -64,8 +64,8 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QSettings>
-#include <QUrlQuery>
 #include <QToolBar>
+#include <QUrlQuery>
 #include <QtAlgorithms>
 
 #include <algorithm>

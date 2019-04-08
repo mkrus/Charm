@@ -25,8 +25,8 @@
 #ifndef EVENTMODELADAPTER_H
 #define EVENTMODELADAPTER_H
 
-#include <QPointer>
 #include <QAbstractListModel>
+#include <QPointer>
 
 #include "Core/CharmDataModelAdapterInterface.h"
 #include "Core/CommandEmitterInterface.h"
@@ -56,7 +56,7 @@ public:
     void resetEvents() override;
     void eventAboutToBeAdded(EventId id) override;
     void eventAdded(EventId id) override;
-    void eventModified(EventId id, const Event&) override;
+    void eventModified(EventId id, const Event &) override;
     void eventAboutToBeDeleted(EventId id) override;
     void eventDeleted(EventId id) override;
 

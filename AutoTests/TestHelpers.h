@@ -29,8 +29,8 @@
 
 #include <QDebug>
 #include <QDir>
-#include <QDomElement>
 #include <QDomDocument>
+#include <QDomElement>
 
 namespace TestHelpers {
 

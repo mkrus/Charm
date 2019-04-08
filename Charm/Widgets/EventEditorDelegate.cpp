@@ -50,10 +50,9 @@ QSize EventEditorDelegate::sizeHint(const QStyleOptionViewItem &option,
 
         QPixmap pixmap(option.rect.size()); // temp
         QPainter painter(&pixmap);
-        m_cachedSizeHint =
-            paint(&painter, option, DATAMODEL->smartTaskName(event.taskId()),
-                  dateAndDuration(event), 42, EventState_Locked)
-                .size();
+        m_cachedSizeHint = paint(&painter, option, DATAMODEL->smartTaskName(event.taskId()),
+                                 dateAndDuration(event), 42, EventState_Locked)
+                               .size();
     }
     return m_cachedSizeHint;
 }
@@ -67,9 +66,8 @@ void EventEditorDelegate::paint(QPainter *painter, const QStyleOptionViewItem &o
     if (event.isValid()) {
         bool locked = DATAMODEL->isEventActive(event.id());
 
-        paint(painter, option, DATAMODEL->smartTaskName(event.taskId()),
-              dateAndDuration(event), logDuration(event.duration()),
-              locked ? EventState_Locked : EventState_Default);
+        paint(painter, option, DATAMODEL->smartTaskName(event.taskId()), dateAndDuration(event),
+              logDuration(event.duration()), locked ? EventState_Locked : EventState_Default);
     }
 }
 

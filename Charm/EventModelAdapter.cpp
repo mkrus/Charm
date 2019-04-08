@@ -93,7 +93,7 @@ void EventModelAdapter::eventAdded(EventId id)
     endInsertRows();
 }
 
-void EventModelAdapter::eventModified(EventId id, const Event&)
+void EventModelAdapter::eventModified(EventId id, const Event &)
 {
     // nothing to do, except:
     int row = m_events.indexOf(id);

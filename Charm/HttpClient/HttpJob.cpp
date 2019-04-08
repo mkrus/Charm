@@ -32,7 +32,6 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 
-
 HttpJob::HttpJob(QObject *parent)
     : QObject(parent)
     , m_networkManager(new QNetworkAccessManager(this))

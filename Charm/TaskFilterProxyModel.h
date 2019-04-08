@@ -30,7 +30,6 @@
 #include "Core/Configuration.h"
 #include "Core/Task.h"
 
-
 // ViewFilter is implemented as a decorator to avoid accidental direct
 // access to the task model with indexes of the proxy
 class TaskFilterProxyModel : public QSortFilterProxyModel

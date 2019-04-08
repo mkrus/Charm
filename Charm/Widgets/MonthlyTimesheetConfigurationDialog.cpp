@@ -23,7 +23,6 @@
 
 #include "MonthlyTimesheetConfigurationDialog.h"
 
-
 #include "DateEntrySyncer.h"
 #include "SelectTaskDialog.h"
 #include "ViewHelpers.h"
