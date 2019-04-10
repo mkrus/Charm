@@ -19,7 +19,7 @@ const TaskList &TaskModel::tasks() const
 static bool taskIdLessThan(const Task &left, const Task &right)
 {
     return left.id < right.id;
-};
+}
 
 void TaskModel::setTasks(const TaskList &tasks)
 {
