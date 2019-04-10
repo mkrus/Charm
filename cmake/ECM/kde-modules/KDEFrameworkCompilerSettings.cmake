@@ -53,13 +53,10 @@ add_definitions(-DQT_NO_CAST_TO_ASCII
                 -DQT_NO_URL_CAST_FROM_STRING
                 -DQT_NO_CAST_FROM_BYTEARRAY
                 -DQT_NO_SIGNALS_SLOTS_KEYWORDS
-                -DQT_USE_FAST_OPERATOR_PLUS
                 -DQT_USE_QSTRINGBUILDER
+                -DQT_NO_NARROWING_CONVERSIONS_IN_CONNECT
+                -DQT_STRICT_ITERATORS
                )
-
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-  add_definitions(-DQT_STRICT_ITERATORS)
-endif()
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic")
@@ -67,6 +64,12 @@ endif()
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
    if (NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS "5.0.0")
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wsuggest-override" )
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wzero-as-null-pointer-constant -Wsuggest-override" )
+   endif()
+endif()
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+   if (NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS "5.0.0")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wzero-as-null-pointer-constant" )
    endif()
 endif()
