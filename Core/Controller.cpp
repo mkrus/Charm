@@ -42,7 +42,10 @@ Controller::Controller(QObject *parent_)
 {
 }
 
-Controller::~Controller() {}
+Controller::~Controller()
+{
+    delete m_storage;
+}
 
 Event Controller::makeEvent(const Task &task)
 {
