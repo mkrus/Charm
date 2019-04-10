@@ -1,0 +1,2 @@
+org.kdab.charm.application Charm (Application) IDENTIFIER [CHARM_APPLICATION_LOG]
+org.kdab.charm.core Charm (Core) IDENTIFIER [CHARM_CORE_LOG]
