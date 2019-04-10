@@ -237,7 +237,7 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
     // set up idle detection
     m_idleDetector = IdleDetector::createIdleDetector(this);
     Q_ASSERT(m_idleDetector);
-    connect(m_idleDetector, SIGNAL(maybeIdle()), SLOT(slotMaybeIdle()));
+    connect(m_idleDetector, qOverload<>(&IdleDetector::maybeIdle), this, &ApplicationCore::slotMaybeIdle);
 
     setHttpActionsVisible(Lotsofcake::Configuration().isConfigured());
     // add default plugin path for deployment

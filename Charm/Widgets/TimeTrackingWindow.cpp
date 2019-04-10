@@ -99,7 +99,7 @@ TimeTrackingWindow::TimeTrackingWindow(QWidget *parent)
 #if defined(Q_OS_OSX) || defined(Q_OS_WIN)
     m_checkCharmReleaseVersionTimer.setInterval(24 * 60 * 60 * 1000);
     if (!CharmUpdateCheckUrl().isEmpty()) {
-        QTimer::singleShot(1000, this, SLOT(slotCheckForUpdatesAutomatic()));
+        QTimer::singleShot(1000, this, &TimeTrackingWindow::slotCheckForUpdatesAutomatic);
         m_checkCharmReleaseVersionTimer.start();
     }
 #endif

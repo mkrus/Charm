@@ -35,8 +35,8 @@ DateEntrySyncer::DateEntrySyncer(QSpinBox *week, QSpinBox *year, QDateEdit *date
     , m_date(date)
     , m_weekDay(weekDay)
 {
-    connect(m_week, SIGNAL(valueChanged(int)), this, SLOT(dateSelectionChanged()));
-    connect(m_year, SIGNAL(valueChanged(int)), this, SLOT(dateSelectionChanged()));
+    connect(m_week, qOverload<int>(&QSpinBox::valueChanged), this, &DateEntrySyncer::dateSelectionChanged);
+    connect(m_year, qOverload<int>(&QSpinBox::valueChanged), this, &DateEntrySyncer::dateSelectionChanged);
     if (m_date)
         connect(m_date, &QDateTimeEdit::dateChanged, this, &DateEntrySyncer::dateSelectionChanged);
 }

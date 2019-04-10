@@ -50,8 +50,8 @@ EventEditor::EventEditor(const Event &event, QWidget *parent)
     m_ui->buttonBox->button(QDialogButtonBox::Ok)->setShortcut(Qt::CTRL + Qt::Key_Return);
 
     // connect stuff:
-    connect(m_ui->spinBoxHours, SIGNAL(valueChanged(int)), SLOT(durationHoursEdited(int)));
-    connect(m_ui->spinBoxMinutes, SIGNAL(valueChanged(int)), SLOT(durationMinutesEdited(int)));
+    connect(m_ui->spinBoxHours, qOverload<int>(&QSpinBox::valueChanged), this, &EventEditor::durationHoursEdited);
+    connect(m_ui->spinBoxMinutes, qOverload<int>(&QSpinBox::valueChanged), this, &EventEditor::durationMinutesEdited);
     connect(m_ui->dateEditStart, &QDateEdit::dateChanged, this, &EventEditor::startDateChanged);
     connect(m_ui->timeEditStart, &QTimeEdit::timeChanged, this, &EventEditor::startTimeChanged);
     connect(m_ui->dateEditEnd, &QDateEdit::dateChanged, this, &EventEditor::endDateChanged);

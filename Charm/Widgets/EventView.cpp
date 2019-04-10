@@ -78,7 +78,7 @@ EventView::EventView(QWidget *parent)
             &EventView::slotContextMenuRequested);
     connect(m_listView, &QListView::doubleClicked, this, &EventView::slotEventDoubleClicked);
     connect(&m_actionNewEvent, &QAction::triggered, this, &EventView::slotNewEvent);
-    connect(&m_actionEditEvent, SIGNAL(triggered()), SLOT(slotEditEvent()));
+    connect(&m_actionEditEvent, &QAction::triggered, this, qOverload<>(&EventView::slotEditEvent));
     connect(&m_actionDeleteEvent, &QAction::triggered, this, &EventView::slotDeleteEvent);
     //     connect( &m_commitTimer, SIGNAL(timeout()),
     //              SLOT(slotCommitTimeout()) );
@@ -119,7 +119,7 @@ EventView::EventView(QWidget *parent)
     m_actionDeleteEvent.setEnabled(false);
 
     m_toolBar->addWidget(m_comboBox);
-    connect(m_comboBox, SIGNAL(currentIndexChanged(int)), SLOT(timeFrameChanged(int)));
+    connect(m_comboBox, qOverload<int>(&QComboBox::currentIndexChanged), this, &EventView::timeFrameChanged);
 
     auto spacer = new QWidget(this);
     QSizePolicy spacerSizePolicy = spacer->sizePolicy();

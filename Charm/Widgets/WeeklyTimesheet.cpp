@@ -120,8 +120,8 @@ WeeklyTimesheetConfigurationDialog::WeeklyTimesheetConfigurationDialog(QWidget *
     connect(m_ui->buttonBox, &QDialogButtonBox::rejected, this,
             &WeeklyTimesheetConfigurationDialog::reject);
 
-    connect(m_ui->comboBoxWeek, SIGNAL(currentIndexChanged(int)),
-            SLOT(slotWeekComboItemSelected(int)));
+    connect(m_ui->comboBoxWeek, qOverload<int>(&QComboBox::currentIndexChanged),
+            this, &WeeklyTimesheetConfigurationDialog::slotWeekComboItemSelected);
     m_ui->comboBoxWeek->setCurrentIndex(1);
     new DateEntrySyncer(m_ui->spinBoxWeek, m_ui->spinBoxYear, m_ui->dateEditDay, 1, this);
 

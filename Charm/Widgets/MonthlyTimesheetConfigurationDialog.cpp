@@ -45,8 +45,8 @@ MonthlyTimesheetConfigurationDialog::MonthlyTimesheetConfigurationDialog(QWidget
     connect(m_ui->buttonBox, &QDialogButtonBox::rejected, this,
             &MonthlyTimesheetConfigurationDialog::reject);
 
-    connect(m_ui->comboBoxMonth, SIGNAL(currentIndexChanged(int)),
-            SLOT(slotMonthComboItemSelected(int)));
+    connect(m_ui->comboBoxMonth, qOverload<int>(&QComboBox::currentIndexChanged),
+            this, &MonthlyTimesheetConfigurationDialog::slotMonthComboItemSelected);
     m_ui->comboBoxMonth->setCurrentIndex(1);
 
     slotStandardTimeSpansChanged();

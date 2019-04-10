@@ -46,8 +46,8 @@ CharmWindow::CharmWindow(const QString &name, QWidget *parent)
     , m_showAction(new QAction(this))
 {
     setWindowName(name);
-    connect(m_openCharmAction, SIGNAL(triggered(bool)), SLOT(showView()));
-    connect(m_showAction, SIGNAL(triggered(bool)), SLOT(showView()));
+    connect(m_openCharmAction, &QAction::triggered, this, qOverload<>(&CharmWindow::showView));
+    connect(m_showAction, &QAction::triggered, this, qOverload<>(&CharmWindow::showView));
     connect(this, &CharmWindow::visibilityChanged, this, &CharmWindow::handleShow);
     m_toolBar = addToolBar(QStringLiteral("Toolbar"));
     m_toolBar->setMovable(false);
@@ -114,8 +114,8 @@ void CharmWindow::setWindowNumber(int number)
 #endif
     m_shortcut->setContext(Qt::ApplicationShortcut);
     m_showAction->setShortcut(sequence);
-    connect(m_shortcut, SIGNAL(activated()), SLOT(showHideView()));
-    connect(m_shortcut, SIGNAL(activated()), SLOT(showView()));
+    connect(m_shortcut, &QShortcut::activated, this, qOverload<>(&CharmWindow::showHideView));
+    connect(m_shortcut, &QShortcut::activated, this, qOverload<>(&CharmWindow::showView));
 }
 
 int CharmWindow::windowNumber() const
