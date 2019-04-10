@@ -35,16 +35,14 @@ ConfigurationDialog::ConfigurationDialog(const Configuration &config, QWidget *p
     m_ui.databaseLocation->setText(config.localStorageDatabase);
     connect(m_ui.buttonBox, &QDialogButtonBox::rejected, this, &ConfigurationDialog::reject);
     connect(m_ui.buttonBox, &QDialogButtonBox::accepted, this, &ConfigurationDialog::accept);
+    connect(m_ui.databaseLocation, &QLineEdit::textChanged, this, &ConfigurationDialog::checkInput);
+    connect(m_ui.nameLineEdit, &QLineEdit::textChanged, this, &ConfigurationDialog::checkInput);
+    connect(m_ui.databaseLocationButton, &QPushButton::clicked, this, &ConfigurationDialog::slotDatabaseLocationButtonClicked);
 }
 
 Configuration ConfigurationDialog::configuration() const
 {
     return m_config;
-}
-
-void ConfigurationDialog::on_databaseLocation_textChanged(const QString &)
-{
-    checkInput();
 }
 
 void ConfigurationDialog::accept()
@@ -58,16 +56,11 @@ void ConfigurationDialog::accept()
     QDialog::accept();
 }
 
-void ConfigurationDialog::on_databaseLocationButton_clicked()
+void ConfigurationDialog::slotDatabaseLocationButtonClicked()
 {
     QString filename = QFileDialog::getSaveFileName(this, tr("Choose Database Location..."));
     if (!filename.isNull())
         m_ui.databaseLocation->setText(filename);
-}
-
-void ConfigurationDialog::on_nameLineEdit_textChanged(const QString &)
-{
-    checkInput();
 }
 
 void ConfigurationDialog::checkInput()

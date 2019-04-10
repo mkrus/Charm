@@ -40,9 +40,7 @@ public:
     Configuration configuration() const;
 
 private Q_SLOTS:
-    void on_databaseLocationButton_clicked();
-    void on_databaseLocation_textChanged(const QString &text);
-    void on_nameLineEdit_textChanged(const QString &text);
+    void slotDatabaseLocationButtonClicked();
 
     void accept() override;
 
