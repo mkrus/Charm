@@ -27,6 +27,7 @@
 
 #include <QPushButton>
 #include <QSettings>
+#include <QShowEvent>
 
 #include "ui_SelectTaskDialog.h"
 
@@ -95,7 +96,9 @@ bool SelectTaskDialog::isValid(TaskId id) const
 
 void SelectTaskDialog::showEvent(QShowEvent *event)
 {
-    slotResetState();
+    if (!event->spontaneous()) {
+        slotResetState();
+    }
     QDialog::showEvent(event);
 }
 
