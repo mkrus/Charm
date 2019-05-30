@@ -34,6 +34,7 @@ public:
         Later,
         AsYouWish,
         AlreadyDone,
+        AlreadyDoneAll,
     };
     explicit BillDialog(QWidget *parent = nullptr, Qt::WindowFlags f = {});
     void setReport(int year, int week);
@@ -48,6 +49,7 @@ private:
     QPushButton *m_asYouWish = nullptr;
     QPushButton *m_alreadyDone = nullptr;
     QPushButton *m_later = nullptr;
+    QAction *m_alreadyDoneWeek = nullptr;
     int m_year = 0;
     int m_week = 0;
 };

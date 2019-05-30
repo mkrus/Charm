@@ -22,6 +22,9 @@
 */
 
 #include "BillDialog.h"
+
+#include <QAction>
+#include <QMenu>
 #include <QDialogButtonBox>
 #include <QPushButton>
 #include <QVBoxLayout>
@@ -42,7 +45,20 @@ BillDialog::BillDialog(QWidget *parent, Qt::WindowFlags f)
 
     m_asYouWish = new QPushButton(QStringLiteral("As you wish"));
     connect(m_asYouWish, &QPushButton::clicked, this, &BillDialog::slotAsYouWish);
-    m_alreadyDone = new QPushButton(QStringLiteral("Already done"));
+    m_alreadyDone = new QPushButton(QStringLiteral("Already sent"));
+    {
+        auto allDoneMenu = new QMenu();
+
+        m_alreadyDoneWeek = new QAction(QString(), this);
+        connect(m_alreadyDoneWeek, &QAction::triggered, this, [this]{ done(AlreadyDone); });
+        allDoneMenu->addAction(m_alreadyDoneWeek);
+
+        auto action = new QAction(tr("All timesheets already sent in"), this);
+        connect(action, &QAction::triggered, this, [this]{ done(AlreadyDoneAll); });
+        allDoneMenu->addAction(action);
+
+        m_alreadyDone->setMenu(allDoneMenu);
+    }
     connect(m_alreadyDone, &QPushButton::clicked, this, &BillDialog::slotAlreadyDone);
     m_later = new QPushButton(QStringLiteral("Later"));
     connect(m_later, &QPushButton::clicked, this, &BillDialog::slotLater);
@@ -59,7 +75,7 @@ void BillDialog::setReport(int year, int week)
 {
     m_year = year;
     m_week = week;
-    m_alreadyDone->setText(QStringLiteral("Already sent Week %1 (%2)").arg(week).arg(year));
+    m_alreadyDoneWeek->setText(QStringLiteral("Already sent Week %1 (%2)").arg(week).arg(year));
 }
 
 int BillDialog::year() const

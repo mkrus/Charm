@@ -433,6 +433,18 @@ void TimeTrackingWindow::slotCheckUploadedTimesheets()
 void TimeTrackingWindow::slotBillGone(int result)
 {
     switch (result) {
+    case BillDialog::AlreadyDoneAll:
+    {
+        const auto missing = missingTimeSheets();
+        for (auto yearIt = missing.begin(), yearEnd = missing.end(); yearIt != yearEnd; ++yearIt)
+        {
+            for (auto weekIt = yearIt.value().begin(), weekEnd = yearIt.value().end(); weekIt != weekEnd; ++weekIt)
+            {
+                addUploadedTimesheet(yearIt.key(), *weekIt);
+            }
+        }
+        break;
+    }
     case BillDialog::AlreadyDone:
         addUploadedTimesheet(m_billDialog->year(), m_billDialog->week());
         break;
