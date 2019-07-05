@@ -22,8 +22,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef VIEWFILTER_H
-#define VIEWFILTER_H
+#ifndef TASKFILTERPROXYMODEL_H
+#define TASKFILTERPROXYMODEL_H
 
 #include <QSortFilterProxyModel>
 
