@@ -87,6 +87,9 @@ void SelectTaskDialog::slotTaskDoubleClicked(TaskId id)
 
 bool SelectTaskDialog::isValid(TaskId id) const
 {
+    if (id == 0)
+        return false;
+
     const Task &task = MODEL.charmDataModel()->getTask(id);
     if (task.isNull() || !task.trackable)
         return false;

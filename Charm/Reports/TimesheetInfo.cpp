@@ -46,13 +46,13 @@ TimeSheetInfoList TimeSheetInfo::taskWithSubTasks(const CharmDataModel *dataMode
 {
     TimeSheetInfoList result;
     TimeSheetInfoList children;
-
     TimeSheetInfo myInformation(segments);
-    const Task &task = dataModel->getTask(id);
-    // real task or virtual root item
-    Q_ASSERT(!task.isNull() || id == 0);
 
     if (id != 0) {
+        const Task &task = dataModel->getTask(id);
+        // real task or virtual root item
+        Q_ASSERT(!task.isNull());
+
         // add totals for task itself:
         if (secondsMap.contains(id))
             myInformation.seconds = secondsMap.value(id);

@@ -193,11 +193,10 @@ void EnterVacationDialog::updateButtonStates()
 
 void EnterVacationDialog::updateTaskLabel()
 {
-    const Task task = DATAMODEL->getTask(m_selectedTaskId);
-
-    if (task.isNull()) {
+    if (m_selectedTaskId == -1) {
         m_ui->taskLabel->setText(tr("(No task selected)"));
     } else {
+        const Task task = DATAMODEL->getTask(m_selectedTaskId);
         m_ui->taskLabel->setText(task.name);
     }
     updateGeometry();

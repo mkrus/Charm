@@ -143,7 +143,13 @@ const Task &TaskModel::taskForId(TaskId id) const
 {
     Q_ASSERT(id >= 0 && id < m_items.size());
     const auto &item = m_items.at(id);
-    Q_ASSERT(item.id != 0);
+
+    // If the task does not exist, return an empty one
+    if (item.task == nullptr) {
+        static Task task;
+        return task;
+    }
+
     return *(item.task);
 }
 
