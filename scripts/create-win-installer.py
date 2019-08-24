@@ -57,8 +57,7 @@ class DeployHelper(object):
             self._logExec("windeployqt --%s --dir \"%s\" --qmldir \"%s\"  \"%s\"" % (self.args.buildType, self.deployImage, self.gitDir, src))
 
     def _sign(self, fileName):
-        if self.args.sign:
-            self._logExec("signtool.exe sign  -t http://timestamp.globalsign.com/scripts/timestamp.dll  -fd SHA256 -v \"%s\"" % fileName)
+        self._logExec("signtool.exe sign  -t http://timestamp.globalsign.com/scripts/timestamp.dll  -fd SHA256 -v \"%s\"" % fileName)
 
     def cleanImage(self):
         if os.path.exists(self.deployImage):
@@ -138,7 +137,8 @@ class DeployHelper(object):
                   (definestring, os.path.join(os.path.dirname(__file__), "NullsoftInstaller.nsi"))
         self._logExec(command)
         installer = os.path.realpath(self.args.installerName)
-        self._sign(installer)
+        if self.args.sign:
+            self._sign(installer)
         print("""Generated package file: %s """ % installer)
 
 
