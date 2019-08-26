@@ -42,11 +42,11 @@ void Charm::connectControllerAndView(Controller *controller, CharmWindow *view)
 {
     // connect view and controller:
     // make controller process commands send by the view:
-    QObject::connect(view, SIGNAL(emitCommand(CharmCommand *)), controller,
-                     SLOT(executeCommand(CharmCommand *)));
+    QObject::connect(view, SIGNAL(emitCommand(CharmCommand*)), controller,
+                     SLOT(executeCommand(CharmCommand*)));
     // make view receive done commands from the controller:
-    QObject::connect(controller, SIGNAL(commandCompleted(CharmCommand *)), view,
-                     SLOT(commitCommand(CharmCommand *)));
+    QObject::connect(controller, SIGNAL(commandCompleted(CharmCommand*)), view,
+                     SLOT(commitCommand(CharmCommand*)));
 }
 
 class EventSorter

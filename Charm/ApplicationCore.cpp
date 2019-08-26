@@ -163,8 +163,8 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
             &ApplicationCore::slotPopulateTrayIconMenu);
 
     // due to multiple inheritence we can't use the new style connects here
-    connect(&m_eventView, SIGNAL(emitCommand(CharmCommand *)), &m_timeTracker,
-            SLOT(sendCommand(CharmCommand *)));
+    connect(&m_eventView, SIGNAL(emitCommand(CharmCommand*)), &m_timeTracker,
+            SLOT(sendCommand(CharmCommand*)));
 
     // my own signals:
     connect(this, &ApplicationCore::goToState, this, &ApplicationCore::setState,
