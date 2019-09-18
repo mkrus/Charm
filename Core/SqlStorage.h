@@ -24,6 +24,7 @@
 #ifndef SQLSTORAGE_H
 #define SQLSTORAGE_H
 
+#include <QSqlDatabase>
 #include <QString>
 
 #include "CharmExceptions.h"
@@ -41,16 +42,11 @@ class SqlStorage
 {
 public:
     SqlStorage();
-    virtual ~SqlStorage();
-
-    // a readable description for the user
-    virtual QString description() const = 0;
+    ~SqlStorage();
 
     // backend availability
-    virtual bool connect(Configuration &) = 0;
-    virtual bool disconnect() = 0;
-
-    virtual QSqlDatabase &database() = 0;
+    bool connect(Configuration &configuration);
+    bool disconnect();
 
     // task database functions:
     TaskList getAllTasks();
@@ -86,36 +82,27 @@ public:
       */
     QString setAllTasksAndEvents(const TaskList &, const EventList &);
 
-    /**
-     * @throws UnsupportedDatabaseVersionException
-     */
-    bool verifyDatabase();
-
-    virtual bool createDatabaseTables() = 0;
-
-    // run the query and process possible errors
-    static bool runQuery(QSqlQuery &);
-
-protected:
+private:
     // Put the basic database structure into the database.
     // This includes creating the tables et cetera.
-    // Different backends will have to reimplement this function to
-    // get special requirements in.
-    // return true if successful, false otherwise
-    virtual bool createDatabase(Configuration &) = 0;
+    // Return true if successful, false otherwise
+    bool createDatabase();
+    bool createDatabaseTables();
 
     /** Verify database content and database version.
      * Will return false if the database is found, but for some reason does not contain
      * the complete structure (which is a very unusual odd case).
      * It will throw an UnsupportedDatabaseVersionException if the database version does
      * not match the one the client was compiled against.
+     * @throws UnsupportedDatabaseVersionException
      */
-    virtual QString lastInsertRowFunction() const = 0;
-
-private:
+    bool verifyDatabase();
     bool migrateDB(const QString &queryString, int oldVersion);
+
     Event makeEventFromRecord(const QSqlRecord &);
     Task makeTaskFromRecord(const QSqlRecord &);
+
+    QSqlDatabase m_database;
 };
 
 #endif

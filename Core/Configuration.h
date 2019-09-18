@@ -68,7 +68,6 @@ public:
     // database:
     QString configurationName;
     quint32 installationId = 0;
-    QString localStorageType; // SqLite, MySql, ...
     QString localStorageDatabase; // database name (path, with sqlite)
     bool newDatabase = false; // true if the configuration has just been created
     bool failure = false; // used to reconfigure on failures
@@ -79,7 +78,7 @@ private:
     // allow test classes to create configuration objects (tests are
     // the only  application that can have (test) multiple
     // configurations):
-    friend class SqLiteStorageTests;
+    friend class SqlStorageTests;
     friend class ControllerTests;
     // these are all the persisted metadata settings, and the constructor is only used during test
     // runs:

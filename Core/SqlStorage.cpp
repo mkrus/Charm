@@ -25,12 +25,14 @@
 #include "SqlStorage.h"
 #include "CharmConstants.h"
 #include "CharmExceptions.h"
+#include "Configuration.h"
 #include "Event.h"
 #include "SqlRaiiTransactor.h"
 #include "State.h"
 #include "Task.h"
-
 #include "charm_core_debug.h"
+
+#include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QSqlError>
@@ -39,18 +41,127 @@
 #include <QSqlRecord>
 #include <QSettings>
 
-SqlStorage::SqlStorage() {}
+#include <cerrno>
+
+// increment when SQL DB format changes:
+namespace {
+const char DatabaseName[] = "charm.kdab.com";
+const char DatabseSchemaVersionKey[] = "CharmDatabaseSchemaVersion";
+
+enum {
+  VersionBeforeSubscriptionRemoval = 5,
+  VersionBeforeUserRemoval,
+  VersionBeforeInstallationsRemoval,
+  VersionBeforeEventCleanup,
+  VersionBeforeInstallationIdAddedToDatabase,
+  DatabaseVersion
+};
+}
+
+static bool runQuery(QSqlQuery &query)
+{
+#if 0
+    const auto MARKER = "============================================================";
+    qCDebug(CHARM_CORE_LOG) << MARKER << endl << "SqlStorage::runQuery: executing query:"
+             << endl << query.executedQuery();
+    bool result = query.exec();
+    if (result) {
+        qCDebug(CHARM_CORE_LOG) << "SqlStorage::runQuery: SUCCESS" << endl << MARKER;
+    } else {
+        qCDebug(CHARM_CORE_LOG) << "SqlStorage::runQuery: FAILURE" << endl
+                 << "Database says: " << query.lastError().databaseText() << endl
+                 << "Driver says:   " << query.lastError().driverText() << endl
+                 << MARKER;
+    }
+    return result;
+#else
+    return query.exec();
+#endif
+}
+
+SqlStorage::SqlStorage()
+    : m_database(QSqlDatabase::addDatabase(QStringLiteral("QSQLITE"), QLatin1String(DatabaseName)))
+{
+    if (!m_database.isValid())
+        throw CharmException(QObject::tr("QSQLITE driver not available"));
+}
 
 SqlStorage::~SqlStorage() {}
+
+bool SqlStorage::connect(Configuration &configuration)
+{
+    // make sure the database folder exits:
+    configuration.failure = true;
+
+    const QFileInfo fileInfo(configuration.localStorageDatabase); // this is the full path
+
+    // make sure the path exists, file will be created by sqlite
+    if (!QDir().mkpath(fileInfo.absolutePath())) {
+        configuration.failureMessage =
+            QObject::tr("Cannot make database directory: %1").arg(qt_error_string(errno));
+        return false;
+    }
+
+    if (!QDir(fileInfo.absolutePath()).exists()) {
+        configuration.failureMessage =
+            QObject::tr("I made a directory, but it is not there. Weird.");
+        return false;
+    }
+
+    m_database.setHostName(QStringLiteral("localhost"));
+    const QString databaseName = fileInfo.absoluteFilePath();
+    m_database.setDatabaseName(databaseName);
+
+    bool error = false;
+
+    if (!fileInfo.exists() && !configuration.newDatabase) {
+        error = true;
+        configuration.failureMessage =
+            QObject::tr("<html><head><meta name=\"qrichtext\" content=\"1\" /></head>"
+                        "<body><p>The configuration seems to be valid, but the database "
+                        "file does not exist.</p>"
+                        "<p>The file will automatically be generated. Please verify "
+                        "the configuration.</p>"
+                        "<p>If the configuration is correct, just close the dialog.</p>"
+                        "</body></html>");
+    }
+
+    if (!m_database.open()) {
+        configuration.failureMessage =
+            QObject::tr("Could not open SQLite database %1").arg(databaseName);
+        return false;
+    }
+
+    if (!verifyDatabase()) {
+        if (!createDatabase()) {
+            configuration.failureMessage =
+                QObject::tr("SqLiteStorage::connect: error creating default database contents");
+            return false;
+        }
+    }
+
+    if (error)
+        return false;
+
+    configuration.failure = false;
+    return true;
+}
+
+bool SqlStorage::disconnect()
+{
+    m_database.removeDatabase(QLatin1String(DatabaseName));
+    m_database.close();
+    return true; // neither of the two methods return a value
+}
 
 bool SqlStorage::verifyDatabase()
 {
     // if the database is empty, it is not ok :-)
-    if (database().tables().isEmpty())
+    if (m_database.tables().isEmpty())
         return false;
     // check database metadata, throw an exception in case the version does not match:
     int version = 1;
-    QString versionString = getMetaData(CHARM_DATABASE_VERSION_DESCRIPTOR);
+    QString versionString = getMetaData(QLatin1String(DatabseSchemaVersionKey));
     if (!versionString.isEmpty()) {
         int value;
         bool ok;
@@ -59,36 +170,29 @@ bool SqlStorage::verifyDatabase()
             version = value;
     }
 
-    if (version == CHARM_DATABASE_VERSION)
+    if (version == DatabaseVersion)
         return true;
 
-    if (version > CHARM_DATABASE_VERSION)
+    if (version > DatabaseVersion)
         throw UnsupportedDatabaseVersionException(QObject::tr("Database version is too new."));
 
-    if (version == CHARM_DATABASE_VERSION_BEFORE_TRACKABLE) {
-        return migrateDB(QStringLiteral("ALTER TABLE Tasks ADD trackable INTEGER"),
-                         CHARM_DATABASE_VERSION_BEFORE_TRACKABLE);
-    } else if (version == CHARM_DATABASE_VERSION_BEFORE_COMMENT) {
-        return migrateDB(QStringLiteral("ALTER TABLE Tasks ADD comment varchar(256)"),
-                         CHARM_DATABASE_VERSION_BEFORE_COMMENT);
-    } else if (version == CHARM_DATABASE_VERSION_BEFORE_SUBSCRIPTION_REMOVAL) {
+    if (version == VersionBeforeSubscriptionRemoval) {
         return migrateDB(QStringLiteral("DROP TABLE Subscriptions"),
-                         CHARM_DATABASE_VERSION_BEFORE_SUBSCRIPTION_REMOVAL);
-    } else if (version == CHARM_DATABASE_VERSION_BEFORE_USER_REMOVAL) {
-        return migrateDB(QStringLiteral("DROP TABLE Users"),
-                         CHARM_DATABASE_VERSION_BEFORE_USER_REMOVAL);
-    } else if (version == CHARM_DATABASE_VERSION_BEFORE_INSTALLATIONS_REMOVAL) {
+                         VersionBeforeSubscriptionRemoval);
+    } else if (version == VersionBeforeUserRemoval) {
+        return migrateDB(QStringLiteral("DROP TABLE Users"), VersionBeforeUserRemoval);
+    } else if (version == VersionBeforeInstallationsRemoval) {
         return migrateDB(QStringLiteral("DROP TABLE Installations"),
-                         CHARM_DATABASE_VERSION_BEFORE_INSTALLATIONS_REMOVAL);
-    } else if (version == CHARM_DATABASE_VERSION_BEFORE_EVENT_CLEANUP) {
+                         VersionBeforeInstallationsRemoval);
+    } else if (version == VersionBeforeEventCleanup) {
         return migrateDB(QStringLiteral(
             "CREATE TEMPORARY TABLE `EventsB` ( `id` INTEGER PRIMARY KEY, `event_id` INTEGER, `task` INTEGER, `comment` varchar(256), `start` date, `end` date);"
             "INSERT INTO `EventsB` SELECT `id`, `event_id`, `task`, `comment`, `start`, `end` FROM `Events`;"
             "DROP TABLE `Events`;"
             "CREATE TABLE `Events` ( `id` INTEGER PRIMARY KEY, `event_id` INTEGER, `task` INTEGER, `comment` varchar(256), `start` date, `end` date);"
             "INSERT INTO `Events` SELECT `id`, `event_id`, `task`, `comment`, `start`, `end` FROM `EventsB`;"
-            "DROP TABLE `EventsB`"), CHARM_DATABASE_VERSION_BEFORE_EVENT_CLEANUP);
-    } else if (version == CHARM_DATABASE_VERSION_BEFORE_INSTALLATION_ID_ADDED_TO_DATABASE) {
+            "DROP TABLE `EventsB`"), VersionBeforeEventCleanup);
+    } else if (version == VersionBeforeInstallationIdAddedToDatabase) {
         QString installationId;
         QSettings settings;
         settings.beginGroup(CONFIGURATION.configurationName);
@@ -100,10 +204,10 @@ bool SqlStorage::verifyDatabase()
             CONFIGURATION.installationId = installationId.toInt();
         }
 
-        SqlRaiiTransactor transactor(database());
+        SqlRaiiTransactor transactor(m_database);
         setMetaData(MetaKey_Key_InstallationId, installationId, transactor);
-        setMetaData(CHARM_DATABASE_VERSION_DESCRIPTOR,
-            QString::number(CHARM_DATABASE_VERSION_BEFORE_INSTALLATION_ID_ADDED_TO_DATABASE + 1),
+        setMetaData(QLatin1String(DatabseSchemaVersionKey),
+            QString::number(VersionBeforeInstallationIdAddedToDatabase + 1),
             transactor);
         transactor.commit();
 
@@ -114,10 +218,56 @@ bool SqlStorage::verifyDatabase()
     return true;
 }
 
+bool SqlStorage::createDatabaseTables()
+{
+    Q_ASSERT_X(m_database.open(), Q_FUNC_INFO, "Connection to database must be established first");
+
+    // Database definition
+    QString tables[3] = {QLatin1String(R"(CREATE TABLE "Events" (
+            "id"                INTEGER,
+            "user_id"           INTEGER,
+            "event_id"          INTEGER,
+            "installation_id"   INTEGER,
+            "report_id"         INTEGER NULL,
+            "task"              INTEGER,
+            "comment"           varchar(256),
+            "start"             date,
+            "end"               date,
+            PRIMARY KEY("id")
+        );)"),
+                         QLatin1String(R"(CREATE TABLE "Tasks" (
+            "id"            INTEGER,
+            "task_id"       INTEGER UNIQUE,
+            "parent"        INTEGER,
+            "validfrom"     timestamp,
+            "validuntil"    timestamp,
+            "trackable"     INTEGER,
+            "comment"       varchar(256),
+            "name"          varchar(256),
+            PRIMARY KEY("id")
+        );)"),
+                         QLatin1String(R"(CREATE TABLE "MetaData" (
+            "id"    INTEGER,
+            "key"   VARCHAR(128) NOT NULL,
+            "value" VARCHAR(128),
+            PRIMARY KEY("id")
+        );)")};
+
+    bool error = false;
+    // create tables:
+    for (const auto &table : tables) {
+        QSqlQuery query(m_database);
+        query.prepare(table);
+        if (!runQuery(query))
+            error = true;
+    }
+    return !error;
+}
+
 TaskList SqlStorage::getAllTasks()
 {
     TaskList tasks;
-    QSqlQuery query(database());
+    QSqlQuery query(m_database);
     query.prepare(QStringLiteral("select * from Tasks;"));
 
     // FIXME merge record retrieval with getTask:
@@ -133,7 +283,7 @@ TaskList SqlStorage::getAllTasks()
 
 bool SqlStorage::setAllTasks(const TaskList &tasks)
 {
-    SqlRaiiTransactor transactor(database());
+    SqlRaiiTransactor transactor(m_database);
     const TaskList oldTasks = getAllTasks();
     // clear tasks
     deleteAllTasks(transactor);
@@ -147,7 +297,7 @@ bool SqlStorage::setAllTasks(const TaskList &tasks)
 
 bool SqlStorage::addTask(const Task &task)
 {
-    SqlRaiiTransactor t(database());
+    SqlRaiiTransactor t(m_database);
     if (addTask(task, t)) {
         t.commit();
         return true;
@@ -158,7 +308,7 @@ bool SqlStorage::addTask(const Task &task)
 
 bool SqlStorage::addTask(const Task &task, const SqlRaiiTransactor &)
 {
-    QSqlQuery query(database());
+    QSqlQuery query(m_database);
     query.prepare(QStringLiteral(
         "INSERT into Tasks (task_id, name, parent, validfrom, validuntil, trackable, comment) "
         "values ( :task_id, :name, :parent, :validfrom, :validuntil, :trackable, :comment);"));
@@ -174,7 +324,7 @@ bool SqlStorage::addTask(const Task &task, const SqlRaiiTransactor &)
 
 Task SqlStorage::getTask(int taskid)
 {
-    QSqlQuery query(database());
+    QSqlQuery query(m_database);
     query.prepare(QStringLiteral("SELECT * FROM Tasks WHERE task_id = :id;"));
     query.bindValue(QStringLiteral(":id"), taskid);
 
@@ -188,7 +338,7 @@ Task SqlStorage::getTask(int taskid)
 
 bool SqlStorage::deleteAllTasks()
 {
-    SqlRaiiTransactor t(database());
+    SqlRaiiTransactor t(m_database);
     if (deleteAllTasks(t)) {
         t.commit();
         return true;
@@ -199,7 +349,7 @@ bool SqlStorage::deleteAllTasks()
 
 bool SqlStorage::deleteAllTasks(const SqlRaiiTransactor &)
 {
-    QSqlQuery query(database());
+    QSqlQuery query(m_database);
     query.prepare(QStringLiteral("DELETE from Tasks;"));
     return runQuery(query);
 }
@@ -230,7 +380,7 @@ Event SqlStorage::makeEventFromRecord(const QSqlRecord &record)
 EventList SqlStorage::getAllEvents()
 {
     EventList events;
-    QSqlQuery query(database());
+    QSqlQuery query(m_database);
     query.prepare(QStringLiteral("SELECT * from Events;"));
     if (runQuery(query)) {
         while (query.next())
@@ -241,7 +391,7 @@ EventList SqlStorage::getAllEvents()
 
 Event SqlStorage::makeEvent()
 {
-    SqlRaiiTransactor transactor(database());
+    SqlRaiiTransactor transactor(m_database);
     Event event = makeEvent(transactor);
     if (event.isValid())
         transactor.commit();
@@ -254,15 +404,15 @@ Event SqlStorage::makeEvent(const SqlRaiiTransactor &)
     Event event;
 
     { // insert a new record in the database
-        QSqlQuery query(database());
+        QSqlQuery query(m_database);
         query.prepare(QStringLiteral("INSERT INTO Events DEFAULT VALUES;"));
         result = runQuery(query);
         Q_ASSERT(result); // this has to suceed
     }
     if (result) { // retrieve the AUTOINCREMENT id value of it
-        const QString statement = QString::fromLocal8Bit("SELECT id from Events WHERE id = %1();")
-                                      .arg(lastInsertRowFunction());
-        QSqlQuery query(database());
+        const QString statement =
+            QString::fromLocal8Bit("SELECT id from Events WHERE id = last_insert_rowid();");
+        QSqlQuery query(m_database);
         query.prepare(statement);
         result = runQuery(query);
         if (result && query.next()) {
@@ -276,7 +426,7 @@ Event SqlStorage::makeEvent(const SqlRaiiTransactor &)
     if (result) {
         // modify the created record to make sure event_id is unique
         // within the installation:
-        QSqlQuery query(database());
+        QSqlQuery query(m_database);
         query.prepare(QStringLiteral(
             "UPDATE Events SET event_id = :event_id WHERE id = :id;"));
         query.bindValue(QStringLiteral(":event_id"), event.id());
@@ -295,7 +445,7 @@ Event SqlStorage::makeEvent(const SqlRaiiTransactor &)
 
 Event SqlStorage::getEvent(int id)
 {
-    QSqlQuery query(database());
+    QSqlQuery query(m_database);
     query.prepare(QStringLiteral("SELECT * FROM Events WHERE event_id = :id;"));
     query.bindValue(QStringLiteral(":id"), id);
 
@@ -312,7 +462,7 @@ Event SqlStorage::getEvent(int id)
 
 bool SqlStorage::modifyEvent(const Event &event)
 {
-    SqlRaiiTransactor transactor(database());
+    SqlRaiiTransactor transactor(m_database);
     if (modifyEvent(event, transactor)) {
         transactor.commit();
         return true;
@@ -323,7 +473,7 @@ bool SqlStorage::modifyEvent(const Event &event)
 
 bool SqlStorage::modifyEvent(const Event &event, const SqlRaiiTransactor &)
 {
-    QSqlQuery query(database());
+    QSqlQuery query(m_database);
     query.prepare(QStringLiteral("UPDATE Events set task = :task, comment = :comment, "
                                 "start = :start, end = :end "
                                 "where event_id = :id;"));
@@ -338,7 +488,7 @@ bool SqlStorage::modifyEvent(const Event &event, const SqlRaiiTransactor &)
 
 bool SqlStorage::deleteEvent(const Event &event)
 {
-    QSqlQuery query(database());
+    QSqlQuery query(m_database);
     query.prepare(QStringLiteral("DELETE from Events where event_id = :id;"));
     query.bindValue(QStringLiteral(":id"), event.id());
 
@@ -347,7 +497,7 @@ bool SqlStorage::deleteEvent(const Event &event)
 
 bool SqlStorage::deleteAllEvents()
 {
-    SqlRaiiTransactor transactor(database());
+    SqlRaiiTransactor transactor(m_database);
     if (deleteAllEvents(transactor)) {
         transactor.commit();
         return true;
@@ -358,30 +508,21 @@ bool SqlStorage::deleteAllEvents()
 
 bool SqlStorage::deleteAllEvents(const SqlRaiiTransactor &)
 {
-    QSqlQuery query(database());
+    QSqlQuery query(m_database);
     query.prepare(QStringLiteral("DELETE from Events;"));
     return runQuery(query);
 }
 
-bool SqlStorage::runQuery(QSqlQuery &query)
+bool SqlStorage::createDatabase()
 {
-#if 0
-    const auto MARKER = "============================================================";
-    qCDebug(CHARM_CORE_LOG) << MARKER << endl << "SqlStorage::runQuery: executing query:"
-             << endl << query.executedQuery();
-    bool result = query.exec();
-    if (result) {
-        qCDebug(CHARM_CORE_LOG) << "SqlStorage::runQuery: SUCCESS" << endl << MARKER;
-    } else {
-        qCDebug(CHARM_CORE_LOG) << "SqlStorage::runQuery: FAILURE" << endl
-                 << "Database says: " << query.lastError().databaseText() << endl
-                 << "Driver says:   " << query.lastError().driverText() << endl
-                 << MARKER;
-    }
-    return result;
-#else
-    return query.exec();
-#endif
+    bool success = createDatabaseTables();
+    if (!success)
+        return false;
+
+    success &=
+        setMetaData(QLatin1String(DatabseSchemaVersionKey), QString().setNum(DatabaseVersion));
+
+    return success;
 }
 
 bool SqlStorage::migrateDB(const QString &queryString, int oldVersion)
@@ -391,11 +532,12 @@ bool SqlStorage::migrateDB(const QString &queryString, int oldVersion)
         QFile::copy(info.fileName(),
                     info.fileName().append(QStringLiteral("-backup-version-%1").arg(oldVersion)));
     }
-    SqlRaiiTransactor transactor(database());
-    QSqlQuery query(database());
+
+    SqlRaiiTransactor transactor(m_database);
+    QSqlQuery query(m_database);
 
     const QStringList queryStrings = queryString.split(QStringLiteral(";"));
-    for (const QString singleQuery : queryStrings) {
+    for (const QString &singleQuery : queryStrings) {
         query.prepare(singleQuery);
         if (!runQuery(query)) {
             throw UnsupportedDatabaseVersionException(
@@ -405,14 +547,15 @@ bool SqlStorage::migrateDB(const QString &queryString, int oldVersion)
         }
     }
 
-    setMetaData(CHARM_DATABASE_VERSION_DESCRIPTOR, QString::number(oldVersion + 1), transactor);
+    setMetaData(QLatin1String(DatabseSchemaVersionKey), QString::number(oldVersion + 1),
+                transactor);
     transactor.commit();
     return verifyDatabase();
 }
 
 bool SqlStorage::setMetaData(const QString &key, const QString &value)
 {
-    SqlRaiiTransactor transactor(database());
+    SqlRaiiTransactor transactor(m_database);
     if (!setMetaData(key, value, transactor)) {
         return false;
     } else {
@@ -425,7 +568,7 @@ bool SqlStorage::setMetaData(const QString &key, const QString &value, const Sql
     // find out if the key is in the database:
     bool result;
     {
-        QSqlQuery query(database());
+        QSqlQuery query(m_database);
         query.prepare(QStringLiteral("SELECT * FROM MetaData WHERE MetaData.key = :key;"));
         query.bindValue(QStringLiteral(":key"), key);
         if (runQuery(query) && query.next()) {
@@ -436,7 +579,7 @@ bool SqlStorage::setMetaData(const QString &key, const QString &value, const Sql
     }
 
     if (result) { // key exists, let's update:
-        QSqlQuery query(database());
+        QSqlQuery query(m_database);
         query.prepare(QStringLiteral("UPDATE MetaData SET value = :value WHERE key = :key;"));
         query.bindValue(QStringLiteral(":value"), value);
         query.bindValue(QStringLiteral(":key"), key);
@@ -444,7 +587,7 @@ bool SqlStorage::setMetaData(const QString &key, const QString &value, const Sql
         return runQuery(query);
     } else {
         // key does not exist, let's insert:
-        QSqlQuery query(database());
+        QSqlQuery query(m_database);
         query.prepare(QStringLiteral("INSERT INTO MetaData VALUES ( NULL, :key, :value );"));
         query.bindValue(QStringLiteral(":key"), key);
         query.bindValue(QStringLiteral(":value"), value);
@@ -457,7 +600,7 @@ bool SqlStorage::setMetaData(const QString &key, const QString &value, const Sql
 
 QString SqlStorage::getMetaData(const QString &key)
 {
-    QSqlQuery query(database());
+    QSqlQuery query(m_database);
     query.prepare(QStringLiteral("SELECT * FROM MetaData WHERE key = :key;"));
     query.bindValue(QStringLiteral(":key"), key);
 
@@ -502,7 +645,7 @@ Task SqlStorage::makeTaskFromRecord(const QSqlRecord &record)
 
 QString SqlStorage::setAllTasksAndEvents(const TaskList &tasks, const EventList &events)
 {
-    SqlRaiiTransactor transactor(database());
+    SqlRaiiTransactor transactor(m_database);
 
     // clear subscriptions, tasks and events:
     if (!deleteAllEvents(transactor))

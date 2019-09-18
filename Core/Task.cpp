@@ -116,7 +116,7 @@ QDomElement Task::toXml(QDomDocument document) const
     return element;
 }
 
-Task Task::fromXml(const QDomElement &element, int databaseSchemaVersion)
+Task Task::fromXml(const QDomElement &element)
 { // in case any task object creates trouble with
     // serialization/deserialization, add an object of it to
     // void XmlSerializationTests::testTaskSerialization()
@@ -134,25 +134,21 @@ Task Task::fromXml(const QDomElement &element, int databaseSchemaVersion)
     if (!ok)
         throw XmlSerializationException(QObject::tr("Task::fromXml: invalid parent task id"));
 
-    if (databaseSchemaVersion > CHARM_DATABASE_VERSION_BEFORE_TASK_EXPIRY) {
-        if (element.hasAttribute(TaskValidFrom)) {
-            QDateTime start = QDateTime::fromString(element.attribute(TaskValidFrom), Qt::ISODate);
-            if (!start.isValid())
-                throw XmlSerializationException(
-                    QObject::tr("Task::fromXml: invalid valid-from date"));
+    if (element.hasAttribute(TaskValidFrom)) {
+        QDateTime start = QDateTime::fromString(element.attribute(TaskValidFrom), Qt::ISODate);
+        if (!start.isValid())
+            throw XmlSerializationException(QObject::tr("Task::fromXml: invalid valid-from date"));
 
-            task.validFrom = start;
-        }
-        if (element.hasAttribute(TaskValidUntil)) {
-            QDateTime end = QDateTime::fromString(element.attribute(TaskValidUntil), Qt::ISODate);
-            if (!end.isValid())
-                throw XmlSerializationException(
-                    QObject::tr("Task::fromXml: invalid valid-until date"));
-
-            task.validUntil = end;
-        }
+        task.validFrom = start;
     }
-    if (databaseSchemaVersion > CHARM_DATABASE_VERSION_BEFORE_TRACKABLE) {
+    if (element.hasAttribute(TaskValidUntil)) {
+        QDateTime end = QDateTime::fromString(element.attribute(TaskValidUntil), Qt::ISODate);
+        if (!end.isValid())
+            throw XmlSerializationException(QObject::tr("Task::fromXml: invalid valid-until date"));
+
+        task.validUntil = end;
+    }
+    if (element.hasAttribute(TaskTrackable)) {
         task.trackable = (element.attribute(TaskTrackable, QStringLiteral("1")).toInt(&ok) == 1);
         if (!ok)
             throw XmlSerializationException(
@@ -163,7 +159,7 @@ Task Task::fromXml(const QDomElement &element, int databaseSchemaVersion)
     return task;
 }
 
-TaskList Task::readTasksElement(const QDomElement &element, int databaseSchemaVersion)
+TaskList Task::readTasksElement(const QDomElement &element)
 {
     if (element.tagName() == taskListTagName()) {
         TaskList tasks;
@@ -173,7 +169,7 @@ TaskList Task::readTasksElement(const QDomElement &element, int databaseSchemaVe
                 throw XmlSerializationException(
                     QObject::tr("Task::readTasksElement: parent-child mismatch"));
 
-            Task task = fromXml(child, databaseSchemaVersion);
+            Task task = fromXml(child);
             tasks << task;
         }
         return tasks;

@@ -5,7 +5,6 @@ SET(
     Controller.cpp
     Dates.cpp
     SqlRaiiTransactor.cpp
-    SqLiteStorage.cpp
     Configuration.cpp
     SqlStorage.cpp
     Event.cpp

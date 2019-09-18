@@ -30,7 +30,6 @@
 #include "CharmExceptions.h"
 #include "Configuration.h"
 #include "Event.h"
-#include "SqLiteStorage.h"
 #include "SqlRaiiTransactor.h"
 #include "SqlStorage.h"
 #include "Task.h"
@@ -209,19 +208,10 @@ void Controller::provideMetaData(Configuration &configuration)
     CONFIGURATION.dump();
 }
 
-bool Controller::initializeBackEnd(const QString &name)
+void Controller::initializeBackEnd()
 {
-    // make storage interface according to configuration
-    // this is our local storage backend factory and may have to be
-    // factored out into a factory method (now that is some serious
-    // refucktoring):
-    if (name == CHARM_SQLITE_BACKEND_DESCRIPTOR) {
-        m_storage = new SqLiteStorage;
-        return true;
-    } else {
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Unknown local storage backend type");
-        return false;
-    }
+    Q_ASSERT_X(!m_storage, Q_FUNC_INFO, "Backend already initialized");
+    m_storage = new SqlStorage;
 }
 
 bool Controller::connectToBackend()

@@ -94,7 +94,7 @@ void XmlSerializationTests::testTaskSerialization()
     for (const Task &task : tasksToTest()) {
         QDomElement element = task.toXml(document);
         try {
-            Task readTask = Task::fromXml(element, CHARM_DATABASE_VERSION);
+            Task readTask = Task::fromXml(element);
             QVERIFY(task == readTask);
         } catch (const CharmException &e) {
             qDebug() << "XmlSerializationTests::testTaskSerialization: exception caught ("
@@ -157,7 +157,7 @@ void XmlSerializationTests::testTaskListSerialization()
     QDomDocument document(QStringLiteral("testdocument"));
     QDomElement element = Task::makeTasksElement(document, tasks);
     try {
-        TaskList result = Task::readTasksElement(element, CHARM_DATABASE_VERSION);
+        TaskList result = Task::readTasksElement(element);
         QVERIFY(tasks.count() == result.count());
         QVERIFY(tasks == result);
     } catch (const XmlSerializationException &e) {

@@ -55,7 +55,7 @@ public:
     void provideMetaData(Configuration &);
 
     /** Create the backend. */
-    bool initializeBackEnd(const QString &name);
+    void initializeBackEnd();
 
     /** Connect to the backend (make it available). */
     bool connectToBackend();

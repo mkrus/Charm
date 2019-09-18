@@ -52,7 +52,6 @@ void ControllerTests::initTestCase()
     }
 
     m_configuration.installationId = 1;
-    m_configuration.localStorageType = CHARM_SQLITE_BACKEND_DESCRIPTOR;
     m_configuration.localStorageDatabase = m_localPath;
     m_configuration.newDatabase = true;
     auto controller = new Controller;
@@ -64,7 +63,7 @@ void ControllerTests::initTestCase()
 
 void ControllerTests::initializeConnectBackendTest()
 {
-    QVERIFY(m_controller->initializeBackEnd(CHARM_SQLITE_BACKEND_DESCRIPTOR));
+    m_controller->initializeBackEnd();
     QVERIFY(m_controller->connectToBackend());
 }
 

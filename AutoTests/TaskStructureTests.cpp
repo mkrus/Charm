@@ -47,7 +47,7 @@ void TaskStructureTests::checkForUniqueTaskIdsTest_data()
         bool expectedResult = TestHelpers::attribute(QStringLiteral("expectedResult"), testcase);
         QDomElement element = testcase.firstChildElement(Task::taskListTagName());
         QVERIFY(!element.isNull());
-        TaskList tasks = Task::readTasksElement(element, CHARM_DATABASE_VERSION);
+        TaskList tasks = Task::readTasksElement(element);
         QTest::newRow(name.toLocal8Bit().constData()) << tasks << expectedResult;
         QVERIFY(element.nextSiblingElement(Task::taskListTagName()).isNull());
         qDebug() << "Added test case" << name;
@@ -73,7 +73,7 @@ void TaskStructureTests::checkForTreenessTest_data()
         bool expectedResult = TestHelpers::attribute(QStringLiteral("expectedResult"), testcase);
         QDomElement element = testcase.firstChildElement(Task::taskListTagName());
         QVERIFY(!element.isNull());
-        TaskList tasks = Task::readTasksElement(element, CHARM_DATABASE_VERSION);
+        TaskList tasks = Task::readTasksElement(element);
         QTest::newRow(name.toLocal8Bit().constData()) << tasks << expectedResult;
         QVERIFY(element.nextSiblingElement(Task::taskListTagName()).isNull());
         qDebug() << "Added test case" << name;

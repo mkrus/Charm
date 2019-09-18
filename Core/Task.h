@@ -67,9 +67,9 @@ struct Task
 
     QDomElement toXml(QDomDocument) const;
 
-    static Task fromXml(const QDomElement &, int databaseSchemaVersion = 1);
+    static Task fromXml(const QDomElement &);
 
-    static TaskList readTasksElement(const QDomElement &, int databaseSchemaVersion = 1);
+    static TaskList readTasksElement(const QDomElement &);
 
     static QDomElement makeTasksElement(QDomDocument, const TaskList &);
 

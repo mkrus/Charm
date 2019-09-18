@@ -83,12 +83,11 @@ void TestApplication::initialize()
     // -----
     // ... make the controller:
     m_configuration->installationId = InstallationId;
-    m_configuration->localStorageType = CHARM_SQLITE_BACKEND_DESCRIPTOR;
     m_configuration->localStorageDatabase = m_localPath;
     m_configuration->newDatabase = true;
     m_controller = new Controller;
     // ... initialize the backend:
-    QVERIFY(m_controller->initializeBackEnd(CHARM_SQLITE_BACKEND_DESCRIPTOR));
+    m_controller->initializeBackEnd();
     QVERIFY(m_controller->connectToBackend());
     // ... make the data model:
     m_model = new CharmDataModel;

@@ -70,14 +70,12 @@ bool Configuration::operator==(const Configuration &other) const
         && requestEventComment == other.requestEventComment
         && toolButtonStyle == other.toolButtonStyle && showStatusBar == other.showStatusBar
         && configurationName == other.configurationName && installationId == other.installationId
-        && localStorageType == other.localStorageType
         && localStorageDatabase == other.localStorageDatabase
         && numberOfTaskSelectorEntries == other.numberOfTaskSelectorEntries;
 }
 
 void Configuration::writeTo(QSettings &settings)
 {
-    settings.setValue(MetaKey_Key_LocalStorageType, localStorageType);
     settings.setValue(MetaKey_Key_LocalStorageDatabase, localStorageDatabase);
     dump(QStringLiteral("(Configuration::writeTo stored configuration)"));
 }
@@ -85,11 +83,6 @@ void Configuration::writeTo(QSettings &settings)
 bool Configuration::readFrom(QSettings &settings)
 {
     bool complete = true;
-    if (settings.contains(MetaKey_Key_LocalStorageType)) {
-        localStorageType = settings.value(MetaKey_Key_LocalStorageType).toString();
-    } else {
-        complete = false;
-    }
     if (settings.contains(MetaKey_Key_LocalStorageDatabase)) {
         localStorageDatabase = settings.value(MetaKey_Key_LocalStorageDatabase).toString();
     } else {
@@ -108,7 +101,6 @@ void Configuration::dump(const QString &why)
     return; // disable debug output
     qDebug() << "Configuration: configuration:" << (why.isEmpty() ? QString() : why) << endl
              << "--> installation id:          " << installationId << endl
-             << "--> local storage type:       " << localStorageType << endl
              << "--> local storage database:   " << localStorageDatabase << endl
              << "--> task prefiltering mode:   " << taskPrefilteringMode << endl
              << "--> Idle Detection:           " << detectIdling << endl

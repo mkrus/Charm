@@ -158,7 +158,7 @@ void TaskExport::readFrom(QIODevice *device)
     m_exportTime = XmlSerialization::creationTime(metadata);
     // from report, read tasks:
     QDomElement tasksElement = report.firstChildElement(Task::taskListTagName());
-    m_tasks = Task::readTasksElement(tasksElement, CHARM_DATABASE_VERSION);
+    m_tasks = Task::readTasksElement(tasksElement);
 }
 
 TaskList TaskExport::tasks() const

@@ -26,7 +26,7 @@
 #include "CharmCMake.h"
 #include "Core/CharmConstants.h"
 #include "Core/CharmExceptions.h"
-#include "Core/SqLiteStorage.h"
+#include "Core/SqlStorage.h"
 #include "Data.h"
 #include "ViewHelpers.h"
 #include "charm_application_debug.h"
@@ -517,8 +517,7 @@ void ApplicationCore::showInformation(const QString &title, const QString &messa
 void ApplicationCore::enterConnectingState()
 {
     try {
-        if (!m_controller.initializeBackEnd(CHARM_SQLITE_BACKEND_DESCRIPTOR))
-            QCoreApplication::quit();
+        m_controller.initializeBackEnd();
     } catch (const CharmException &e) {
         showCritical(tr("Database Backend Error"),
                      tr("The backend could not be initialized: %1").arg(e.what()));

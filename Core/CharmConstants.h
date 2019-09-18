@@ -31,23 +31,6 @@
 #include "CharmDataModel.h"
 #include "Configuration.h"
 
-// increment when SQL DB format changes:
-#define CHARM_DATABASE_VERSION_DESCRIPTOR QStringLiteral("CharmDatabaseSchemaVersion")
-#define CHARM_DATABASE_VERSION_BEFORE_TASK_EXPIRY 2
-#define CHARM_DATABASE_VERSION_BEFORE_TRACKABLE 3
-#define CHARM_DATABASE_VERSION_BEFORE_COMMENT 4
-#define CHARM_DATABASE_VERSION_BEFORE_SUBSCRIPTION_REMOVAL 5
-#define CHARM_DATABASE_VERSION_BEFORE_USER_REMOVAL 6
-#define CHARM_DATABASE_VERSION_BEFORE_INSTALLATIONS_REMOVAL 7
-#define CHARM_DATABASE_VERSION_BEFORE_EVENT_CLEANUP 8
-#define CHARM_DATABASE_VERSION_BEFORE_INSTALLATION_ID_ADDED_TO_DATABASE 9
-#define CHARM_DATABASE_VERSION 10
-#define REQUIRED_CHARM_DATABASE_VERSION CHARM_DATABASE_VERSION
-// FIXME this may have to go into some plugin configuration later:
-// FIXME also, we may need some verbose descriptors for configuration
-#define CHARM_SQLITE_BACKEND_DESCRIPTOR QStringLiteral("sqlite")
-#define CHARM_MYSQL_BACKEND_DESCRIPTOR QStringLiteral("mysql")
-
 namespace Constants {
 const int RootTaskId = 1;
 }

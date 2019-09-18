@@ -48,7 +48,6 @@ Configuration ConfigurationDialog::configuration() const
 void ConfigurationDialog::accept()
 {
     m_config.installationId = m_config.createInstallationId();
-    m_config.localStorageType = CHARM_SQLITE_BACKEND_DESCRIPTOR;
     m_config.localStorageDatabase = m_ui.databaseLocation->text();
     m_config.newDatabase = true;
     // m_config.failure = false; currently set by application
