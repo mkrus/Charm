@@ -79,6 +79,93 @@ static bool runQuery(QSqlQuery &query)
 #endif
 }
 
+static Event makeEventFromRecord(const QSqlRecord &record)
+{
+    Event event;
+
+    int idField = record.indexOf(QStringLiteral("event_id"));
+    int taskField = record.indexOf(QStringLiteral("task"));
+    int commentField = record.indexOf(QStringLiteral("comment"));
+    int startField = record.indexOf(QStringLiteral("start"));
+    int endField = record.indexOf(QStringLiteral("end"));
+
+    event.setId(record.field(idField).value().toInt());
+    event.setTaskId(record.field(taskField).value().toInt());
+    event.setComment(record.field(commentField).value().toString());
+    if (!record.field(startField).isNull()) {
+        event.setStartDateTime(record.field(startField).value().toDateTime());
+    }
+    if (!record.field(endField).isNull()) {
+        event.setEndDateTime(record.field(endField).value().toDateTime());
+    }
+
+    return event;
+}
+
+static Task makeTaskFromRecord(const QSqlRecord &record)
+{
+    Task task;
+    int idField = record.indexOf(QStringLiteral("task_id"));
+    int nameField = record.indexOf(QStringLiteral("name"));
+    int parentField = record.indexOf(QStringLiteral("parent"));
+    int validfromField = record.indexOf(QStringLiteral("validfrom"));
+    int validuntilField = record.indexOf(QStringLiteral("validuntil"));
+    int trackableField = record.indexOf(QStringLiteral("trackable"));
+    int commentField = record.indexOf(QStringLiteral("comment"));
+
+    task.id = record.field(idField).value().toInt();
+    task.name = record.field(nameField).value().toString();
+    task.parentId = record.field(parentField).value().toInt();
+    QString from = record.field(validfromField).value().toString();
+    if (!from.isEmpty()) {
+        task.validFrom = record.field(validfromField).value().toDateTime();
+    }
+    QString until = record.field(validuntilField).value().toString();
+    if (!until.isEmpty()) {
+        task.validUntil = record.field(validuntilField).value().toDateTime();
+    }
+    const QVariant trackableValue = record.field(trackableField).value();
+    if (!trackableValue.isNull() && trackableValue.isValid())
+        task.trackable = trackableValue.toInt() == 1;
+    const QVariant commentValue = record.field(commentField).value();
+    if (!commentValue.isNull() && commentValue.isValid())
+        task.comment = commentValue.toString();
+    return task;
+}
+
+static bool doSetMetaData(const QString &key, const QString &value, QSqlDatabase &database)
+{
+    // find out if the key is in the database:
+    bool result;
+    {
+        QSqlQuery query(database);
+        query.prepare(QStringLiteral("SELECT * FROM MetaData WHERE MetaData.key = :key;"));
+        query.bindValue(QStringLiteral(":key"), key);
+        if (runQuery(query) && query.next()) {
+            result = true;
+        } else {
+            result = false;
+        }
+    }
+
+    if (result) { // key exists, let's update:
+        QSqlQuery query(database);
+        query.prepare(QStringLiteral("UPDATE MetaData SET value = :value WHERE key = :key;"));
+        query.bindValue(QStringLiteral(":value"), value);
+        query.bindValue(QStringLiteral(":key"), key);
+
+        return runQuery(query);
+    } else {
+        // key does not exist, let's insert:
+        QSqlQuery query(database);
+        query.prepare(QStringLiteral("INSERT INTO MetaData VALUES ( NULL, :key, :value );"));
+        query.bindValue(QStringLiteral(":key"), key);
+        query.bindValue(QStringLiteral(":value"), value);
+
+        return runQuery(query);
+    }
+}
+
 SqlStorage::SqlStorage()
     : m_database(QSqlDatabase::addDatabase(QStringLiteral("QSQLITE"), QLatin1String(DatabaseName)))
 {
@@ -205,17 +292,15 @@ bool SqlStorage::verifyDatabase()
         }
 
         SqlRaiiTransactor transactor(m_database);
-        setMetaData(MetaKey_Key_InstallationId, installationId, transactor);
-        setMetaData(QLatin1String(DatabseSchemaVersionKey),
-            QString::number(VersionBeforeInstallationIdAddedToDatabase + 1),
-            transactor);
+        doSetMetaData(MetaKey_Key_InstallationId, installationId, m_database);
+        doSetMetaData(QLatin1String(DatabseSchemaVersionKey),
+                      QString::number(VersionBeforeInstallationIdAddedToDatabase + 1), m_database);
         transactor.commit();
 
         return verifyDatabase();
     }
 
     throw UnsupportedDatabaseVersionException(QObject::tr("Database version is not supported."));
-    return true;
 }
 
 bool SqlStorage::createDatabaseTables()
@@ -281,34 +366,27 @@ TaskList SqlStorage::getAllTasks()
     return tasks;
 }
 
-bool SqlStorage::setAllTasks(const TaskList &tasks)
+static bool doDeleteAllTasks(QSqlDatabase &database)
 {
-    SqlRaiiTransactor transactor(m_database);
-    const TaskList oldTasks = getAllTasks();
-    // clear tasks
-    deleteAllTasks(transactor);
-    // add tasks
-    for (const Task &task : tasks) {
-        addTask(task, transactor);
-    }
-    transactor.commit();
-    return true;
+    QSqlQuery query(database);
+    query.prepare(QStringLiteral("DELETE from Tasks;"));
+    return runQuery(query);
 }
 
-bool SqlStorage::addTask(const Task &task)
+bool SqlStorage::deleteAllTasks()
 {
-    SqlRaiiTransactor t(m_database);
-    if (addTask(task, t)) {
-        t.commit();
+    SqlRaiiTransactor transactor(m_database);
+    if (doDeleteAllTasks(m_database)) {
+        transactor.commit();
         return true;
     } else {
         return false;
     }
 }
 
-bool SqlStorage::addTask(const Task &task, const SqlRaiiTransactor &)
+static bool doAddTask(const Task &task, QSqlDatabase &database)
 {
-    QSqlQuery query(m_database);
+    QSqlQuery query(database);
     query.prepare(QStringLiteral(
         "INSERT into Tasks (task_id, name, parent, validfrom, validuntil, trackable, comment) "
         "values ( :task_id, :name, :parent, :validfrom, :validuntil, :trackable, :comment);"));
@@ -322,9 +400,35 @@ bool SqlStorage::addTask(const Task &task, const SqlRaiiTransactor &)
     return runQuery(query);
 }
 
+bool SqlStorage::setAllTasks(const TaskList &tasks)
+{
+    SqlRaiiTransactor transactor(m_database);
+    const TaskList oldTasks = getAllTasks();
+    // clear tasks
+    doDeleteAllTasks(m_database);
+    // add tasks
+    for (const Task &task : tasks) {
+        doAddTask(task, m_database);
+    }
+    transactor.commit();
+    return true;
+}
+
+bool SqlStorage::addTask(const Task &task)
+{
+    SqlRaiiTransactor transactor(m_database);
+    if (doAddTask(task, m_database)) {
+        transactor.commit();
+        return true;
+    } else {
+        return false;
+    }
+}
+
 Task SqlStorage::getTask(int taskid)
 {
     QSqlQuery query(m_database);
+
     query.prepare(QStringLiteral("SELECT * FROM Tasks WHERE task_id = :id;"));
     query.bindValue(QStringLiteral(":id"), taskid);
 
@@ -334,47 +438,6 @@ Task SqlStorage::getTask(int taskid)
     } else {
         return Task();
     }
-}
-
-bool SqlStorage::deleteAllTasks()
-{
-    SqlRaiiTransactor t(m_database);
-    if (deleteAllTasks(t)) {
-        t.commit();
-        return true;
-    } else {
-        return false;
-    }
-}
-
-bool SqlStorage::deleteAllTasks(const SqlRaiiTransactor &)
-{
-    QSqlQuery query(m_database);
-    query.prepare(QStringLiteral("DELETE from Tasks;"));
-    return runQuery(query);
-}
-
-Event SqlStorage::makeEventFromRecord(const QSqlRecord &record)
-{
-    Event event;
-
-    int idField = record.indexOf(QStringLiteral("event_id"));
-    int taskField = record.indexOf(QStringLiteral("task"));
-    int commentField = record.indexOf(QStringLiteral("comment"));
-    int startField = record.indexOf(QStringLiteral("start"));
-    int endField = record.indexOf(QStringLiteral("end"));
-
-    event.setId(record.field(idField).value().toInt());
-    event.setTaskId(record.field(taskField).value().toInt());
-    event.setComment(record.field(commentField).value().toString());
-    if (!record.field(startField).isNull()) {
-        event.setStartDateTime(record.field(startField).value().toDateTime());
-    }
-    if (!record.field(endField).isNull()) {
-        event.setEndDateTime(record.field(endField).value().toDateTime());
-    }
-
-    return event;
 }
 
 EventList SqlStorage::getAllEvents()
@@ -389,22 +452,13 @@ EventList SqlStorage::getAllEvents()
     return events;
 }
 
-Event SqlStorage::makeEvent()
-{
-    SqlRaiiTransactor transactor(m_database);
-    Event event = makeEvent(transactor);
-    if (event.isValid())
-        transactor.commit();
-    return event;
-}
-
-Event SqlStorage::makeEvent(const SqlRaiiTransactor &)
+static Event doMakeEvent(const QSqlDatabase &database)
 {
     bool result;
     Event event;
 
     { // insert a new record in the database
-        QSqlQuery query(m_database);
+        QSqlQuery query(database);
         query.prepare(QStringLiteral("INSERT INTO Events DEFAULT VALUES;"));
         result = runQuery(query);
         Q_ASSERT(result); // this has to suceed
@@ -412,7 +466,7 @@ Event SqlStorage::makeEvent(const SqlRaiiTransactor &)
     if (result) { // retrieve the AUTOINCREMENT id value of it
         const QString statement =
             QString::fromLocal8Bit("SELECT id from Events WHERE id = last_insert_rowid();");
-        QSqlQuery query(m_database);
+        QSqlQuery query(database);
         query.prepare(statement);
         result = runQuery(query);
         if (result && query.next()) {
@@ -426,7 +480,7 @@ Event SqlStorage::makeEvent(const SqlRaiiTransactor &)
     if (result) {
         // modify the created record to make sure event_id is unique
         // within the installation:
-        QSqlQuery query(m_database);
+        QSqlQuery query(database);
         query.prepare(QStringLiteral(
             "UPDATE Events SET event_id = :event_id WHERE id = :id;"));
         query.bindValue(QStringLiteral(":event_id"), event.id());
@@ -441,6 +495,14 @@ Event SqlStorage::makeEvent(const SqlRaiiTransactor &)
     } else {
         return Event();
     }
+}
+Event SqlStorage::makeEvent()
+{
+    SqlRaiiTransactor transactor(m_database);
+    Event event = doMakeEvent(m_database);
+    if (event.isValid())
+        transactor.commit();
+    return event;
 }
 
 Event SqlStorage::getEvent(int id)
@@ -460,20 +522,9 @@ Event SqlStorage::getEvent(int id)
     }
 }
 
-bool SqlStorage::modifyEvent(const Event &event)
+static bool doModifyEvent(const Event &event, QSqlDatabase &database)
 {
-    SqlRaiiTransactor transactor(m_database);
-    if (modifyEvent(event, transactor)) {
-        transactor.commit();
-        return true;
-    } else {
-        return false;
-    }
-}
-
-bool SqlStorage::modifyEvent(const Event &event, const SqlRaiiTransactor &)
-{
-    QSqlQuery query(m_database);
+    QSqlQuery query(database);
     query.prepare(QStringLiteral("UPDATE Events set task = :task, comment = :comment, "
                                 "start = :start, end = :end "
                                 "where event_id = :id;"));
@@ -486,6 +537,17 @@ bool SqlStorage::modifyEvent(const Event &event, const SqlRaiiTransactor &)
     return runQuery(query);
 }
 
+bool SqlStorage::modifyEvent(const Event &event)
+{
+    SqlRaiiTransactor transactor(m_database);
+    if (doModifyEvent(event, m_database)) {
+        transactor.commit();
+        return true;
+    } else {
+        return false;
+    }
+}
+
 bool SqlStorage::deleteEvent(const Event &event)
 {
     QSqlQuery query(m_database);
@@ -495,22 +557,22 @@ bool SqlStorage::deleteEvent(const Event &event)
     return runQuery(query);
 }
 
+static bool doDeleteAllEvents(QSqlDatabase &database)
+{
+    QSqlQuery query(database);
+    query.prepare(QStringLiteral("DELETE from Events;"));
+    return runQuery(query);
+}
+
 bool SqlStorage::deleteAllEvents()
 {
     SqlRaiiTransactor transactor(m_database);
-    if (deleteAllEvents(transactor)) {
+    if (doDeleteAllEvents(m_database)) {
         transactor.commit();
         return true;
     } else {
         return false;
     }
-}
-
-bool SqlStorage::deleteAllEvents(const SqlRaiiTransactor &)
-{
-    QSqlQuery query(m_database);
-    query.prepare(QStringLiteral("DELETE from Events;"));
-    return runQuery(query);
 }
 
 bool SqlStorage::createDatabase()
@@ -547,8 +609,8 @@ bool SqlStorage::migrateDB(const QString &queryString, int oldVersion)
         }
     }
 
-    setMetaData(QLatin1String(DatabseSchemaVersionKey), QString::number(oldVersion + 1),
-                transactor);
+    doSetMetaData(QLatin1String(DatabseSchemaVersionKey), QString::number(oldVersion + 1),
+                  m_database);
     transactor.commit();
     return verifyDatabase();
 }
@@ -556,46 +618,11 @@ bool SqlStorage::migrateDB(const QString &queryString, int oldVersion)
 bool SqlStorage::setMetaData(const QString &key, const QString &value)
 {
     SqlRaiiTransactor transactor(m_database);
-    if (!setMetaData(key, value, transactor)) {
+    if (!doSetMetaData(key, value, m_database)) {
         return false;
     } else {
         return transactor.commit();
     }
-}
-
-bool SqlStorage::setMetaData(const QString &key, const QString &value, const SqlRaiiTransactor &)
-{
-    // find out if the key is in the database:
-    bool result;
-    {
-        QSqlQuery query(m_database);
-        query.prepare(QStringLiteral("SELECT * FROM MetaData WHERE MetaData.key = :key;"));
-        query.bindValue(QStringLiteral(":key"), key);
-        if (runQuery(query) && query.next()) {
-            result = true;
-        } else {
-            result = false;
-        }
-    }
-
-    if (result) { // key exists, let's update:
-        QSqlQuery query(m_database);
-        query.prepare(QStringLiteral("UPDATE MetaData SET value = :value WHERE key = :key;"));
-        query.bindValue(QStringLiteral(":value"), value);
-        query.bindValue(QStringLiteral(":key"), key);
-
-        return runQuery(query);
-    } else {
-        // key does not exist, let's insert:
-        QSqlQuery query(m_database);
-        query.prepare(QStringLiteral("INSERT INTO MetaData VALUES ( NULL, :key, :value );"));
-        query.bindValue(QStringLiteral(":key"), key);
-        query.bindValue(QStringLiteral(":value"), value);
-
-        return runQuery(query);
-    }
-
-    return false; // never reached
 }
 
 QString SqlStorage::getMetaData(const QString &key)
@@ -610,75 +637,4 @@ QString SqlStorage::getMetaData(const QString &key)
     } else {
         return QString();
     }
-}
-
-Task SqlStorage::makeTaskFromRecord(const QSqlRecord &record)
-{
-    Task task;
-    int idField = record.indexOf(QStringLiteral("task_id"));
-    int nameField = record.indexOf(QStringLiteral("name"));
-    int parentField = record.indexOf(QStringLiteral("parent"));
-    int validfromField = record.indexOf(QStringLiteral("validfrom"));
-    int validuntilField = record.indexOf(QStringLiteral("validuntil"));
-    int trackableField = record.indexOf(QStringLiteral("trackable"));
-    int commentField = record.indexOf(QStringLiteral("comment"));
-
-    task.id = record.field(idField).value().toInt();
-    task.name = record.field(nameField).value().toString();
-    task.parentId = record.field(parentField).value().toInt();
-    QString from = record.field(validfromField).value().toString();
-    if (!from.isEmpty()) {
-        task.validFrom = record.field(validfromField).value().toDateTime();
-    }
-    QString until = record.field(validuntilField).value().toString();
-    if (!until.isEmpty()) {
-        task.validUntil = record.field(validuntilField).value().toDateTime();
-    }
-    const QVariant trackableValue = record.field(trackableField).value();
-    if (!trackableValue.isNull() && trackableValue.isValid())
-        task.trackable = trackableValue.toInt() == 1;
-    const QVariant commentValue = record.field(commentField).value();
-    if (!commentValue.isNull() && commentValue.isValid())
-        task.comment = commentValue.toString();
-    return task;
-}
-
-QString SqlStorage::setAllTasksAndEvents(const TaskList &tasks, const EventList &events)
-{
-    SqlRaiiTransactor transactor(m_database);
-
-    // clear subscriptions, tasks and events:
-    if (!deleteAllEvents(transactor))
-        return QObject::tr("Error deleting the existing events.");
-    Q_ASSERT(getAllEvents().isEmpty());
-    if (!deleteAllTasks(transactor))
-        return QObject::tr("Error deleting the existing tasks.");
-    Q_ASSERT(getAllTasks().isEmpty());
-
-    // now import Events and Tasks from the XML document:
-    for (const Task &task : tasks) {
-        // don't use our own addTask method, it emits signals and that
-        // confuses the model, because the task tree is not inserted depth-first:
-        if (!addTask(task, transactor)) {
-            return QObject::tr("Cannot add imported tasks.");
-        }
-    }
-    for (const Event &event : events) {
-        if (!event.isValid())
-            continue;
-        Task task = getTask(event.taskId());
-        if (task.isNull()) {
-            // semantical error
-            continue;
-        }
-        Event newEvent = makeEvent(transactor);
-        int id = newEvent.id();
-        newEvent = event;
-        newEvent.setId(id);
-        if (!modifyEvent(newEvent, transactor))
-            return QObject::tr("Error adding imported event.");
-    }
-
-    transactor.commit();
-    return QString();
 }

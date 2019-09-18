@@ -52,35 +52,20 @@ public:
     TaskList getAllTasks();
     bool setAllTasks(const TaskList &tasks);
     bool addTask(const Task &task);
-    bool addTask(const Task &task, const SqlRaiiTransactor &);
     Task getTask(int taskid);
     bool deleteAllTasks();
-    bool deleteAllTasks(const SqlRaiiTransactor &);
 
     // event database functions:
     EventList getAllEvents();
-
-    // all events are created by the storage interface
-    Event makeEvent();
-    Event makeEvent(const SqlRaiiTransactor &);
+    Event makeEvent(); // all events are created by the storage interface
     Event getEvent(int eventid);
     bool modifyEvent(const Event &event);
-    bool modifyEvent(const Event &event, const SqlRaiiTransactor &);
     bool deleteEvent(const Event &event);
     bool deleteAllEvents();
-    bool deleteAllEvents(const SqlRaiiTransactor &);
 
-    // implement metadata management functions:
+    // metadata database functions:
     bool setMetaData(const QString &, const QString &);
-    bool setMetaData(const QString &, const QString &, const SqlRaiiTransactor &);
-
-    // database metadata management functions
     QString getMetaData(const QString &);
-
-    /*! @brief update all tasks and events in a single-transaction during imports
-      @return an empty String on success, an error message otherwise
-      */
-    QString setAllTasksAndEvents(const TaskList &, const EventList &);
 
 private:
     // Put the basic database structure into the database.
@@ -98,9 +83,6 @@ private:
      */
     bool verifyDatabase();
     bool migrateDB(const QString &queryString, int oldVersion);
-
-    Event makeEventFromRecord(const QSqlRecord &);
-    Task makeTaskFromRecord(const QSqlRecord &);
 
     QSqlDatabase m_database;
 };
