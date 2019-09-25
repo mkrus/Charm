@@ -33,19 +33,11 @@ class Configuration
 {
 public:
     // only append to that, to no break old configurations:
-    enum TimeTrackerFontSize {
-        TimeTrackerFont_Small,
-        TimeTrackerFont_Regular,
-        TimeTrackerFont_Large
-    };
-
     enum TaskPrefilteringMode {
         TaskPrefilter_ShowAll,
         TaskPrefilter_CurrentOnly,
         TaskPrefilter_NumberOfModes
     };
-
-    enum DurationFormat { Minutes = 0, Decimal };
 
     bool operator==(const Configuration &other) const;
 
@@ -65,8 +57,6 @@ public:
 
     QString userName;
     TaskPrefilteringMode taskPrefilteringMode = TaskPrefilter_ShowAll;
-    TimeTrackerFontSize timeTrackerFontSize = TimeTrackerFont_Regular;
-    DurationFormat durationFormat = Minutes;
     Qt::ToolButtonStyle toolButtonStyle = Qt::ToolButtonFollowStyle;
     bool showStatusBar = true;
     bool detectIdling = true;
@@ -94,8 +84,8 @@ private:
     friend class ControllerTests;
     // these are all the persisted metadata settings, and the constructor is only used during test
     // runs:
-    Configuration(TaskPrefilteringMode taskPrefilteringMode, TimeTrackerFontSize,
-                  DurationFormat durationFormat, bool detectIdling, Qt::ToolButtonStyle buttonstyle,
+    Configuration(TaskPrefilteringMode taskPrefilteringMode,
+                  bool detectIdling, Qt::ToolButtonStyle buttonstyle,
                   bool showStatusBar, bool warnUnuploadedTimesheets, bool _requestEventComment,
                   bool enableCommandInterface, int _numberOfTaskSelectorEntries);
     Configuration();

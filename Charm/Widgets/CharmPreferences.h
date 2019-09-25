@@ -37,7 +37,6 @@ public:
     explicit CharmPreferences(const Configuration &config, QWidget *parent = nullptr);
     ~CharmPreferences() override;
 
-    Configuration::DurationFormat durationFormat() const;
     bool detectIdling() const;
     bool warnUnuploadedTimesheets() const;
     bool requestEventComment() const;
@@ -46,7 +45,6 @@ public:
 
     Qt::ToolButtonStyle toolButtonStyle() const;
 
-    Configuration::TimeTrackerFontSize timeTrackerFontSize() const;
 private Q_SLOTS:
     void slotWarnUnuploadedChanged(bool);
 

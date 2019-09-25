@@ -110,8 +110,6 @@ inline bool strToT(const QString &str)
     {                                                                                              \
         return static_cast<TYPE>(strToT<int>(str));                                                \
     }
-INT_CONFIG_TYPE(Configuration::TimeTrackerFontSize)
-INT_CONFIG_TYPE(Configuration::DurationFormat)
 INT_CONFIG_TYPE(Configuration::TaskPrefilteringMode)
 INT_CONFIG_TYPE(Qt::ToolButtonStyle)
 

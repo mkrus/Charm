@@ -47,14 +47,10 @@ Configuration::Configuration()
 }
 
 Configuration::Configuration(TaskPrefilteringMode _taskPrefilteringMode,
-                             TimeTrackerFontSize _timeTrackerFontSize,
-                             DurationFormat _durationFormat, bool _detectIdling,
-                             Qt::ToolButtonStyle _buttonstyle, bool _showStatusBar,
+                             bool _detectIdling, Qt::ToolButtonStyle _buttonstyle, bool _showStatusBar,
                              bool _warnUnuploadedTimesheets, bool _requestEventComment,
                              bool _enableCommandInterface, int _numberOfTaskSelectorEntries)
     : taskPrefilteringMode(_taskPrefilteringMode)
-    , timeTrackerFontSize(_timeTrackerFontSize)
-    , durationFormat(_durationFormat)
     , toolButtonStyle(_buttonstyle)
     , showStatusBar(_showStatusBar)
     , detectIdling(_detectIdling)
@@ -69,8 +65,7 @@ Configuration::Configuration(TaskPrefilteringMode _taskPrefilteringMode,
 bool Configuration::operator==(const Configuration &other) const
 {
     return userName == other.userName && taskPrefilteringMode == other.taskPrefilteringMode
-        && timeTrackerFontSize == other.timeTrackerFontSize
-        && durationFormat == other.durationFormat && detectIdling == other.detectIdling
+        && detectIdling == other.detectIdling
         && warnUnuploadedTimesheets == other.warnUnuploadedTimesheets
         && requestEventComment == other.requestEventComment
         && toolButtonStyle == other.toolButtonStyle && showStatusBar == other.showStatusBar
@@ -131,8 +126,6 @@ void Configuration::dump(const QString &why)
              << "--> local storage type:       " << localStorageType << endl
              << "--> local storage database:   " << localStorageDatabase << endl
              << "--> task prefiltering mode:   " << taskPrefilteringMode << endl
-             << "--> task tracker font size:   " << timeTrackerFontSize << endl
-             << "--> duration format:          " << durationFormat << endl
              << "--> Idle Detection:           " << detectIdling << endl
              << "--> toolButtonStyle:          " << toolButtonStyle << endl
              << "--> showStatusBar:            " << showStatusBar << endl

@@ -159,8 +159,6 @@ void Controller::persistMetaData(Configuration &configuration)
     Setting settings[] = {
         {MetaKey_Key_UserName, configuration.userName},
         {MetaKey_Key_SubscribedTasksOnly, QString().setNum(configuration.taskPrefilteringMode)},
-        {MetaKey_Key_TimeTrackerFontSize, QString().setNum(configuration.timeTrackerFontSize)},
-        {MetaKey_Key_DurationFormat, QString::number(configuration.durationFormat)},
         {MetaKey_Key_IdleDetection, stringForBool(configuration.detectIdling)},
         {MetaKey_Key_WarnUnuploadedTimesheets,
          stringForBool(configuration.warnUnuploadedTimesheets)},
@@ -195,8 +193,6 @@ void Controller::provideMetaData(Configuration &configuration)
     Q_ASSERT_X(m_storage != nullptr, Q_FUNC_INFO, "No storage interface available");
     configuration.userName = m_storage->getMetaData(MetaKey_Key_UserName);
 
-    loadConfigValue(MetaKey_Key_TimeTrackerFontSize, configuration.timeTrackerFontSize);
-    loadConfigValue(MetaKey_Key_DurationFormat, configuration.durationFormat);
     loadConfigValue(MetaKey_Key_SubscribedTasksOnly, configuration.taskPrefilteringMode);
     loadConfigValue(MetaKey_Key_IdleDetection, configuration.detectIdling);
     loadConfigValue(MetaKey_Key_WarnUnuploadedTimesheets, configuration.warnUnuploadedTimesheets);

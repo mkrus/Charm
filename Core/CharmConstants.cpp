@@ -97,23 +97,16 @@ static QString formatDecimal(double d)
 QString hoursAndMinutes(int duration)
 {
     if (duration == 0) {
-        if (CONFIGURATION.durationFormat == Configuration::Minutes) {
-            return QObject::tr("00:00");
-        } else {
-            return formatDecimal(0.0);
-        }
+        return QObject::tr("00:00");
     }
+
     int minutes = duration / 60;
     int hours = minutes / 60;
     minutes = minutes % 60;
 
-    if (CONFIGURATION.durationFormat == Configuration::Minutes) {
-        QString text;
-        QTextStream stream(&text);
-        stream << qSetFieldWidth(2) << qSetPadChar(QLatin1Char('0')) << hours << qSetFieldWidth(0)
-               << ":" << qSetFieldWidth(2) << minutes;
-        return text;
-    } else { // Decimal
-        return formatDecimal(hours + minutes / 60.0);
-    }
+    QString text;
+    QTextStream stream(&text);
+    stream << qSetFieldWidth(2) << qSetPadChar(QLatin1Char('0')) << hours << qSetFieldWidth(0)
+           << ":" << qSetFieldWidth(2) << minutes;
+    return text;
 }

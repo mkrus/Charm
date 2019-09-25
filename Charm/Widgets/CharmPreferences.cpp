@@ -56,28 +56,6 @@ CharmPreferences::CharmPreferences(const Configuration &config, QWidget *parent_
     connect(m_ui.cbWarnUnuploadedTimesheets, &QCheckBox::toggled, this,
             &CharmPreferences::slotWarnUnuploadedChanged);
 
-    // this would not need a switch, but i hate casting enums to int:
-    switch (config.timeTrackerFontSize) {
-    case Configuration::TimeTrackerFont_Small:
-        m_ui.cbTimeTrackerFontSize->setCurrentIndex(0);
-        break;
-    case Configuration::TimeTrackerFont_Regular:
-        m_ui.cbTimeTrackerFontSize->setCurrentIndex(1);
-        break;
-    case Configuration::TimeTrackerFont_Large:
-        m_ui.cbTimeTrackerFontSize->setCurrentIndex(2);
-        break;
-    }
-
-    switch (config.durationFormat) {
-    case Configuration::Minutes:
-        m_ui.cbDurationFormat->setCurrentIndex(0);
-        break;
-    case Configuration::Decimal:
-        m_ui.cbDurationFormat->setCurrentIndex(1);
-        break;
-    }
-
     switch (config.toolButtonStyle) {
     case Qt::ToolButtonIconOnly:
         m_ui.cbToolButtonStyle->setCurrentIndex(0);
@@ -126,35 +104,6 @@ bool CharmPreferences::enableCommandInterface() const
 int CharmPreferences::numberOfTaskSelectorEntries() const
 {
     return m_ui.sbNumberOfTaskSelectorEntries->value();
-}
-
-Configuration::DurationFormat CharmPreferences::durationFormat() const
-{
-    switch (m_ui.cbDurationFormat->currentIndex()) {
-    case 0:
-        return Configuration::Minutes;
-    case 1:
-        return Configuration::Decimal;
-    default:
-        Q_ASSERT(!"Unexpected combobox item for DurationFormat");
-    }
-    return Configuration::Minutes;
-}
-
-Configuration::TimeTrackerFontSize CharmPreferences::timeTrackerFontSize() const
-{
-    switch (m_ui.cbTimeTrackerFontSize->currentIndex()) {
-    case 0:
-        return Configuration::TimeTrackerFont_Small;
-    case 1:
-        return Configuration::TimeTrackerFont_Regular;
-    case 2:
-        return Configuration::TimeTrackerFont_Large;
-    default:
-        Q_ASSERT(false); // somebody added an item
-    }
-    // always return something, to avoid compiler warning:
-    return Configuration::TimeTrackerFont_Regular;
 }
 
 Qt::ToolButtonStyle CharmPreferences::toolButtonStyle() const

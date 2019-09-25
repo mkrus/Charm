@@ -262,8 +262,6 @@ void TimeTrackingWindow::slotEditPreferences(bool)
     CharmPreferences dialog(CONFIGURATION, this);
 
     if (dialog.exec()) {
-        CONFIGURATION.timeTrackerFontSize = dialog.timeTrackerFontSize();
-        CONFIGURATION.durationFormat = dialog.durationFormat();
         CONFIGURATION.toolButtonStyle = dialog.toolButtonStyle();
         CONFIGURATION.detectIdling = dialog.detectIdling();
         CONFIGURATION.warnUnuploadedTimesheets = dialog.warnUnuploadedTimesheets();

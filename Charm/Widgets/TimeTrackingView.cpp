@@ -356,17 +356,6 @@ void TimeTrackingView::configurationChanged()
     m_fixedFont.setPointSize(11);
 #endif
 
-    switch (CONFIGURATION.timeTrackerFontSize) {
-    case Configuration::TimeTrackerFont_Small:
-        m_fixedFont.setPointSizeF(0.9 * m_fixedFont.pointSize());
-        break;
-    case Configuration::TimeTrackerFont_Regular:
-        break;
-    case Configuration::TimeTrackerFont_Large:
-        m_fixedFont.setPointSizeF(1.2 * m_fixedFont.pointSize());
-        break;
-    }
-
     // re-populate menu:
     m_taskSelector->populate(m_summaries);
     emit taskMenuChanged();
