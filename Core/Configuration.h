@@ -33,12 +33,6 @@ class Configuration
 {
 public:
     // only append to that, to no break old configurations:
-    enum TaskPrefilteringMode {
-        TaskPrefilter_ShowAll,
-        TaskPrefilter_CurrentOnly,
-        TaskPrefilter_NumberOfModes
-    };
-
     bool operator==(const Configuration &other) const;
 
     static Configuration &instance();
@@ -55,13 +49,10 @@ public:
 
     quint32 createInstallationId() const;
 
-    TaskPrefilteringMode taskPrefilteringMode = TaskPrefilter_ShowAll;
     Qt::ToolButtonStyle toolButtonStyle = Qt::ToolButtonFollowStyle;
-    bool showStatusBar = true;
     bool detectIdling = true;
     bool warnUnuploadedTimesheets = true;
     bool requestEventComment = false;
-    bool enableCommandInterface = false;
     int numberOfTaskSelectorEntries = 5;
 
     // these are stored in QSettings, since we need this information to locate and open the
@@ -82,10 +73,9 @@ private:
     friend class ControllerTests;
     // these are all the persisted metadata settings, and the constructor is only used during test
     // runs:
-    Configuration(TaskPrefilteringMode taskPrefilteringMode,
-                  bool detectIdling, Qt::ToolButtonStyle buttonstyle,
+    Configuration(bool detectIdling, Qt::ToolButtonStyle buttonstyle,
                   bool showStatusBar, bool warnUnuploadedTimesheets, bool _requestEventComment,
-                  bool enableCommandInterface, int _numberOfTaskSelectorEntries);
+                  int _numberOfTaskSelectorEntries);
     Configuration();
 };
 

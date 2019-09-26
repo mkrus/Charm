@@ -51,8 +51,6 @@ const QString MetaKey_ExportToXmlRecentSavePath = QStringLiteral("ExportToXmlSav
 const QString MetaKey_LastEventEditorDateTime = QStringLiteral("LastEventEditorDateTime");
 const QString MetaKey_Key_InstallationId = QStringLiteral("InstallationId");
 const QString MetaKey_Key_LocalStorageDatabase = QStringLiteral("LocalStorageDatabase");
-const QString MetaKey_Key_LocalStorageType = QStringLiteral("LocalStorageType");
-const QString MetaKey_Key_SubscribedTasksOnly = QStringLiteral("SubscribedTasksOnly");
 const QString MetaKey_Key_TimeTrackerFontSize = QStringLiteral("TimeTrackerFontSize");
 const QString MetaKey_Key_24hEditing = QStringLiteral("Key24hEditing");
 const QString MetaKey_Key_DurationFormat = QStringLiteral("DurationFormat");
@@ -60,8 +58,6 @@ const QString MetaKey_Key_IdleDetection = QStringLiteral("IdleDetection");
 const QString MetaKey_Key_WarnUnuploadedTimesheets = QStringLiteral("WarnUnuploadedTimesheets");
 const QString MetaKey_Key_RequestEventComment = QStringLiteral("RequestEventComment");
 const QString MetaKey_Key_ToolButtonStyle = QStringLiteral("ToolButtonStyle");
-const QString MetaKey_Key_ShowStatusBar = QStringLiteral("ShowStatusBar");
-const QString MetaKey_Key_EnableCommandInterface = QStringLiteral("EnableCommandInterface");
 const QString MetaKey_Key_NumberOfTaskSelectorEntries =
     QStringLiteral("NumberOfTaskSelectorEntries");
 

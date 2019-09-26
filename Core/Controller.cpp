@@ -156,15 +156,11 @@ void Controller::persistMetaData(Configuration &configuration)
 {
     Q_ASSERT_X(m_storage != nullptr, Q_FUNC_INFO, "No storage interface available");
     Setting settings[] = {
-        {MetaKey_Key_InstallationId, QString::number(configuration.installationId)},
-        {MetaKey_Key_SubscribedTasksOnly, QString().setNum(configuration.taskPrefilteringMode)},
         {MetaKey_Key_IdleDetection, stringForBool(configuration.detectIdling)},
         {MetaKey_Key_WarnUnuploadedTimesheets,
          stringForBool(configuration.warnUnuploadedTimesheets)},
         {MetaKey_Key_RequestEventComment, stringForBool(configuration.requestEventComment)},
         {MetaKey_Key_ToolButtonStyle, QString().setNum(configuration.toolButtonStyle)},
-        {MetaKey_Key_ShowStatusBar, stringForBool(configuration.showStatusBar)},
-        {MetaKey_Key_EnableCommandInterface, stringForBool(configuration.enableCommandInterface)},
         {MetaKey_Key_NumberOfTaskSelectorEntries,
          QString::number(configuration.numberOfTaskSelectorEntries)}};
 
@@ -192,15 +188,10 @@ void Controller::provideMetaData(Configuration &configuration)
 {
     Q_ASSERT_X(m_storage != nullptr, Q_FUNC_INFO, "No storage interface available");
 
-    int installationId = configuration.installationId;
-    loadConfigValue(MetaKey_Key_InstallationId, installationId);
-    loadConfigValue(MetaKey_Key_SubscribedTasksOnly, configuration.taskPrefilteringMode);
     loadConfigValue(MetaKey_Key_IdleDetection, configuration.detectIdling);
     loadConfigValue(MetaKey_Key_WarnUnuploadedTimesheets, configuration.warnUnuploadedTimesheets);
     loadConfigValue(MetaKey_Key_RequestEventComment, configuration.requestEventComment);
     loadConfigValue(MetaKey_Key_ToolButtonStyle, configuration.toolButtonStyle);
-    loadConfigValue(MetaKey_Key_ShowStatusBar, configuration.showStatusBar);
-    loadConfigValue(MetaKey_Key_EnableCommandInterface, configuration.enableCommandInterface);
     loadConfigValue(MetaKey_Key_NumberOfTaskSelectorEntries,
                     configuration.numberOfTaskSelectorEntries);
     configuration.numberOfTaskSelectorEntries = qMax(0, configuration.numberOfTaskSelectorEntries);

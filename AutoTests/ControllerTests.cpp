@@ -70,11 +70,10 @@ void ControllerTests::initializeConnectBackendTest()
 void ControllerTests::persistProvideMetaDataTest()
 {
     Configuration configs[] = {
-        Configuration(Configuration::TaskPrefilter_ShowAll, true,
-                      Qt::ToolButtonIconOnly, true, true, true, false,
-                      5),
-        Configuration(Configuration::TaskPrefilter_CurrentOnly, false,
-                      Qt::ToolButtonTextOnly, false, false, false, false, 5),
+        Configuration(true,
+                      Qt::ToolButtonIconOnly, true, true, true, 5),
+        Configuration(false,
+                      Qt::ToolButtonTextOnly, false, false, false, 5),
     };
     const int NumberOfConfigurations = sizeof configs / sizeof configs[0];
 

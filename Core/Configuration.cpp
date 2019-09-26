@@ -46,17 +46,13 @@ Configuration::Configuration()
 {
 }
 
-Configuration::Configuration(TaskPrefilteringMode _taskPrefilteringMode,
-                             bool _detectIdling, Qt::ToolButtonStyle _buttonstyle, bool _showStatusBar,
+Configuration::Configuration(bool _detectIdling, Qt::ToolButtonStyle _buttonstyle, bool _showStatusBar,
                              bool _warnUnuploadedTimesheets, bool _requestEventComment,
-                             bool _enableCommandInterface, int _numberOfTaskSelectorEntries)
-    : taskPrefilteringMode(_taskPrefilteringMode)
-    , toolButtonStyle(_buttonstyle)
-    , showStatusBar(_showStatusBar)
+                             int _numberOfTaskSelectorEntries)
+    : toolButtonStyle(_buttonstyle)
     , detectIdling(_detectIdling)
     , warnUnuploadedTimesheets(_warnUnuploadedTimesheets)
     , requestEventComment(_requestEventComment)
-    , enableCommandInterface(_enableCommandInterface)
     , numberOfTaskSelectorEntries(_numberOfTaskSelectorEntries)
     , configurationName(DEFAULT_CONFIG_GROUP)
 {
@@ -64,12 +60,12 @@ Configuration::Configuration(TaskPrefilteringMode _taskPrefilteringMode,
 
 bool Configuration::operator==(const Configuration &other) const
 {
-    return taskPrefilteringMode == other.taskPrefilteringMode
-        && detectIdling == other.detectIdling
+
+    return detectIdling == other.detectIdling
         && warnUnuploadedTimesheets == other.warnUnuploadedTimesheets
         && requestEventComment == other.requestEventComment
-        && toolButtonStyle == other.toolButtonStyle && showStatusBar == other.showStatusBar
-        && configurationName == other.configurationName && installationId == other.installationId
+        && toolButtonStyle == other.toolButtonStyle && configurationName == other.configurationName
+        && installationId == other.installationId
         && localStorageDatabase == other.localStorageDatabase
         && numberOfTaskSelectorEntries == other.numberOfTaskSelectorEntries;
 }
@@ -102,13 +98,10 @@ void Configuration::dump(const QString &why)
     qDebug() << "Configuration: configuration:" << (why.isEmpty() ? QString() : why) << endl
              << "--> installation id:          " << installationId << endl
              << "--> local storage database:   " << localStorageDatabase << endl
-             << "--> task prefiltering mode:   " << taskPrefilteringMode << endl
              << "--> Idle Detection:           " << detectIdling << endl
              << "--> toolButtonStyle:          " << toolButtonStyle << endl
-             << "--> showStatusBar:            " << showStatusBar << endl
              << "--> warnUnuploadedTimesheets: " << warnUnuploadedTimesheets << endl
              << "--> requestEventComment:      " << requestEventComment << endl
-             << "--> enableCommandInterface:   " << enableCommandInterface
              << "--> numberOfTaskSelectorEntries: " << numberOfTaskSelectorEntries;
 }
 

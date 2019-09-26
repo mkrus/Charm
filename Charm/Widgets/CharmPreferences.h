@@ -40,7 +40,6 @@ public:
     bool detectIdling() const;
     bool warnUnuploadedTimesheets() const;
     bool requestEventComment() const;
-    bool enableCommandInterface() const;
     int numberOfTaskSelectorEntries() const;
 
     Qt::ToolButtonStyle toolButtonStyle() const;

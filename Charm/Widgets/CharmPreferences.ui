@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>289</width>
-    <height>196</height>
+    <width>358</width>
+    <height>158</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,35 +16,6 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="4" column="0">
-      <widget class="QLabel" name="lbCommandInterface">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Enable command interface</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-       <property name="buddy">
-        <cstring>cbEnableCommandInterface</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="2">
-      <widget class="QCheckBox" name="cbEnableCommandInterface">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="2">
       <widget class="QComboBox" name="cbToolButtonStyle">
        <item>
@@ -74,22 +45,6 @@
        </item>
       </widget>
      </item>
-     <item row="5" column="0" alignment="Qt::AlignRight">
-      <widget class="QLabel" name="lbNumberOfTaskSelectorEntries">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Limit recently used tasks to</string>
-       </property>
-       <property name="buddy">
-        <cstring>sbNumberOfTaskSelectorEntries</cstring>
-       </property>
-      </widget>
-     </item>
      <item row="2" column="0" alignment="Qt::AlignRight">
       <widget class="QLabel" name="lbWarnUnuploadedTimesheets">
        <property name="sizePolicy">
@@ -106,22 +61,6 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="0" alignment="Qt::AlignRight">
-      <widget class="QLabel" name="lbToolButtonStyle">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Buttons show</string>
-       </property>
-       <property name="buddy">
-        <cstring>cbToolButtonStyle</cstring>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="0" alignment="Qt::AlignRight">
       <widget class="QLabel" name="lbIdleDetection">
        <property name="sizePolicy">
@@ -135,16 +74,6 @@
        </property>
        <property name="buddy">
         <cstring>cbIdleDetection</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="2">
-      <widget class="QCheckBox" name="cbRequestEventComment">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -174,13 +103,6 @@
        </property>
       </widget>
      </item>
-     <item row="5" column="2">
-      <widget class="QSpinBox" name="sbNumberOfTaskSelectorEntries">
-       <property name="value">
-        <number>5</number>
-       </property>
-      </widget>
-     </item>
      <item row="2" column="2">
       <widget class="QCheckBox" name="cbWarnUnuploadedTimesheets">
        <property name="text">
@@ -188,6 +110,55 @@
        </property>
        <property name="checked">
         <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="2">
+      <widget class="QCheckBox" name="cbRequestEventComment">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0" alignment="Qt::AlignRight">
+      <widget class="QLabel" name="lbNumberOfTaskSelectorEntries">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Limit recently used tasks to</string>
+       </property>
+       <property name="buddy">
+        <cstring>sbNumberOfTaskSelectorEntries</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0" alignment="Qt::AlignRight">
+      <widget class="QLabel" name="lbToolButtonStyle">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Buttons show</string>
+       </property>
+       <property name="buddy">
+        <cstring>cbToolButtonStyle</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="2">
+      <widget class="QSpinBox" name="sbNumberOfTaskSelectorEntries">
+       <property name="value">
+        <number>5</number>
        </property>
       </widget>
      </item>

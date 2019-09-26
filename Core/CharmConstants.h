@@ -51,16 +51,12 @@ extern const QString MetaKey_ExportToXmlRecentSavePath;
 extern const QString MetaKey_LastEventEditorDateTime;
 extern const QString MetaKey_Key_InstallationId;
 extern const QString MetaKey_Key_LocalStorageDatabase;
-extern const QString MetaKey_Key_LocalStorageType;
-extern const QString MetaKey_Key_SubscribedTasksOnly;
 extern const QString MetaKey_Key_TimeTrackerFontSize;
 extern const QString MetaKey_Key_DurationFormat;
 extern const QString MetaKey_Key_IdleDetection;
 extern const QString MetaKey_Key_WarnUnuploadedTimesheets;
 extern const QString MetaKey_Key_RequestEventComment;
 extern const QString MetaKey_Key_ToolButtonStyle;
-extern const QString MetaKey_Key_ShowStatusBar;
-extern const QString MetaKey_Key_EnableCommandInterface;
 extern const QString MetaKey_Key_NumberOfTaskSelectorEntries;
 
 extern const QString TrueString;
@@ -93,7 +89,6 @@ inline bool strToT(const QString &str)
     {                                                                                              \
         return static_cast<TYPE>(strToT<int>(str));                                                \
     }
-INT_CONFIG_TYPE(Configuration::TaskPrefilteringMode)
 INT_CONFIG_TYPE(Qt::ToolButtonStyle)
 
 const QString &stringForBool(bool val);
