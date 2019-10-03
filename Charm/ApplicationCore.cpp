@@ -155,7 +155,7 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
     Charm::connectControllerAndView(&m_controller, &m_timeTracker);
 
     // save the configuration (configuration is managed by the application)
-    connect(&m_timeTracker, &CharmWindow::saveConfiguration, this,
+    connect(&m_timeTracker, &TimeTrackingWindow::saveConfiguration, this,
             &ApplicationCore::slotSaveConfiguration);
     connect(&m_timeTracker, &TimeTrackingWindow::showNotification, this,
             &ApplicationCore::slotShowNotification);
@@ -180,7 +180,6 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
     m_systrayContextMenu.addAction(&m_actionStopAllTasks);
     m_systrayContextMenu.addSeparator();
 
-    m_systrayContextMenu.addAction(m_timeTracker.openCharmAction());
     m_systrayContextMenu.addAction(&m_actionQuit);
 
     m_trayIcon.setContextMenu(&m_systrayContextMenu);
@@ -373,7 +372,7 @@ void ApplicationCore::createHelpMenu(QMenuBar *menuBar)
     menuBar->addMenu(menu);
 }
 
-CharmWindow &ApplicationCore::mainView()
+TimeTrackingWindow &ApplicationCore::mainView()
 {
     m_timeTracker.setHideAtStartup(m_hideAtStart);
     return m_timeTracker;
@@ -793,10 +792,10 @@ void ApplicationCore::slotShowTasksEditor()
 {
     if (!m_tasksView)
         m_tasksView = new TasksView;
-    CharmWindow::showView(m_tasksView);
+    TimeTrackingWindow::showView(m_tasksView);
 }
 
 void ApplicationCore::slotShowEventEditor()
 {
-    CharmWindow::showView(&m_eventView);
+    TimeTrackingWindow::showView(&m_eventView);
 }

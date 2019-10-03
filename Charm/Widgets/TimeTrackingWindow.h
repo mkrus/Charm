@@ -25,15 +25,19 @@
 #define TimeTrackingWindow_H
 
 #include <QTimer>
+#include <QMainWindow>
 
 #include "Core/CharmDataModelAdapterInterface.h"
+#include "Core/CommandEmitterInterface.h"
+#include "Core/UIStateInterface.h"
 
 #include "Charm/HttpClient/CheckForUpdatesJob.h"
 
 #include "BillDialog.h"
 #include "Charm/WeeklySummary.h"
-#include "CharmWindow.h"
 
+class QAction;
+class QShortcut;
 class HttpJob;
 class CheckForUpdatesJob;
 class CharmCommand;
@@ -43,21 +47,36 @@ class ReportConfigurationDialog;
 class WeeklyTimesheetConfigurationDialog;
 class MonthlyTimesheetConfigurationDialog;
 
-class TimeTrackingWindow : public CharmWindow, public CharmDataModelAdapterInterface
+class TimeTrackingWindow : public QMainWindow, public UIStateInterface, public CharmDataModelAdapterInterface
 {
     Q_OBJECT
+
 public:
     explicit TimeTrackingWindow(QWidget *parent = nullptr);
     ~TimeTrackingWindow() override;
 
     enum VerboseMode { Verbose = 0, Silent };
+
     // application:
-    void stateChanged(State previous) override;
-    void restore() override;
+    QMenu *menu() const;
+
+    QString windowName() const;
+    QString windowIdentifier() const;
 
     bool event(QEvent *) override;
     void showEvent(QShowEvent *) override;
-    QMenu *menu() const;
+    void hideEvent(QHideEvent *) override;
+    void keyPressEvent(QKeyEvent *event) override;
+    void stateChanged(State previous) override;
+
+    void saveGuiState() override;
+    void restoreGuiState() override;
+
+    static void showView(QWidget *w);
+    static bool showHideView(QWidget *w);
+
+    void setHideAtStartup(bool);
+
     // model adapter:
     void resetTasks() override;
     void resetEvents() override;
@@ -71,6 +90,12 @@ public:
 
 public Q_SLOTS:
     // slots migrated from the old main window:
+    void showView();
+    void showHideView();
+    void configurationChanged() override;
+    void sendCommand(CharmCommand *);
+    void commitCommand(CharmCommand *) override;
+    void restore();
     void slotEditPreferences(bool); // show prefs dialog
     void slotAboutDialog();
     void slotEnterVacation();
@@ -84,10 +109,17 @@ public Q_SLOTS:
     void slotUserInfoDownloaded(HttpJob *);
     void slotCheckForUpdatesManual();
     void slotStartEvent(TaskId);
-    void configurationChanged() override;
 
 protected:
-    void insertEditMenu() override;
+    /** The window name is the human readable name the application uses to reference the window.
+     */
+    void setWindowName(const QString &name);
+    /** The window identifier is used to reference window specific configuration groups, et cetera.
+     * It is generally not recommend to change it once the application is in use. */
+    void setWindowIdentifier(const QString &id);
+
+    void checkVisibility();
+    void insertEditMenu();
 
 private Q_SLOTS:
     void slotStopEvent();
@@ -102,6 +134,8 @@ private Q_SLOTS:
     void slotGetUserInfo();
 
 Q_SIGNALS:
+    void visibilityChanged(bool);
+    void saveConfiguration();
     void emitCommand(CharmCommand *) override;
     void showNotification(const QString &title, const QString &message);
     void taskMenuChanged();
@@ -118,6 +152,12 @@ private:
     void informUserAboutNewRelease(const QString &releaseVersion, const QUrl &link,
                                    const QString &releaseInfoLink);
     void handleIdleEvents(IdleDetector *detector, bool restart);
+
+    QString m_windowName;
+    QString m_windowIdentifier;
+    QShortcut *m_shortcut = nullptr;
+    bool m_isVisibility = false;
+    bool m_hideAtStartUp = false;
 
     WeeklyTimesheetConfigurationDialog *m_weeklyTimesheetDialog = nullptr;
     MonthlyTimesheetConfigurationDialog *m_monthlyTimesheetDialog = nullptr;

@@ -38,9 +38,11 @@
 #include "TimeTrackingView.h"
 #include "ViewHelpers.h"
 #include "WeeklyTimesheet.h"
+#include "WidgetUtils.h"
 
 #include "Commands/CommandMakeEvent.h"
 #include "Commands/CommandModifyEvent.h"
+#include "Commands/CommandRelayCommand.h"
 #include "Commands/CommandSetAllTasks.h"
 
 #include "Core/TimeSpans.h"
@@ -61,22 +63,25 @@
 #include <QFileDialog>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QKeyEvent>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QSettings>
-#include <QToolBar>
+#include <QShortcut>
 #include <QUrlQuery>
 #include <QtAlgorithms>
 
 #include <algorithm>
 
 TimeTrackingWindow::TimeTrackingWindow(QWidget *parent)
-    : CharmWindow(tr("Time Tracker"), parent)
+    : QMainWindow(parent)
     , m_summaryWidget(new TimeTrackingView(this))
     , m_billDialog(nullptr)
 {
+    setWindowName(tr("Time Tracker"));
+    emit visibilityChanged(false);
+
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    setWindowNumber(3);
     setWindowIdentifier(QStringLiteral("window_tracking"));
     setCentralWidget(m_summaryWidget);
     connect(m_summaryWidget, &TimeTrackingView::startEvent, this,
@@ -107,25 +112,6 @@ TimeTrackingWindow::TimeTrackingWindow(QWidget *parent)
     m_updateUserInfoAndTasksDefinitionsTimer.setInterval(24 * 60 * 60 * 1000);
     QTimer::singleShot(1000, this, &TimeTrackingWindow::slotSyncTasksAutomatic);
     m_updateUserInfoAndTasksDefinitionsTimer.start();
-
-    toolBar()->hide();
-}
-
-bool TimeTrackingWindow::event(QEvent *event)
-{
-    if (event->type() == QEvent::LayoutRequest)
-        setMaximumHeight(sizeHint().height());
-    return CharmWindow::event(event);
-}
-
-void TimeTrackingWindow::showEvent(QShowEvent *e)
-{
-    CharmWindow::showEvent(e);
-}
-
-QMenu *TimeTrackingWindow::menu() const
-{
-    return m_summaryWidget->menu();
 }
 
 TimeTrackingWindow::~TimeTrackingWindow()
@@ -134,19 +120,59 @@ TimeTrackingWindow::~TimeTrackingWindow()
         DATAMODEL->unregisterAdapter(this);
 }
 
+QMenu *TimeTrackingWindow::menu() const
+{
+    return m_summaryWidget->menu();
+}
+
+bool TimeTrackingWindow::event(QEvent *event)
+{
+    if (event->type() == QEvent::LayoutRequest)
+        setMaximumHeight(sizeHint().height());
+    return QMainWindow::event(event);
+}
+
+void TimeTrackingWindow::showEvent(QShowEvent *e)
+{
+    checkVisibility();
+    QMainWindow::showEvent(e);
+}
+
+void TimeTrackingWindow::hideEvent(QHideEvent *e)
+{
+    checkVisibility();
+    QMainWindow::hideEvent(e);
+}
+
 void TimeTrackingWindow::stateChanged(State previous)
 {
-    CharmWindow::stateChanged(previous);
+    Q_UNUSED(previous)
+
     switch (ApplicationCore::instance().state()) {
     case Connecting:
+        setEnabled(false);
+        restoreGuiState();
+        configurationChanged();
         connect(ApplicationCore::instance().dateChangeWatcher(), &DateChangeWatcher::dateChanged,
                 this, &TimeTrackingWindow::slotSelectTasksToShow);
         DATAMODEL->registerAdapter(this);
         m_summaryWidget->setSummaries(QVector<WeeklySummary>());
         m_summaryWidget->handleActiveEvent();
         break;
+    case Connected:
+        configurationChanged();
+        ApplicationCore::instance().createFileMenu(menuBar());
+        insertEditMenu();
+        ApplicationCore::instance().createWindowMenu(menuBar());
+        ApplicationCore::instance().createHelpMenu(menuBar());
+        setEnabled(true);
+        break;
     case Disconnecting:
+        setEnabled(false);
+        saveGuiState();
+        break;
     case ShuttingDown:
+    case Dead:
     default:
         break;
     }
@@ -214,7 +240,7 @@ void TimeTrackingWindow::configurationChanged()
         m_checkUploadedSheetsTimer.stop();
     }
     m_summaryWidget->configurationChanged();
-    CharmWindow::configurationChanged();
+    WidgetUtils::updateToolButtonStyle(this);
 }
 
 void TimeTrackingWindow::slotSelectTasksToShow()
@@ -748,4 +774,128 @@ void TimeTrackingWindow::slotUserInfoDownloaded(HttpJob *job_)
     settings.beginGroup(QStringLiteral("users"));
     settings.setValue(QStringLiteral("weeklyhours"), weeklyHours);
     settings.endGroup();
+}
+
+QString TimeTrackingWindow::windowName() const
+{
+    return m_windowName;
+}
+
+void TimeTrackingWindow::setWindowName(const QString &text)
+{
+    m_windowName = text;
+    setWindowTitle(text);
+}
+
+void TimeTrackingWindow::setWindowIdentifier(const QString &id)
+{
+    m_windowIdentifier = id;
+}
+
+QString TimeTrackingWindow::windowIdentifier() const
+{
+    return m_windowIdentifier;
+}
+
+void TimeTrackingWindow::checkVisibility()
+{
+    const auto visibility = isVisible();
+
+    if (m_isVisibility != visibility) {
+        m_isVisibility = visibility;
+        emit visibilityChanged(m_isVisibility);
+    }
+}
+
+void TimeTrackingWindow::sendCommand(CharmCommand *cmd)
+{
+    cmd->prepare();
+    auto relay = new CommandRelayCommand(this);
+    relay->setCommand(cmd);
+    emitCommand(relay);
+}
+
+void TimeTrackingWindow::commitCommand(CharmCommand *command)
+{
+    command->finalize();
+}
+
+void TimeTrackingWindow::keyPressEvent(QKeyEvent *event)
+{
+    if (event->type() == QEvent::KeyPress) {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+        if (keyEvent->modifiers() & Qt::ControlModifier && keyEvent->key() == Qt::Key_W
+            && isVisible()) {
+            showHideView();
+            return;
+        }
+    }
+    QMainWindow::keyPressEvent(event);
+}
+
+void TimeTrackingWindow::showView(QWidget *w)
+{
+    w->show();
+    w->setWindowState(w->windowState() & ~Qt::WindowMinimized);
+    w->raise();
+    w->activateWindow();
+}
+
+bool TimeTrackingWindow::showHideView(QWidget *w)
+{
+    // hide or restore the view
+    if (w->isVisible()) {
+        w->hide();
+        return false;
+    } else {
+        showView(w);
+        return true;
+    }
+}
+
+void TimeTrackingWindow::showView()
+{
+    showView(this);
+}
+
+void TimeTrackingWindow::showHideView()
+{
+    showHideView(this);
+}
+
+void TimeTrackingWindow::saveGuiState()
+{
+    Q_ASSERT(!windowIdentifier().isEmpty());
+    QSettings settings;
+    settings.beginGroup(windowIdentifier());
+    // save geometry
+    WidgetUtils::saveGeometry(this, MetaKey_MainWindowGeometry);
+    settings.setValue(MetaKey_MainWindowVisible, isVisible());
+}
+
+void TimeTrackingWindow::restoreGuiState()
+{
+    const QString identifier = windowIdentifier();
+    Q_ASSERT(!identifier.isEmpty());
+    // restore geometry
+    QSettings settings;
+    settings.beginGroup(identifier);
+    WidgetUtils::restoreGeometry(this, MetaKey_MainWindowGeometry);
+    // restore visibility
+    bool visible = true;
+    if (m_hideAtStartUp) {
+        visible = false;
+    } else {
+        // Time Tracking Window should always be visible, except when Charm is started with
+        // --hide-at-start
+        visible = (identifier == QLatin1String("window_tracking"))
+            ? true
+            : settings.value(MetaKey_MainWindowVisible).toBool();
+    }
+    setVisible(visible);
+}
+
+void TimeTrackingWindow::setHideAtStartup(bool value)
+{
+    m_hideAtStartUp = value;
 }

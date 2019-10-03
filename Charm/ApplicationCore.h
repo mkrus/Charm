@@ -37,7 +37,6 @@
 #include "Core/State.h"
 #include "Core/TimeSpans.h"
 
-#include "Widgets/CharmWindow.h"
 #include "Widgets/EventView.h"
 #include "Widgets/TasksView.h"
 #include "Widgets/TimeTrackingWindow.h"
@@ -87,7 +86,7 @@ public:
 
     /** The main view is the window responsible for managing state during command execution.
      * It is an internal concept, not a notion for the end user. */
-    CharmWindow &mainView();
+    TimeTrackingWindow &mainView();
 
     TrayIcon &trayIcon();
 

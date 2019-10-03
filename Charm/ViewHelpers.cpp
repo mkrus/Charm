@@ -38,7 +38,7 @@ static QCollator collator()
 }
 }
 
-void Charm::connectControllerAndView(Controller *controller, CharmWindow *view)
+void Charm::connectControllerAndView(Controller *controller, TimeTrackingWindow *view)
 {
     // connect view and controller:
     // make controller process commands send by the view:

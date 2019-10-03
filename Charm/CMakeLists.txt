@@ -30,7 +30,6 @@ SET(
     Reports/TimesheetXmlWriter.cpp
     Widgets/BillDialog.cpp
     Widgets/CharmPreferences.cpp
-    Widgets/CharmWindow.cpp
     Widgets/CharmAboutDialog.cpp
     Widgets/CharmNewReleaseDialog.cpp
     Widgets/CommentEditorPopup.cpp

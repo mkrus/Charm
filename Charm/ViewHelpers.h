@@ -40,7 +40,7 @@ enum class SortOrder { None = 0, StartTime, EndTime, TaskId, Comment };
 
 typedef QVarLengthArray<SortOrder, 5> SortOrderList;
 
-void connectControllerAndView(Controller *, CharmWindow *);
+void connectControllerAndView(Controller *, TimeTrackingWindow *);
 int collatorCompare(const QString &left, const QString &right);
 EventIdList eventIdsSortedBy(EventIdList, const SortOrderList &orders);
 EventIdList eventIdsSortedBy(const EventIdList &, SortOrder order);
