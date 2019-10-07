@@ -175,7 +175,7 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
     m_actionStopAllTasks.setShortcut(Qt::Key_Escape);
     m_actionStopAllTasks.setShortcutContext(Qt::ApplicationShortcut);
     mainView().addAction(&m_actionStopAllTasks); // for the shortcut to work
-    connect(&m_actionStopAllTasks, &QAction::triggered, this, &ApplicationCore::slotStopAllTasks);
+    connect(&m_actionStopAllTasks, &QAction::triggered, this, &ApplicationCore::slotStopTask);
 
     m_systrayContextMenu.addAction(&m_actionStopAllTasks);
     m_systrayContextMenu.addSeparator();
@@ -184,7 +184,7 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
     m_systrayContextMenu.addAction(&m_actionQuit);
 
     m_trayIcon.setContextMenu(&m_systrayContextMenu);
-    m_trayIcon.setToolTip(tr("No active events"));
+    m_trayIcon.setToolTip(tr("No active event"));
     m_trayIcon.setIcon(Data::charmTrayIcon());
     m_trayIcon.show();
 
@@ -672,9 +672,9 @@ QString ApplicationCore::titleString(const QString &text) const
     }
 }
 
-void ApplicationCore::slotStopAllTasks()
+void ApplicationCore::slotStopTask()
 {
-    DATAMODEL->endAllEventsRequested();
+    DATAMODEL->endEventRequested();
 }
 
 void ApplicationCore::slotQuitApplication()
@@ -726,7 +726,7 @@ void ApplicationCore::setHttpActionsVisible(bool visible)
 
 void ApplicationCore::slotMaybeIdle()
 {
-    if (DATAMODEL->activeEventCount() > 0)
+    if (DATAMODEL->hasActiveEvent())
         m_timeTracker.maybeIdle(idleDetector());
     // there are four parameters to the idle property:
     // - the initial start time of the currently active event(s)
@@ -736,7 +736,6 @@ void ApplicationCore::slotMaybeIdle()
     // all this information is available in the data model, plus the
     // argument to this call
     // things that make it complicated:
-    // - there may be multiple active events
     // - there may be multiple idle periods before the user deals with
     // it
 }

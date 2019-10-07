@@ -44,7 +44,7 @@ public:
     explicit TimeTrackingTaskSelector(QWidget *parent = nullptr);
 
     void populate(const QVector<WeeklySummary> &summaries);
-    void handleActiveEvents();
+    void handleActiveEvent();
     void taskSelected(const WeeklySummary &);
 
     QMenu *menu() const;

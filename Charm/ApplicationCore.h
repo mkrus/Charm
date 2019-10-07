@@ -97,7 +97,7 @@ public Q_SLOTS:
     void showMainWindow(ShowMode mode = ShowMode::Show);
 
     void setState(State state);
-    void slotStopAllTasks();
+    void slotStopTask();
     void slotQuitApplication();
     void slotControllerReadyToQuit();
     void slotSaveConfiguration();

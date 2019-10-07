@@ -107,7 +107,7 @@ Q_SIGNALS:
 
     /** This tells the application that the controller is ready to quit.
         When the user quits the application, the application will tell
-        the controller to end and commit all active events.
+        the controller to end and commit the active event.
         The controller will emit readyToQuit() when all data is
         stored.
         The controller will leave Disconnecting state when it receives

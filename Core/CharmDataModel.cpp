@@ -56,13 +56,11 @@ CharmDataModel::~CharmDataModel()
 
 void CharmDataModel::stateChanged(State previous, State next)
 {
-    if (previous == Connected && next == Disconnecting) {
-        for (EventId id : m_activeEventIds) {
-            const Event &event = findEvent(id);
-            const Task &task = m_taskModel->taskForId(event.taskId());
-            Q_ASSERT(!task.isNull());
-            endEventRequested(task);
-        }
+    if (m_hasActiveEvent && previous == Connected && next == Disconnecting) {
+        const Event &event = findEvent(m_activeEventId);
+        const Task &task = m_taskModel->taskForId(event.taskId());
+        Q_ASSERT(!task.isNull());
+        endEventRequested(task);
     }
 }
 
@@ -153,7 +151,7 @@ void CharmDataModel::modifyEvent(const Event &newEvent)
 void CharmDataModel::deleteEvent(const Event &event)
 {
     Q_ASSERT_X(eventExists(event.id()), Q_FUNC_INFO, "Event to delete has to exist");
-    Q_ASSERT_X(!m_activeEventIds.contains(event.id()), Q_FUNC_INFO,
+    Q_ASSERT_X(!m_hasActiveEvent || m_activeEventId != event.id(), Q_FUNC_INFO,
                "Cannot delete an active event");
 
     for (auto adapter : m_adapters)
@@ -216,13 +214,13 @@ bool CharmDataModel::activateEvent(const Event &activeEvent)
         TaskId taskId = activeEvent.taskId();
 
         // this check may become obsolete:
-        for (int i = 0; i < m_activeEventIds.size(); ++i) {
-            if (m_activeEventIds[i] == activeEvent.id()) {
+        if (m_hasActiveEvent) {
+            if (m_activeEventId == activeEvent.id()) {
                 Q_ASSERT(!"inconsistency (event already active)!");
                 return false;
             }
 
-            const Event &e = eventForId(m_activeEventIds[i]);
+            const Event &e = eventForId(m_activeEventId);
             if (e.taskId() == taskId) {
                 Q_ASSERT(!"inconsistency (event already active for task)!");
                 return false;
@@ -230,7 +228,9 @@ bool CharmDataModel::activateEvent(const Event &activeEvent)
         }
     }
 
-    m_activeEventIds << activeEvent.id();
+    m_activeEventId = activeEvent.id();
+    m_hasActiveEvent = true;
+
     for (auto adapter : m_adapters)
         adapter->eventActivated(activeEvent.id());
     m_timer.start(10000);
@@ -244,8 +244,8 @@ bool CharmDataModel::eventExists(EventId id)
 
 bool CharmDataModel::isTaskActive(TaskId id) const
 {
-    for (int i = 0; i < m_activeEventIds.size(); ++i) {
-        const Event &e = eventForId(m_activeEventIds[i]);
+    if (m_hasActiveEvent) {
+        const Event &e = eventForId(m_activeEventId);
         Q_ASSERT(e.isValid());
         if (e.taskId() == id)
             return true;
@@ -258,8 +258,8 @@ const Event &CharmDataModel::activeEventFor(TaskId id) const
 {
     static Event InvalidEvent;
 
-    for (int i = 0; i < m_activeEventIds.size(); ++i) {
-        const Event &e = eventForId(m_activeEventIds[i]);
+    if (m_hasActiveEvent) {
+        const Event &e = eventForId(m_activeEventId);
         if (e.taskId() == id)
             return e;
     }
@@ -270,8 +270,8 @@ const Event &CharmDataModel::activeEventFor(TaskId id) const
 void CharmDataModel::startEventRequested(const Task &task)
 {
     // respect configuration:
-    if (!m_activeEventIds.isEmpty())
-        endAllEventsRequested();
+    if (m_hasActiveEvent)
+        endEventRequested();
 
     // clear the "last event editor datetime" so that the next manual "create event"
     // doesn't use some old date
@@ -286,15 +286,13 @@ void CharmDataModel::endEventRequested(const Task &task)
 {
     EventId eventId = 0;
 
-    // find the event in the list of active events and remove it:
-    for (int i = 0; i < m_activeEventIds.size(); ++i) {
-        if (eventForId(m_activeEventIds[i]).taskId() == task.id) {
-            eventId = m_activeEventIds[i];
-            m_activeEventIds.removeAt(i);
-            for (auto adapter : m_adapters)
-                adapter->eventDeactivated(eventId);
-            break;
-        }
+    // remove the active event
+    if (m_hasActiveEvent && eventForId(m_activeEventId).taskId() == task.id) {
+        eventId = m_activeEventId;
+        m_hasActiveEvent = false;
+
+        for (auto adapter : m_adapters)
+            adapter->eventDeactivated(eventId);
     }
 
     Q_ASSERT(eventId != 0);
@@ -304,17 +302,18 @@ void CharmDataModel::endEventRequested(const Task &task)
 
     emit requestEventModification(event, old);
 
-    if (m_activeEventIds.isEmpty())
+    if (!m_hasActiveEvent)
         m_timer.stop();
     updateToolTip();
 }
 
-void CharmDataModel::endAllEventsRequested()
+void CharmDataModel::endEventRequested()
 {
     QDateTime currentDateTime = QDateTime::currentDateTime();
-    while (!m_activeEventIds.isEmpty()) {
-        EventId eventId = m_activeEventIds.first();
-        m_activeEventIds.pop_front();
+    if (m_hasActiveEvent) {
+        EventId eventId = m_activeEventId;
+        m_hasActiveEvent = false;
+
         for (auto adapter : m_adapters)
             adapter->eventDeactivated(eventId);
 
@@ -332,10 +331,10 @@ void CharmDataModel::endAllEventsRequested()
 
 void CharmDataModel::eventUpdateTimerEvent()
 {
-    for (EventId id : m_activeEventIds) {
+    if (m_hasActiveEvent) {
         // Not a ref (Event &), since we want to diff "old event"
         // and "new event" in *Adapter::eventModified
-        Event event = findEvent(id);
+        Event event = findEvent(m_activeEventId);
         Event old = event;
         event.setEndDateTime(QDateTime::currentDateTime());
 
@@ -349,19 +348,19 @@ QString CharmDataModel::fullTaskName(TaskId id) const
     return m_taskModel->fullTaskName(id);
 }
 
-QString CharmDataModel::eventsString() const
+QString CharmDataModel::eventString() const
 {
-    QStringList eStrList;
-    for (EventId eventId : activeEvents()) {
-        Event event = eventForId(eventId);
+    QString str;
+    if (m_hasActiveEvent) {
+        Event event = eventForId(m_activeEventId);
         if (event.isValid()) {
             const Task &task = getTask(event.taskId());
-            eStrList << tr("%1 - %2")
+            str = tr("%1 - %2")
                             .arg(hoursAndMinutes(event.duration()))
                             .arg(m_taskModel->fullTaskName(task.id));
         }
     }
-    return eStrList.join(QLatin1Char('\n'));
+    return str;
 }
 
 QString CharmDataModel::smartTaskName(TaskId id) const
@@ -372,8 +371,8 @@ QString CharmDataModel::smartTaskName(TaskId id) const
 int CharmDataModel::totalDuration() const
 {
     int totalDuration = 0;
-    for (EventId eventId : activeEvents()) {
-        Event event = eventForId(eventId);
+    if (m_hasActiveEvent) {
+        Event event = eventForId(m_activeEventId);
         if (event.isValid())
             totalDuration += event.duration();
     }
@@ -388,23 +387,9 @@ QString CharmDataModel::totalDurationString() const
 void CharmDataModel::updateToolTip()
 {
     QString toolTip;
-    int numEvents = activeEvents().count();
-    switch (numEvents) {
-    case 0:
-        toolTip = tr("No active events");
-        break;
-    case 1:
-        toolTip = eventsString();
-        break;
-    default:
-        toolTip = tr("<qt>%1 for %2 active events:<hr>%3</qt>")
-                      .arg(totalDurationString())
-                      .arg(numEvents)
-                      .arg(eventsString());
-        break;
-    }
+    toolTip = m_hasActiveEvent ? tr("No active event") : eventString();
 
-    emit sysTrayUpdate(toolTip, numEvents != 0);
+    emit sysTrayUpdate(toolTip, m_hasActiveEvent);
 }
 
 const EventMap &CharmDataModel::eventMap() const
@@ -414,12 +399,7 @@ const EventMap &CharmDataModel::eventMap() const
 
 bool CharmDataModel::isEventActive(EventId id) const
 {
-    return m_activeEventIds.contains(id);
-}
-
-int CharmDataModel::activeEventCount() const
-{
-    return m_activeEventIds.count();
+    return m_hasActiveEvent && m_activeEventId == id;
 }
 
 EventIdList CharmDataModel::eventsThatStartInTimeFrame(const QDate &start, const QDate &end) const
@@ -444,9 +424,14 @@ EventIdList CharmDataModel::eventsThatStartInTimeFrame(const TimeSpan &timeSpan)
     return eventsThatStartInTimeFrame(timeSpan.first, timeSpan.second);
 }
 
-EventIdList CharmDataModel::activeEvents() const
+bool CharmDataModel::hasActiveEvent() const
 {
-    return m_activeEventIds;
+    return m_hasActiveEvent;
+}
+
+EventId CharmDataModel::activeEvent() const
+{
+    return m_activeEventId;
 }
 
 TaskIdList CharmDataModel::mostFrequentlyUsedTasks() const
@@ -512,7 +497,7 @@ bool CharmDataModel::operator==(const CharmDataModel &other) const
     if (&other == this)
         return true;
     return getAllTasks() == other.getAllTasks() && m_events == other.m_events
-        && m_activeEventIds == other.m_activeEventIds;
+        && m_activeEventId == other.m_activeEventId;
 }
 
 CharmDataModel *CharmDataModel::clone() const
@@ -520,6 +505,6 @@ CharmDataModel *CharmDataModel::clone() const
     auto c = new CharmDataModel();
     c->setAllTasks(getAllTasks());
     c->m_events = m_events;
-    c->m_activeEventIds = m_activeEventIds;
+    c->m_activeEventId = m_activeEventId;
     return c;
 }

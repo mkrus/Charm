@@ -146,30 +146,23 @@ void TimeTrackingTaskSelector::populate(const QVector<WeeklySummary> &summaries)
 
 void TimeTrackingTaskSelector::slotEditCommentClicked()
 {
-    const EventIdList events = DATAMODEL->activeEvents();
-    Q_ASSERT(events.size() == 1);
+    Q_ASSERT(DATAMODEL->hasActiveEvent());
+    const EventId event = DATAMODEL->activeEvent();
     CommentEditorPopup popup;
-    popup.loadEvent(events.first());
+    popup.loadEvent(event);
     popup.exec();
 }
 
-void TimeTrackingTaskSelector::handleActiveEvents()
+void TimeTrackingTaskSelector::handleActiveEvent()
 {
-    const int activeEventCount = DATAMODEL->activeEventCount();
-    if (activeEventCount > 1) {
-        m_stopGoAction->setIcon(Data::goIcon());
-        m_stopGoAction->setText(tr("Start Task"));
-        m_stopGoAction->setEnabled(false);
-        m_stopGoAction->setChecked(true);
-        m_editCommentAction->setEnabled(false);
-    } else if (activeEventCount == 1) {
+    if (DATAMODEL->hasActiveEvent()) {
         m_stopGoAction->setIcon(Data::stopIcon());
         m_stopGoAction->setText(tr("Stop Task"));
         m_stopGoAction->setEnabled(true);
         m_stopGoAction->setChecked(true);
         m_editCommentAction->setEnabled(true);
 
-        const Event &event = DATAMODEL->eventForId(DATAMODEL->activeEvents().first());
+        const Event &event = DATAMODEL->eventForId(DATAMODEL->activeEvent());
         const Task &task = DATAMODEL->getTask(event.taskId());
         m_taskSelectorButton->setText(escapeAmpersands(DATAMODEL->smartTaskName(task.id)));
     } else {
@@ -219,10 +212,10 @@ void TimeTrackingTaskSelector::slotActionSelected()
         return;
     }
     taskSelected(taskId);
-    handleActiveEvents();
+    handleActiveEvent();
 
     if (!DATAMODEL->isTaskActive(taskId)) {
-        if (!DATAMODEL->activeEvents().isEmpty())
+        if (DATAMODEL->hasActiveEvent())
             emit stopEvents();
         emit startEvent(taskId);
     }
@@ -285,7 +278,7 @@ void TimeTrackingTaskSelector::slotManuallySelectTask()
     if (m_selectedTask <= 0)
         m_selectedTask = m_manuallySelectedTask;
     m_taskManuallySelected = true;
-    handleActiveEvents();
+    handleActiveEvent();
     emit updateSummariesPlease();
 }
 

@@ -41,8 +41,8 @@ class QAbstractItemModel;
 
 /** CharmDataModel is the application's model.
     CharmDataModel holds all data that makes up the application's
-    current data space: the list of tasks, the list of events, and the
-    list of active (currently timed) events.
+    current data space: the list of tasks, the list of events,
+    and the active (currently timed) event.
     It will notify all registered CharmDataModelAdapterInterfaces
     about changes in the model. Those interfaces could, for example,
     implement QAbstractItemModel.
@@ -85,10 +85,10 @@ public:
     // convenience overload
     EventIdList eventsThatStartInTimeFrame(const TimeSpan &timeSpan) const;
     const Event &activeEventFor(TaskId id) const;
-    EventIdList activeEvents() const;
-    int activeEventCount() const;
+    bool hasActiveEvent() const;
+    EventId activeEvent() const;
 
-    // handling of active events:
+    // handling of active event:
     /** Is an event active for the task with this id? */
     bool isTaskActive(TaskId id) const;
     /** Is this event active? */
@@ -97,8 +97,8 @@ public:
     void startEventRequested(const Task &);
     /** Stop the active event for this task. */
     void endEventRequested(const Task &);
-    /** Stop all tasks. */
-    void endAllEventsRequested();
+    /** Stop task. */
+    void endEventRequested();
     /** Activate this event. */
     bool activateEvent(const Event &);
 
@@ -146,12 +146,13 @@ private:
     Event &findEvent(EventId id);
 
     int totalDuration() const;
-    QString eventsString() const;
+    QString eventString() const;
     QString totalDurationString() const;
     void updateToolTip();
 
     EventMap m_events;
-    EventIdList m_activeEventIds;
+    bool m_hasActiveEvent = false;
+    EventId m_activeEventId;
     // adapters are notified when the model changes
     CharmDataModelAdapterList m_adapters;
 

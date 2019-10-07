@@ -78,7 +78,7 @@ public:
 
     void populateEditMenu(QMenu *);
 
-    void handleActiveEvents();
+    void handleActiveEvent();
 
     bool isTracking() const;
 

@@ -99,7 +99,7 @@ int IdleDetector::idlenessDuration() const
 
 void IdleDetector::maybeIdle(const IdlePeriod &period)
 {
-    if (!Configuration::instance().detectIdling || DATAMODEL->activeEventCount() == 0)
+    if (!Configuration::instance().detectIdling || !DATAMODEL->hasActiveEvent())
         return;
 
     qCDebug(CHARM_APPLICATION_LOG) << "IdleDetector::maybeIdle: Checking for idleness";

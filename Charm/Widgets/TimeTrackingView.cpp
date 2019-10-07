@@ -339,13 +339,13 @@ void TimeTrackingView::setSummaries(const QVector<WeeklySummary> &summaries)
     // populate menu:
     m_taskSelector->populate(m_summaries);
     // FIXME maybe remember last selected task
-    handleActiveEvents();
+    handleActiveEvent();
     emit taskMenuChanged();
 }
 
 bool TimeTrackingView::isTracking() const
 {
-    return DATAMODEL->activeEventCount() > 0;
+    return DATAMODEL->hasActiveEvent();
 }
 
 void TimeTrackingView::configurationChanged()
@@ -373,12 +373,10 @@ void TimeTrackingView::configurationChanged()
     repaint();
 }
 
-void TimeTrackingView::handleActiveEvents()
+void TimeTrackingView::handleActiveEvent()
 {
     m_activeFieldRects.clear();
-    Q_ASSERT(DATAMODEL->activeEventCount() >= 0);
-
-    m_taskSelector->handleActiveEvents();
+    m_taskSelector->handleActiveEvent();
 }
 
 QString TimeTrackingView::elidedText(const QString &text, const QFont &font, int width)

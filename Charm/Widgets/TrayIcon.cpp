@@ -48,7 +48,7 @@ void TrayIcon::slotActivated(QSystemTrayIcon::ActivationReason reason)
         break;
     case QSystemTrayIcon::MiddleClick:
         // TODO: Start task?
-        ApplicationCore::instance().slotStopAllTasks();
+        ApplicationCore::instance().slotStopTask();
         break;
     case QSystemTrayIcon::Unknown:
     default:

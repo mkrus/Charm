@@ -143,7 +143,7 @@ void TimeTrackingWindow::stateChanged(State previous)
                 this, &TimeTrackingWindow::slotSelectTasksToShow);
         DATAMODEL->registerAdapter(this);
         m_summaryWidget->setSummaries(QVector<WeeklySummary>());
-        m_summaryWidget->handleActiveEvents();
+        m_summaryWidget->handleActiveEvent();
         break;
     case Disconnecting:
     case ShuttingDown:
@@ -189,12 +189,12 @@ void TimeTrackingWindow::eventDeleted(EventId)
 
 void TimeTrackingWindow::eventActivated(EventId)
 {
-    m_summaryWidget->handleActiveEvents();
+    m_summaryWidget->handleActiveEvent();
 }
 
 void TimeTrackingWindow::eventDeactivated(EventId id)
 {
-    m_summaryWidget->handleActiveEvents();
+    m_summaryWidget->handleActiveEvent();
 
     if (CONFIGURATION.requestEventComment) {
         Event event = DATAMODEL->eventForId(id);
@@ -253,7 +253,7 @@ void TimeTrackingWindow::slotStartEvent(TaskId id)
 
 void TimeTrackingWindow::slotStopEvent()
 {
-    DATAMODEL->endAllEventsRequested();
+    DATAMODEL->endEventRequested();
 }
 
 void TimeTrackingWindow::slotEditPreferences(bool)
@@ -521,28 +521,30 @@ void TimeTrackingWindow::informUserAboutNewRelease(const QString &releaseVersion
 
 void TimeTrackingWindow::handleIdleEvents(IdleDetector *detector, bool restart)
 {
-    EventIdList activeEvents = DATAMODEL->activeEvents();
-    DATAMODEL->endAllEventsRequested();
+    bool hadActiveEvent = DATAMODEL->hasActiveEvent();
+    EventId activeEvent = DATAMODEL->activeEvent();
+    DATAMODEL->endEventRequested();
     // FIXME with this option, we can only change the events to
     // the start time of one idle period, I chose to use the last
     // one:
     const auto periods = detector->idlePeriods();
     const IdleDetector::IdlePeriod period = periods.last();
 
-    for (EventId eventId : activeEvents) {
-        Event event = DATAMODEL->eventForId(eventId);
-        if (event.isValid()) {
-            QDateTime start = period.first; // initializes a valid QDateTime
-            event.setEndDateTime(qMax(event.startDateTime(), start));
-            Q_ASSERT(event.isValid());
-            auto cmd = new CommandModifyEvent(event, this);
-            emit emitCommand(cmd);
-            if (restart) {
-                Task task;
-                task.id = event.taskId();
-                if (!task.isNull())
-                    DATAMODEL->startEventRequested(task);
-            }
+    if (hadActiveEvent) {
+        Event event = DATAMODEL->eventForId(activeEvent);
+        Q_ASSERT(event.isValid());
+
+        QDateTime start = period.first; // initializes a valid QDateTime
+        event.setEndDateTime(qMax(event.startDateTime(), start));
+        Q_ASSERT(event.isValid());
+
+        auto cmd = new CommandModifyEvent(event, this);
+        emit emitCommand(cmd);
+        if (restart) {
+            Task task;
+            task.id = event.taskId();
+            if (!task.isNull())
+                DATAMODEL->startEventRequested(task);
         }
     }
 }
