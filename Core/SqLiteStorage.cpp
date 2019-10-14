@@ -143,6 +143,18 @@ bool SqLiteStorage::connect(Configuration &configuration)
 
     const QFileInfo fileInfo(configuration.localStorageDatabase); // this is the full path
 
+    if (!fileInfo.exists() && !configuration.newDatabase) {
+        configuration.failureMessage =
+            QObject::tr("<html><head><meta name=\"qrichtext\" content=\"1\" /></head>"
+                        "<body><p>The configuration seems to be valid, but the database "
+                        "file does not exist.</p>"
+                        "<p>The file will automatically be generated. Please verify "
+                        "the configuration.</p>"
+                        "<p>If the configuration is correct, just close the dialog.</p>"
+                        "</body></html>");
+        return false;
+    }
+
     // make sure the path exists, file will be created by sqlite
     if (!QDir().mkpath(fileInfo.absolutePath())) {
         configuration.failureMessage =
@@ -160,20 +172,6 @@ bool SqLiteStorage::connect(Configuration &configuration)
     const QString databaseName = fileInfo.absoluteFilePath();
     m_database.setDatabaseName(databaseName);
 
-    bool error = false;
-
-    if (!fileInfo.exists() && !configuration.newDatabase) {
-        error = true;
-        configuration.failureMessage =
-            QObject::tr("<html><head><meta name=\"qrichtext\" content=\"1\" /></head>"
-                        "<body><p>The configuration seems to be valid, but the database "
-                        "file does not exist.</p>"
-                        "<p>The file will automatically be generated. Please verify "
-                        "the configuration.</p>"
-                        "<p>If the configuration is correct, just close the dialog.</p>"
-                        "</body></html>");
-    }
-
     if (!m_database.open()) {
         configuration.failureMessage =
             QObject::tr("Could not open SQLite database %1").arg(databaseName);
@@ -187,9 +185,6 @@ bool SqLiteStorage::connect(Configuration &configuration)
             return false;
         }
     }
-
-    if (error)
-        return false;
 
     configuration.failure = false;
     return true;

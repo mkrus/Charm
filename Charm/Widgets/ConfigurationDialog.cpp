@@ -38,6 +38,8 @@ ConfigurationDialog::ConfigurationDialog(const Configuration &config, QWidget *p
     connect(m_ui.databaseLocation, &QLineEdit::textChanged, this, &ConfigurationDialog::checkInput);
     connect(m_ui.nameLineEdit, &QLineEdit::textChanged, this, &ConfigurationDialog::checkInput);
     connect(m_ui.databaseLocationButton, &QPushButton::clicked, this, &ConfigurationDialog::slotDatabaseLocationButtonClicked);
+
+    checkInput();
 }
 
 Configuration ConfigurationDialog::configuration() const
