@@ -64,7 +64,7 @@ Configuration::Configuration(TaskPrefilteringMode _taskPrefilteringMode,
 
 bool Configuration::operator==(const Configuration &other) const
 {
-    return userName == other.userName && taskPrefilteringMode == other.taskPrefilteringMode
+    return taskPrefilteringMode == other.taskPrefilteringMode
         && detectIdling == other.detectIdling
         && warnUnuploadedTimesheets == other.warnUnuploadedTimesheets
         && requestEventComment == other.requestEventComment

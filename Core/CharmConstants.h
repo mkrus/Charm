@@ -66,7 +66,6 @@ extern const QString MetaKey_ReportsRecentSavePath;
 extern const QString MetaKey_ExportToXmlRecentSavePath;
 extern const QString MetaKey_LastEventEditorDateTime;
 extern const QString MetaKey_Key_InstallationId;
-extern const QString MetaKey_Key_UserName;
 extern const QString MetaKey_Key_LocalStorageDatabase;
 extern const QString MetaKey_Key_LocalStorageType;
 extern const QString MetaKey_Key_SubscribedTasksOnly;

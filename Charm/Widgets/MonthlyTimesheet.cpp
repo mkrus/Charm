@@ -81,8 +81,8 @@ QByteArray MonthlyTimeSheetReport::saveToText()
     QByteArray output;
     QTextStream stream(&output);
     QString content =
-        tr("Report for %1, %2 %3 (%4 to %5)")
-            .arg(CONFIGURATION.userName, QLocale::system().monthName(m_monthNumber),
+        tr("Report, %1 %2 (%3 to %4)")
+            .arg(QLocale::system().monthName(m_monthNumber),
                  QString::number(startDate().year()), startDate().toString(Qt::TextDate),
                  endDate().addDays(-1).toString(Qt::TextDate));
     stream << content << '\n';
@@ -193,8 +193,8 @@ void MonthlyTimeSheetReport::update()
     {
         QDomElement headline = doc.createElement(QStringLiteral("h3"));
         QString content =
-            tr("Report for %1, %2 %3 (%4 to %5)")
-                .arg(CONFIGURATION.userName, QLocale::system().monthName(m_monthNumber),
+            tr("Report, %1 %2 (%3 to %4)")
+                .arg(QLocale::system().monthName(m_monthNumber),
                      QString::number(startDate().year()), startDate().toString(Qt::TextDate),
                      endDate().addDays(-1).toString(Qt::TextDate));
         QDomText text = doc.createTextNode(content);

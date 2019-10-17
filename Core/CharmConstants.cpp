@@ -50,7 +50,6 @@ const QString MetaKey_ReportsRecentSavePath = QStringLiteral("ReportsRecentSaveP
 const QString MetaKey_ExportToXmlRecentSavePath = QStringLiteral("ExportToXmlSavePath");
 const QString MetaKey_LastEventEditorDateTime = QStringLiteral("LastEventEditorDateTime");
 const QString MetaKey_Key_InstallationId = QStringLiteral("InstallationId");
-const QString MetaKey_Key_UserName = QStringLiteral("UserName");
 const QString MetaKey_Key_LocalStorageDatabase = QStringLiteral("LocalStorageDatabase");
 const QString MetaKey_Key_LocalStorageType = QStringLiteral("LocalStorageType");
 const QString MetaKey_Key_SubscribedTasksOnly = QStringLiteral("SubscribedTasksOnly");

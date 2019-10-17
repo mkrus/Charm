@@ -31,12 +31,10 @@ ConfigurationDialog::ConfigurationDialog(const Configuration &config, QWidget *p
     , m_config(config)
 {
     m_ui.setupUi(this);
-    m_ui.nameLineEdit->setText(config.userName);
     m_ui.databaseLocation->setText(config.localStorageDatabase);
     connect(m_ui.buttonBox, &QDialogButtonBox::rejected, this, &ConfigurationDialog::reject);
     connect(m_ui.buttonBox, &QDialogButtonBox::accepted, this, &ConfigurationDialog::accept);
     connect(m_ui.databaseLocation, &QLineEdit::textChanged, this, &ConfigurationDialog::checkInput);
-    connect(m_ui.nameLineEdit, &QLineEdit::textChanged, this, &ConfigurationDialog::checkInput);
     connect(m_ui.databaseLocationButton, &QPushButton::clicked, this, &ConfigurationDialog::slotDatabaseLocationButtonClicked);
 
     checkInput();
@@ -50,7 +48,6 @@ Configuration ConfigurationDialog::configuration() const
 void ConfigurationDialog::accept()
 {
     m_config.installationId = m_config.createInstallationId();
-    m_config.userName = m_ui.nameLineEdit->text();
     m_config.localStorageType = CHARM_SQLITE_BACKEND_DESCRIPTOR;
     m_config.localStorageDatabase = m_ui.databaseLocation->text();
     m_config.newDatabase = true;
@@ -67,7 +64,6 @@ void ConfigurationDialog::slotDatabaseLocationButtonClicked()
 
 void ConfigurationDialog::checkInput()
 {
-    const bool ok =
-        !m_ui.databaseLocation->text().isEmpty() && !m_ui.nameLineEdit->text().isEmpty();
+    const bool ok = !m_ui.databaseLocation->text().isEmpty();
     m_ui.buttonBox->button(QDialogButtonBox::Ok)->setEnabled(ok);
 }

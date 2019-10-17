@@ -657,15 +657,8 @@ bool ApplicationCore::configure()
 
 QString ApplicationCore::titleString(const QString &text) const
 {
-    QString dbInfo;
-    const QString userName = CONFIGURATION.userName;
     if (!text.isEmpty()) {
-        if (!userName.isEmpty()) {
-            dbInfo = QStringLiteral("%1 - %2").arg(userName, text);
-        } else {
-            dbInfo = text;
-        }
-        return QStringLiteral("%1 (%2)").arg(QCoreApplication::applicationName(), dbInfo);
+        return QStringLiteral("%1 (%2)").arg(QCoreApplication::applicationName(), text);
     } else {
         return QCoreApplication::applicationName();
     }

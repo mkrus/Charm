@@ -289,8 +289,7 @@ void WeeklyTimeSheetReport::update()
     }
     {
         QDomElement headline = doc.createElement(QStringLiteral("h3"));
-        QString content = tr("Report for %1, Week %2 (%3 to %4)")
-                              .arg(CONFIGURATION.userName)
+        QString content = tr("Report, Week %1 (%2 to %3)")
                               .arg(m_weekNumber, 2, 10, QLatin1Char('0'))
                               .arg(startDate().toString(Qt::TextDate))
                               .arg(endDate().addDays(-1).toString(Qt::TextDate));
@@ -465,8 +464,7 @@ QByteArray WeeklyTimeSheetReport::saveToText()
 {
     QByteArray output;
     QTextStream stream(&output);
-    QString content = tr("Report for %1, Week %2 (%3 to %4)")
-                          .arg(CONFIGURATION.userName)
+    QString content = tr("Report, Week %1 (%2 to %3)")
                           .arg(m_weekNumber, 2, 10, QLatin1Char('0'))
                           .arg(startDate().toString(Qt::TextDate))
                           .arg(endDate().addDays(-1).toString(Qt::TextDate));

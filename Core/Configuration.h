@@ -55,7 +55,6 @@ public:
 
     quint32 createInstallationId() const;
 
-    QString userName;
     TaskPrefilteringMode taskPrefilteringMode = TaskPrefilter_ShowAll;
     Qt::ToolButtonStyle toolButtonStyle = Qt::ToolButtonFollowStyle;
     bool showStatusBar = true;
