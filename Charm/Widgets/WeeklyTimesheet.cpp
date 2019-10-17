@@ -219,7 +219,7 @@ void WeeklyTimeSheetReport::slotUploadTimesheet()
     dialog->setWindowTitle(tr("Uploading"));
     connect(client, &HttpJob::finished, this, &WeeklyTimeSheetReport::slotTimesheetUploaded);
     client->setFileName(suggestedFileName());
-    client->setPayload(saveToXml(ExcludeTaskList));
+    client->setPayload(saveToXml());
     client->start();
     uploadButton()->setEnabled(false);
 }
@@ -435,7 +435,7 @@ void WeeklyTimeSheetReport::update()
     uploadButton()->setEnabled(true);
 }
 
-QByteArray WeeklyTimeSheetReport::saveToXml(SaveToXmlMode mode)
+QByteArray WeeklyTimeSheetReport::saveToXml()
 {
     try {
         WeeklyTimesheetXmlWriter timesheet;
@@ -443,7 +443,6 @@ QByteArray WeeklyTimeSheetReport::saveToXml(SaveToXmlMode mode)
         timesheet.setYear(m_yearOfWeek);
         timesheet.setWeekNumber(m_weekNumber);
         timesheet.setRootTask(rootTask());
-        timesheet.setIncludeTaskList(mode == IncludeTaskList);
         const EventIdList matchingEventIds =
             DATAMODEL->eventsThatStartInTimeFrame(startDate(), endDate());
         EventList events;

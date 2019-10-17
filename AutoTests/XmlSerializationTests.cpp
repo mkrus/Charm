@@ -88,22 +88,6 @@ void XmlSerializationTests::testEventSerialization()
     }
 }
 
-void XmlSerializationTests::testTaskSerialization()
-{
-    QDomDocument document(QStringLiteral("testdocument"));
-    for (const Task &task : tasksToTest()) {
-        QDomElement element = task.toXml(document);
-        try {
-            Task readTask = Task::fromXml(element);
-            QVERIFY(task == readTask);
-        } catch (const CharmException &e) {
-            qDebug() << "XmlSerializationTests::testTaskSerialization: exception caught ("
-                     << e.what() << ")";
-            QFAIL("Task Serialization throws");
-        }
-    }
-}
-
 void XmlSerializationTests::testQDateTimeToFromString()
 {
     // test regular QDate::toString:
@@ -133,37 +117,6 @@ void XmlSerializationTests::testQDateTimeToFromString()
     QString date3string = date3.toString(Qt::ISODate);
     QDateTime date4 = QDateTime::fromString(date3string, Qt::ISODate);
     QVERIFY(date3 == date4);
-}
-
-void XmlSerializationTests::testTaskListSerialization()
-{
-    TaskList tasks = tasksToTest();
-    QVERIFY(!Task::checkForTreeness(tasks));
-    tasks.pop_front();
-
-    // FIXME this needs to go into an extra test module named
-    // TaskStructureTests
-    //
-    // FIXME the data to test needs to be retrieved from resources
-    //
-    // just making sure:
-    for (const Task &task : tasks)
-        QVERIFY(!task.isNull());
-
-    // the next test fails because tasks contains orphan elements (the
-    // parent they have assigned does not exist)
-    QVERIFY(!Task::checkForTreeness(tasks));
-
-    QDomDocument document(QStringLiteral("testdocument"));
-    QDomElement element = Task::makeTasksElement(document, tasks);
-    try {
-        TaskList result = Task::readTasksElement(element);
-        QVERIFY(tasks.count() == result.count());
-        QVERIFY(tasks == result);
-    } catch (const XmlSerializationException &e) {
-        qCritical() << "Failure reading tasks:" << e.what();
-        QFAIL("Read tasks are not equal to the written ones");
-    }
 }
 
 void XmlSerializationTests::testTaskExportImport()

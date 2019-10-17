@@ -84,7 +84,7 @@ private Q_SLOTS:
 private:
     QString suggestedFileName() const override;
     void update() override;
-    QByteArray saveToXml(SaveToXmlMode mode) override;
+    QByteArray saveToXml() override;
     QByteArray saveToText() override;
 
 private:

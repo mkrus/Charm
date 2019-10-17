@@ -679,7 +679,6 @@ void TimeTrackingWindow::uploadStagedTimesheet()
         timesheet.setDataModel(DATAMODEL);
         timesheet.setYear(year);
         timesheet.setWeekNumber(weekNumber);
-        timesheet.setIncludeTaskList(false);
 
         const auto matchingEventIds = DATAMODEL->eventsThatStartInTimeFrame(weekStart, yesterday);
         EventList events;

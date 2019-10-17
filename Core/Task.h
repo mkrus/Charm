@@ -65,13 +65,9 @@ struct Task
     static QString tagName();
     static QString taskListTagName();
 
-    QDomElement toXml(QDomDocument) const;
-
     static Task fromXml(const QDomElement &);
 
     static TaskList readTasksElement(const QDomElement &);
-
-    static QDomElement makeTasksElement(QDomDocument, const TaskList &);
 
     static bool checkForUniqueTaskIds(const TaskList &tasks);
 

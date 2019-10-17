@@ -108,7 +108,7 @@ QByteArray MonthlyTimeSheetReport::saveToText()
     return output;
 }
 
-QByteArray MonthlyTimeSheetReport::saveToXml(SaveToXmlMode mode)
+QByteArray MonthlyTimeSheetReport::saveToXml()
 {
     try {
         MonthlyTimesheetXmlWriter timesheet;
@@ -117,7 +117,6 @@ QByteArray MonthlyTimeSheetReport::saveToXml(SaveToXmlMode mode)
         timesheet.setYearOfMonth(m_yearOfMonth);
         timesheet.setNumberOfWeeks(m_numberOfWeeks);
         timesheet.setRootTask(rootTask());
-        timesheet.setIncludeTaskList(mode == IncludeTaskList);
         const EventIdList matchingEventIds =
             DATAMODEL->eventsThatStartInTimeFrame(startDate(), endDate());
         EventList events;

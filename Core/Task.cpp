@@ -99,23 +99,6 @@ const QString TaskComment(QStringLiteral("comment"));
 const QString TaskValidFrom(QStringLiteral("validfrom"));
 const QString TaskValidUntil(QStringLiteral("validuntil"));
 
-QDomElement Task::toXml(QDomDocument document) const
-{
-    QDomElement element = document.createElement(tagName());
-    element.setAttribute(TaskIdElement, id);
-    element.setAttribute(TaskParentId, parentId);
-    element.setAttribute(TaskTrackable, (trackable ? 1 : 0));
-    if (!name.isEmpty()) {
-        QDomText taskName = document.createTextNode(name);
-        element.appendChild(taskName);
-    }
-    if (validFrom.isValid())
-        element.setAttribute(TaskValidFrom, validFrom.toString(Qt::ISODate));
-    if (validUntil.isValid())
-        element.setAttribute(TaskValidUntil, validUntil.toString(Qt::ISODate));
-    return element;
-}
-
 Task Task::fromXml(const QDomElement &element)
 { // in case any task object creates trouble with
     // serialization/deserialization, add an object of it to
@@ -177,14 +160,6 @@ TaskList Task::readTasksElement(const QDomElement &element)
         throw XmlSerializationException(QObject::tr(
             "Task::readTasksElement: judging by the tag name, this is not a tasks element"));
     }
-}
-
-QDomElement Task::makeTasksElement(QDomDocument document, const TaskList &tasks)
-{
-    QDomElement element = document.createElement(taskListTagName());
-    for (const Task &task : tasks)
-        element.appendChild(task.toXml(document));
-    return element;
 }
 
 bool Task::checkForUniqueTaskIds(const TaskList &tasks)

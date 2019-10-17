@@ -37,8 +37,6 @@ public:
 
 private Q_SLOTS:
     void testEventSerialization();
-    void testTaskSerialization();
-    void testTaskListSerialization();
     void testQDateTimeToFromString();
     void testTaskExportImport();
 

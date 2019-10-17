@@ -48,9 +48,6 @@ public:
     TaskId rootTask() const;
     void setRootTask(TaskId rootTask);
 
-    bool includeTaskList() const;
-    void setIncludeTaskList(bool);
-
     /**
      * @throws XmlSerializationException
      */
