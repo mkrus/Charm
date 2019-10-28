@@ -19,3 +19,5 @@ Thumbs.db
 qrc_*.cxx
 Charm.pro.user
 /build*/
+compile_commands.json
+.ycm_extra_conf.py
