@@ -85,7 +85,7 @@ EventEditor::EventEditor(const Event &event, QWidget *parent)
         m_event.setEndDateTime(start);
         m_endDateChanged = false;
     }
-    updateValues(true);
+    updateValues(UpdateAll);
 }
 
 EventEditor::~EventEditor() {}
@@ -105,13 +105,11 @@ Event EventEditor::eventResult() const
 void EventEditor::durationHoursEdited(int)
 {
     updateEndTime();
-    updateValues();
 }
 
 void EventEditor::durationMinutesEdited(int)
 {
     updateEndTime();
-    updateValues();
 }
 
 void EventEditor::updateEndTime()
@@ -119,6 +117,7 @@ void EventEditor::updateEndTime()
     int duration = 3600 * m_ui->spinBoxHours->value() + 60 * m_ui->spinBoxMinutes->value();
     QDateTime endTime = m_event.startDateTime().addSecs(duration);
     m_event.setEndDateTime(endTime);
+    updateValues(UpdateDateTime);
 }
 
 void EventEditor::startDateChanged(const QDate &date)
@@ -127,12 +126,12 @@ void EventEditor::startDateChanged(const QDate &date)
     start.setDate(date);
     qint64 delta = m_event.startDateTime().secsTo(m_event.endDateTime());
     m_event.setStartDateTime(start);
-    if (!m_endDateChanged)
+    if (!m_endDateChanged) {
         m_event.setEndDateTime(start.addSecs(delta));
-
-    QDateTimeEdit::Section section = m_ui->dateEditStart->currentSection();
-    updateValues();
-    m_ui->dateEditStart->setCurrentSection(section);
+        updateValues(UpdateDuration | UpdateEndDate);
+    } else {
+        updateValues(UpdateDuration);
+    }
 }
 
 void EventEditor::startTimeChanged(const QTime &time)
@@ -141,9 +140,7 @@ void EventEditor::startTimeChanged(const QTime &time)
     start.setTime(time);
     m_event.setStartDateTime(start);
 
-    QDateTimeEdit::Section section = m_ui->timeEditStart->currentSection();
-    updateValues();
-    m_ui->timeEditStart->setCurrentSection(section);
+    updateValues(UpdateDuration);
 }
 
 void EventEditor::endDateChanged(const QDate &date)
@@ -152,9 +149,7 @@ void EventEditor::endDateChanged(const QDate &date)
     end.setDate(date);
     m_event.setEndDateTime(end);
 
-    QDateTimeEdit::Section section = m_ui->dateEditEnd->currentSection();
-    updateValues();
-    m_ui->dateEditEnd->setCurrentSection(section);
+    updateValues(UpdateDuration);
 
     if (!m_updating)
         m_endDateChanged = true;
@@ -166,9 +161,7 @@ void EventEditor::endTimeChanged(const QTime &time)
     end.setTime(time);
     m_event.setEndDateTime(end);
 
-    QDateTimeEdit::Section section = m_ui->timeEditEnd->currentSection();
-    updateValues();
-    m_ui->timeEditEnd->setCurrentSection(section);
+    updateValues(UpdateDuration);
 }
 
 void EventEditor::selectTaskClicked()
@@ -177,7 +170,7 @@ void EventEditor::selectTaskClicked()
 
     if (dialog.exec()) {
         m_event.setTaskId(dialog.selectedTask());
-        updateValues();
+        updateValues(UpdateDateTime | UpdateDuration);
     }
 }
 
@@ -202,56 +195,68 @@ struct SignalBlocker
     bool m_previous;
 };
 
-void EventEditor::updateValues(bool all)
+void EventEditor::updateValues(int updateFlag)
 {
     if (m_updating)
         return;
 
     m_updating = true;
 
+    // controls
+
     m_ui->buttonBox->button(QDialogButtonBox::Ok)
         ->setEnabled(m_event.endDateTime() >= m_event.startDateTime());
 
-    m_ui->dateEditStart->setDate(m_event.startDateTime().date());
-    m_ui->timeEditStart->setTime(m_event.startDateTime().time());
+    QString name = MODEL.charmDataModel()->smartTaskName(m_event.taskId());
+    m_ui->labelTaskName->setText(name);
 
     bool active = MODEL.charmDataModel()->isEventActive(m_event.id());
-    m_ui->dateEditEnd->setEnabled(!active);
-    m_ui->timeEditEnd->setEnabled(!active);
-    m_ui->spinBoxHours->setEnabled(!active);
-    m_ui->spinBoxMinutes->setEnabled(!active);
     m_ui->pushButtonSelectTask->setEnabled(!active);
     m_ui->startToNowButton->setEnabled(!active);
     m_ui->endToNowButton->setEnabled(!active);
 
-    if (!active) {
-        m_ui->dateEditEnd->setDate(m_event.endDateTime().date());
-        m_ui->timeEditEnd->setTime(m_event.endDateTime().time());
-    } else {
-        m_ui->dateEditEnd->setDate(QDate::currentDate());
-        m_ui->timeEditEnd->setTime(QTime::currentTime());
-    }
-    if (all)
-        m_ui->textEditComment->setText(m_event.comment());
-    int durationHours = qMax(m_event.duration() / 3600, 0);
-    int durationMinutes = qMax((m_event.duration() % 3600) / 60, 0);
-
-    { // block signals to prevent updates of the start/end edits
-        const SignalBlocker blocker1(m_ui->spinBoxHours);
-        const SignalBlocker blocker2(m_ui->spinBoxMinutes);
-        m_ui->spinBoxHours->setValue(durationHours);
-        m_ui->spinBoxMinutes->setValue(durationMinutes);
-    }
-
-    QString name = MODEL.charmDataModel()->smartTaskName(m_event.taskId());
-    m_ui->labelTaskName->setText(name);
+    // date and time
 
     QString format = m_ui->dateEditStart->displayFormat()
                          .remove(QStringLiteral("ap"))
                          .remove(QStringLiteral("AP"))
                          .simplified();
-    m_ui->dateEditStart->setDisplayFormat(format);
-    m_ui->dateEditEnd->setDisplayFormat(format);
+
+    if (updateFlag & UpdateEndDate) {
+        m_ui->dateEditEnd->setDate(active ? QDate::currentDate() : m_event.endDateTime().date());
+        m_ui->dateEditEnd->setEnabled(!active);
+        m_ui->dateEditEnd->setDisplayFormat(format);
+    }
+    if (updateFlag & UpdateDateTime) {
+        m_ui->dateEditStart->setDate(m_event.startDateTime().date());
+        m_ui->dateEditStart->setDisplayFormat(format);
+
+        m_ui->timeEditEnd->setTime(active ? QTime::currentTime() : m_event.endDateTime().time());
+        m_ui->timeEditStart->setTime(m_event.startDateTime().time());
+        m_ui->timeEditEnd->setEnabled(!active);
+    }
+
+    // duration
+
+    if (updateFlag & UpdateDuration) {
+        m_ui->spinBoxHours->setEnabled(!active);
+        m_ui->spinBoxMinutes->setEnabled(!active);
+
+        int durationHours = qMax(m_event.duration() / 3600, 0);
+        int durationMinutes = qMax((m_event.duration() % 3600) / 60, 0);
+        { // block signals to prevent updates of the start/end edits
+            const SignalBlocker blocker1(m_ui->spinBoxHours);
+            const SignalBlocker blocker2(m_ui->spinBoxMinutes);
+            m_ui->spinBoxHours->setValue(durationHours);
+            m_ui->spinBoxMinutes->setValue(durationMinutes);
+        }
+    }
+
+    // comment
+
+    if (updateFlag & UpdateComment) {
+        m_ui->textEditComment->setText(m_event.comment());
+    }
 
     m_updating = false;
 }
@@ -259,11 +264,11 @@ void EventEditor::updateValues(bool all)
 void EventEditor::startToNowButtonClicked()
 {
     m_event.setStartDateTime(QDateTime::currentDateTime());
-    updateValues();
+    updateValues(UpdateDateTime | UpdateDuration);
 }
 
 void EventEditor::endToNowButtonClicked()
 {
     m_event.setEndDateTime(QDateTime::currentDateTime());
-    updateValues();
+    updateValues(UpdateDateTime | UpdateDuration);
 }
