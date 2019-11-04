@@ -198,7 +198,7 @@ void TimeularManager::serviceStateChanged(QLowEnergyService::ServiceState newSta
         if (m_notificationDesc.isValid()) {
             qDebug() << "Device Connected";
             setStatus(Connected);
-            m_service->writeDescriptor(m_notificationDesc, QByteArray::fromHex("0100"));
+            m_service->writeDescriptor(m_notificationDesc, QByteArray::fromHex(QByteArrayLiteral("0200")));
         } else {
             setStatus(Disconneted);
         }
