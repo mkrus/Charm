@@ -30,51 +30,53 @@
 #ifndef TIMEULARMANAGER_H
 #define TIMEULARMANAGER_H
 
-#include <QObject>
-#include <QBluetoothLocalDevice>
 #include <QBluetoothDeviceDiscoveryAgent>
+#include <QBluetoothLocalDevice>
 #include <QBluetoothServiceDiscoveryAgent>
 #include <QLowEnergyController>
+#include <QObject>
 
 class TimeularManager : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(Status status READ status NOTIFY statusChanged)
     Q_PROPERTY(Orientation orientation READ orientation NOTIFY orientationChanged)
+    Q_PROPERTY(bool paired READ isPaired NOTIFY pairedChanged)
+    Q_PROPERTY(QStringList discoveredDevices READ discoveredDevices NOTIFY discoveredDevicesChanged)
 public:
     enum Status {
         Disconneted,
+        Scanning,
         Connecting,
         Connected,
     };
     Q_ENUMS(Status)
 
-    enum Orientation {
-        Vertical,
-        Face1,
-        Face2,
-        Face3,
-        Face4,
-        Face5,
-        Face6,
-        Face7,
-        Face8
-    };
+    enum Orientation { Vertical, Face1, Face2, Face3, Face4, Face5, Face6, Face7, Face8 };
     Q_ENUMS(Orientation)
 
     explicit TimeularManager(QObject *parent = nullptr);
     ~TimeularManager();
 
+    void init();
+
     Status status() const;
     Orientation orientation() const;
+    bool isPaired() const;
+    QString pairedDevice() const;
+    QStringList discoveredDevices() const;
 
 public Q_SLOTS:
     void startDiscovery();
+    void startConnection();
     void disconnect();
+    void setPairedDevice(const QString &pairedDevice);
 
 Q_SIGNALS:
     void statusChanged(Status status);
     void orientationChanged(Orientation orientation);
+    void pairedChanged(bool paired);
+    void discoveredDevicesChanged(QStringList discoveredDevices);
 
 private:
     void setStatus(Status status);
@@ -97,8 +99,8 @@ private:
     QBluetoothLocalDevice *m_localDevice = nullptr;
     QLowEnergyDescriptor m_notificationDesc;
     Orientation m_orientation = Vertical;
+    QString m_pairedDevice;
+    QStringList m_discoveredDevices;
 };
-
-
 
 #endif // TIMEULARMANAGER_H

@@ -1,40 +1,38 @@
 /*
-  Copyright 2019 Mike Krus
+  TimeularManager.cpp
 
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions
-  are met:
+  This file is part of Charm, a task-based time tracking application.
 
-  1. Redistributions of source code must retain the above copyright
-     notice, this list of conditions and the following disclaimer.
+  Copyright (C) 2014-2019 Klarälvdalens Datakonsult AB, a KDAB Group company, info@kdab.com
 
-  2. Redistributions in binary form must reproduce the above copyright
-     notice, this list of conditions and the following disclaimer in
-     the documentation and/or other materials provided with the
-     distribution.
+  Author: Mike Krus <mike.krus@kdab.com>
 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-  COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-  POSSIBILITY OF SUCH DAMAGE.
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 2 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "TimeularManager.h"
 
-#include <QDebug>
 #include <QBluetoothUuid>
+#include <QDebug>
+#include <QSettings>
 
 namespace {
-    const QBluetoothUuid zeiOrientationService(QLatin1Literal("{c7e70010-c847-11e6-8175-8c89a55d403c}"));
-    const QBluetoothUuid zeiOrientationCharacteristic(QLatin1Literal("{c7e70012-c847-11e6-8175-8c89a55d403c}"));
+const QBluetoothUuid
+    zeiOrientationService(QLatin1Literal("{c7e70010-c847-11e6-8175-8c89a55d403c}"));
+const QBluetoothUuid
+    zeiOrientationCharacteristic(QLatin1Literal("{c7e70012-c847-11e6-8175-8c89a55d403c}"));
+const QLatin1String timeularDeviceIdKey("timeularDeviceId");
 }
 
 TimeularManager::TimeularManager(QObject *parent)
@@ -43,13 +41,20 @@ TimeularManager::TimeularManager(QObject *parent)
     m_deviceDiscoveryAgent = new QBluetoothDeviceDiscoveryAgent(this);
     m_deviceDiscoveryAgent->setLowEnergyDiscoveryTimeout(5000);
 
-    connect(m_deviceDiscoveryAgent, &QBluetoothDeviceDiscoveryAgent::finished,
-            [this]() {
-                if (!m_service)
-                    this->startDiscovery();
-            });
-    connect(m_deviceDiscoveryAgent, &QBluetoothDeviceDiscoveryAgent::deviceDiscovered,
-            this, &TimeularManager::deviceDiscovered);
+    connect(m_deviceDiscoveryAgent, &QBluetoothDeviceDiscoveryAgent::finished, [this]() {
+        if (m_status != Connected)
+            setStatus(Disconneted);
+    });
+    connect(m_deviceDiscoveryAgent, &QBluetoothDeviceDiscoveryAgent::deviceDiscovered, this,
+            &TimeularManager::deviceDiscovered);
+}
+
+void TimeularManager::init()
+{
+    QSettings settings;
+    m_pairedDevice = settings.value(timeularDeviceIdKey).toString();
+    if (!m_pairedDevice.isEmpty())
+        emit pairedChanged(true);
 }
 
 TimeularManager::~TimeularManager()
@@ -60,6 +65,21 @@ TimeularManager::~TimeularManager()
 TimeularManager::Orientation TimeularManager::orientation() const
 {
     return m_orientation;
+}
+
+bool TimeularManager::isPaired() const
+{
+    return !m_pairedDevice.isEmpty();
+}
+
+QString TimeularManager::pairedDevice() const
+{
+    return m_pairedDevice;
+}
+
+QStringList TimeularManager::discoveredDevices() const
+{
+    return m_discoveredDevices;
 }
 
 TimeularManager::Status TimeularManager::status() const
@@ -81,6 +101,18 @@ void TimeularManager::startDiscovery()
         return;
 
     qDebug() << "Starting Discovery";
+    setStatus(Scanning);
+    m_discoveredDevices.clear();
+    emit discoveredDevicesChanged(m_discoveredDevices);
+    m_deviceDiscoveryAgent->start(QBluetoothDeviceDiscoveryAgent::LowEnergyMethod);
+}
+
+void TimeularManager::startConnection()
+{
+    if (m_status != Disconneted)
+        return;
+
+    qDebug() << "Starting Connection";
     setStatus(Connecting);
     m_deviceDiscoveryAgent->start(QBluetoothDeviceDiscoveryAgent::LowEnergyMethod);
 }
@@ -92,34 +124,66 @@ void TimeularManager::disconnect()
     delete m_controller;
     m_controller = nullptr;
     setStatus(Disconneted);
+    m_deviceDiscoveryAgent->stop();
+}
+
+void TimeularManager::setPairedDevice(const QString &pairedDevice)
+{
+    if (pairedDevice != m_pairedDevice) {
+        m_pairedDevice = pairedDevice;
+        emit pairedChanged(m_pairedDevice.size() > 0);
+
+        QSettings settings;
+        settings.setValue(timeularDeviceIdKey, m_pairedDevice);
+    }
 }
 
 void TimeularManager::deviceDiscovered(const QBluetoothDeviceInfo &info)
 {
-    if (m_status != Connecting)
-        return;
     if (!(info.coreConfigurations() & QBluetoothDeviceInfo::LowEnergyCoreConfiguration))
         return;
 
-    if (info.name() == QLatin1Literal("Timeular ZEI")) {
-        qDebug() << "Connecting to device";
-        if (!m_controller) {
-            m_controller = QLowEnergyController::createCentral(info, this);
-            m_controller ->setRemoteAddressType(QLowEnergyController::RandomAddress);
+    auto deviceId = [](const QBluetoothDeviceInfo &info) {
+#ifdef Q_OS_MACOS
+        return info.deviceUuid().toString();
+#else
+        return info.address().toString();
+#endif
+    };
 
-            connect(m_controller, &QLowEnergyController::connected,
-                    this, &TimeularManager::deviceConnected);
-            connect(m_controller, QOverload<QLowEnergyController::Error>::of(&QLowEnergyController::error),
-                    this, &TimeularManager::errorReceived);
-            connect(m_controller, &QLowEnergyController::disconnected,
-                    this, &TimeularManager::deviceDisconnected);
-            connect(m_controller, &QLowEnergyController::serviceDiscovered,
-                    this, &TimeularManager::addLowEnergyService);
-            connect(m_controller, &QLowEnergyController::discoveryFinished,
-                    this, &TimeularManager::serviceScanDone);
+    qDebug() << info.name();
+
+    if (info.name() != QLatin1Literal("Timeular ZEI"))
+        return;
+
+    if (m_status == Connecting) {
+        if (deviceId(info) == m_pairedDevice) {
+            qDebug() << "Connecting to device";
+            if (!m_controller) {
+                m_controller = QLowEnergyController::createCentral(info, this);
+                m_controller->setRemoteAddressType(QLowEnergyController::RandomAddress);
+
+                connect(m_controller, &QLowEnergyController::connected, this,
+                        &TimeularManager::deviceConnected);
+                connect(m_controller,
+                        QOverload<QLowEnergyController::Error>::of(&QLowEnergyController::error),
+                        this, &TimeularManager::errorReceived);
+                connect(m_controller, &QLowEnergyController::disconnected, this,
+                        &TimeularManager::deviceDisconnected);
+                connect(m_controller, &QLowEnergyController::serviceDiscovered, this,
+                        &TimeularManager::addLowEnergyService);
+                connect(m_controller, &QLowEnergyController::discoveryFinished, this,
+                        &TimeularManager::serviceScanDone);
+            }
+
+            m_controller->connectToDevice();
         }
-
-        m_controller->connectToDevice();
+    } else if (m_status == Scanning) {
+        auto id = deviceId(info);
+        if (!m_discoveredDevices.contains(id)) {
+            m_discoveredDevices.push_back(id);
+            emit discoveredDevicesChanged(m_discoveredDevices);
+        }
     }
 }
 
@@ -152,22 +216,23 @@ void TimeularManager::serviceScanDone()
         m_service = m_controller->createServiceObject(QBluetoothUuid(zeiOrientationService), this);
 
     if (m_service) {
-        connect(m_service, &QLowEnergyService::stateChanged,
-                this, &TimeularManager::serviceStateChanged);
-        connect(m_service, &QLowEnergyService::characteristicChanged,
-                this, &TimeularManager::deviceDataChanged);
-        connect(m_service, &QLowEnergyService::descriptorWritten,
-                this, &TimeularManager::confirmedDescriptorWrite);
+        connect(m_service, &QLowEnergyService::stateChanged, this,
+                &TimeularManager::serviceStateChanged);
+        connect(m_service, &QLowEnergyService::characteristicChanged, this,
+                &TimeularManager::deviceDataChanged);
+        connect(m_service, &QLowEnergyService::descriptorWritten, this,
+                &TimeularManager::confirmedDescriptorWrite);
         m_service->discoverDetails();
     } else {
         qDebug() << "Service not found";
     }
 }
 
-void TimeularManager::confirmedDescriptorWrite(const QLowEnergyDescriptor &d, const QByteArray &value)
+void TimeularManager::confirmedDescriptorWrite(const QLowEnergyDescriptor &d,
+                                               const QByteArray &value)
 {
     if (d.isValid() && d == m_notificationDesc && value == QByteArray::fromHex("0000")) {
-        //disabled notifications -> assume disconnect intent
+        // disabled notifications -> assume disconnect intent
         m_controller->disconnectFromDevice();
         delete m_service;
         m_service = nullptr;
@@ -187,18 +252,21 @@ void TimeularManager::serviceStateChanged(QLowEnergyService::ServiceState newSta
     case QLowEnergyService::DiscoveringServices:
         break;
     case QLowEnergyService::ServiceDiscovered: {
-        const QLowEnergyCharacteristic orientationChar = m_service->characteristic(QBluetoothUuid(zeiOrientationCharacteristic));
+        const QLowEnergyCharacteristic orientationChar =
+            m_service->characteristic(QBluetoothUuid(zeiOrientationCharacteristic));
         if (!orientationChar.isValid()) {
             qDebug() << "Orientation data not found";
             setStatus(Disconneted);
             break;
         }
 
-        m_notificationDesc = orientationChar.descriptor(QBluetoothUuid(QLatin1String("{00002902-0000-1000-8000-00805f9b34fb}")));
+        m_notificationDesc = orientationChar.descriptor(
+            QBluetoothUuid(QLatin1String("{00002902-0000-1000-8000-00805f9b34fb}")));
         if (m_notificationDesc.isValid()) {
             qDebug() << "Device Connected";
             setStatus(Connected);
-            m_service->writeDescriptor(m_notificationDesc, QByteArray::fromHex(QByteArrayLiteral("0200")));
+            m_service->writeDescriptor(m_notificationDesc,
+                                       QByteArray::fromHex(QByteArrayLiteral("0200")));
         } else {
             setStatus(Disconneted);
         }
@@ -206,7 +274,7 @@ void TimeularManager::serviceStateChanged(QLowEnergyService::ServiceState newSta
         break;
     }
     default:
-        //nothing for now
+        // nothing for now
         break;
     }
 }

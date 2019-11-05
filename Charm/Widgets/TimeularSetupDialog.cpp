@@ -24,12 +24,13 @@
 #include "TimeularSetupDialog.h"
 #include "ui_TimeularSetupDialog.h"
 
-#include "ViewHelpers.h"
 #include "SelectTaskDialog.h"
-#include <QVBoxLayout>
+#include "ViewHelpers.h"
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
+#include <QStringListModel>
+#include <QVBoxLayout>
 #include <algorithm>
 
 namespace {
@@ -45,15 +46,18 @@ QString labelText(TaskId taskId, int face, TimeularManager::Orientation activeFa
 
 }
 TimeularSetupDialog::TimeularSetupDialog(QVector<TimeularAdaptor::FaceMapping> mappings,
-                                         TimeularManager *manager,
-                                         QWidget *parent)
+                                         TimeularManager *manager, QWidget *parent)
     : QDialog(parent)
     , m_ui(new Ui::TimeularSetupDialog)
     , m_mappings(mappings)
     , m_manager(manager)
 {
     m_ui->setupUi(this);
+    m_ui->tabWidget->setCurrentIndex(0);
 
+    // device selection
+    // connect(m_ui->discoverButton)
+    // task mapping
     QWidget *mappingWidgets = new QWidget(this);
     QVBoxLayout *l = new QVBoxLayout;
 
@@ -92,12 +96,45 @@ TimeularSetupDialog::TimeularSetupDialog(QVector<TimeularAdaptor::FaceMapping> m
     mappingWidgets->setLayout(l);
     m_ui->scrollArea->setWidget(mappingWidgets);
 
-    connect(m_manager, &TimeularManager::orientationChanged, this, &TimeularSetupDialog::faceChanged);
+    connect(m_manager, &TimeularManager::orientationChanged, this,
+            &TimeularSetupDialog::faceChanged);
+
+    QStringListModel *model = new QStringListModel(this);
+    if (m_manager->isPaired()) {
+        QStringList sl = {m_manager->pairedDevice() + QLatin1String(" *")};
+        model->setStringList(sl);
+    }
+    m_ui->listView->setModel(model);
+    connect(m_manager, &TimeularManager::discoveredDevicesChanged, this,
+            &TimeularSetupDialog::discoveredDevicesChanged);
+    connect(m_manager, &TimeularManager::statusChanged, this, [this](TimeularManager::Status s) {
+        if (s == TimeularManager::Disconneted) {
+            m_ui->discoverButton->setText(QLatin1Literal("Discover"));
+            m_ui->discoverButton->setEnabled(true);
+        }
+    });
+    connect(m_ui->discoverButton, &QPushButton::clicked, this, [this] {
+        m_manager->startDiscovery();
+        m_ui->discoverButton->setText(QLatin1Literal("Searching..."));
+        m_ui->discoverButton->setEnabled(false);
+    });
+
+    m_ui->pairButton->setEnabled(false);
+    connect(m_ui->listView->selectionModel(), &QItemSelectionModel::selectionChanged, this,
+            &TimeularSetupDialog::deviceSelectionChanged);
+    connect(m_ui->pairButton, &QPushButton::clicked, this, &TimeularSetupDialog::setPairedDevice);
+
+    m_ui->connectButton->setEnabled(m_manager->isPaired());
+    connect(m_ui->connectButton, &QPushButton::clicked, this,
+            &TimeularSetupDialog::connectToDevice);
+    connect(m_manager, &TimeularManager::pairedChanged, m_ui->connectButton,
+            &QPushButton::setEnabled);
 }
 
 TimeularSetupDialog::~TimeularSetupDialog()
 {
-
+    if (m_manager->status() != TimeularManager::Connected)
+        m_manager->disconnect();
 }
 
 QVector<TimeularAdaptor::FaceMapping> TimeularSetupDialog::mappings()
@@ -143,8 +180,9 @@ void TimeularSetupDialog::clearFace()
     m_labels[faceId - 1]->setText( labelText(-1, faceId, m_manager->orientation()) );
 }
 
-void TimeularSetupDialog::faceChanged(TimeularManager::Orientation orientation) {
-    for (int i=1; i<9; i++) {
+void TimeularSetupDialog::faceChanged(TimeularManager::Orientation orientation)
+{
+    for (int i = 1; i < 9; i++) {
         auto taskId = -1;
         auto it = std::find_if(std::begin(m_mappings), std::end(m_mappings), [i](TimeularAdaptor::FaceMapping m) {
             return m.face == i;
@@ -153,4 +191,42 @@ void TimeularSetupDialog::faceChanged(TimeularManager::Orientation orientation) 
             taskId = (*it).taskId;
         m_labels[i - 1]->setText(labelText(taskId, i, orientation));
     }
+}
+
+void TimeularSetupDialog::discoveredDevicesChanged(QStringList dl)
+{
+    QStringListModel *model = qobject_cast<QStringListModel *>(m_ui->listView->model());
+    QStringList fl;
+    std::transform(dl.cbegin(), dl.cend(), std::back_inserter(fl), [this](QString deviceId) {
+        return deviceId
+            + (m_manager->pairedDevice() == deviceId ? QLatin1String(" *") : QLatin1String(""));
+    });
+    model->setStringList(fl);
+}
+
+void TimeularSetupDialog::deviceSelectionChanged()
+{
+    auto sr = m_ui->listView->selectionModel()->selectedRows();
+    if (sr.size() == 1) {
+        m_ui->pairButton->setEnabled(true);
+    } else {
+        m_ui->pairButton->setEnabled(false);
+    }
+}
+
+void TimeularSetupDialog::setPairedDevice()
+{
+    auto sr = m_ui->listView->selectionModel()->selectedRows();
+    if (sr.size() != 1)
+        return;
+
+    int r = sr.front().row();
+    if (r < m_manager->discoveredDevices().size())
+        m_manager->setPairedDevice(m_manager->discoveredDevices().at(r));
+}
+
+void TimeularSetupDialog::connectToDevice()
+{
+    if (m_manager->isPaired())
+        m_manager->startConnection();
 }

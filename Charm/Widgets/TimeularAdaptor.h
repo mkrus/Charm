@@ -27,24 +27,25 @@
 #include <QObject>
 #include <QVector>
 
-#include "TimeularManager.h"
 #include "Core/Task.h"
+#include "TimeularManager.h"
 
 class QAction;
 class QMenu;
-
 
 class TimeularAdaptor : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(Status status READ status NOTIFY statusChanged)
 public:
-    struct FaceMapping {
+    struct FaceMapping
+    {
         int face = 0;
         TaskId taskId = 0;
     };
     enum Status {
         Disconneted,
+        Scanning,
         Connecting,
         Connected,
     };
