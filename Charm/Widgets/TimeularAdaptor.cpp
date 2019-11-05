@@ -47,22 +47,31 @@ TimeularAdaptor::TimeularAdaptor(QObject *parent)
 
     m_connectionAction = new QAction(QLatin1String("Connect to Device"), this);
     m_connectionAction->setCheckable(true);
+    m_connectionAction->setEnabled(false);
     QObject::connect(m_connectionAction, &QAction::triggered, this,
                      &TimeularAdaptor::toggleConnection);
+    QObject::connect(m_manager, &TimeularManager::pairedChanged, m_connectionAction,
+                     &QAction::setEnabled);
 
-    m_setupAction = new QAction(QLatin1String("Face Mapping"), this);
+    m_setupAction = new QAction(QLatin1String("Device Settings..."), this);
     QObject::connect(m_setupAction, &QAction::triggered, this, &TimeularAdaptor::setupTasks);
 
-    QSettings settings;
-    if (settings.contains(timeularMappingsKey)) {
-        QStringList s = settings.value(timeularMappingsKey).toStringList();
-        for(int i=0; i<s.size(); i+=2) {
-            FaceMapping fm;
-            fm.face = s[i].toInt();
-            fm.taskId = s[i + 1].toInt();
-            m_faceMappings << fm;
+    QTimer::singleShot(0, [this]() {
+        // delay init until app is done constructing so settings are read
+        // from the right place
+        QSettings settings;
+        if (settings.contains(timeularMappingsKey)) {
+            QStringList s = settings.value(timeularMappingsKey).toStringList();
+            for (int i = 0; i < s.size(); i += 2) {
+                FaceMapping fm;
+                fm.face = s[i].toInt();
+                fm.taskId = s[i + 1].toInt();
+                m_faceMappings << fm;
+            }
         }
-    }
+
+        m_manager->init();
+    });
 }
 
 TimeularAdaptor::Status TimeularAdaptor::status() const
@@ -94,6 +103,8 @@ void TimeularAdaptor::deviceStatusChanged(TimeularManager::Status status)
         m_connectionAction->setText(tr("Connected to Device"));
         emit message(tr("Connected to Device"));
         break;
+    default:
+        break;
     }
 
     emit this->statusChanged(static_cast<TimeularAdaptor::Status>(status));
@@ -102,7 +113,7 @@ void TimeularAdaptor::deviceStatusChanged(TimeularManager::Status status)
 void TimeularAdaptor::toggleConnection(bool checked)
 {
     if (checked && m_manager->status() == TimeularManager::Disconneted) {
-        m_manager->startDiscovery();
+        m_manager->startConnection();
         return;
     }
     if (!checked && m_manager->status() != TimeularManager::Disconneted) {
