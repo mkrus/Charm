@@ -89,6 +89,7 @@ private:
     void serviceStateChanged(QLowEnergyService::ServiceState newState);
     void deviceDataChanged(const QLowEnergyCharacteristic &c, const QByteArray &value);
     void confirmedDescriptorWrite(const QLowEnergyDescriptor &d, const QByteArray &value);
+    void connectToDevice(const QBluetoothDeviceInfo &info);
 
     Status m_status = Disconneted;
     bool m_serviceDiscovered = false;

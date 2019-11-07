@@ -3,7 +3,7 @@
 
   This file is part of Charm, a task-based time tracking application.
 
-  Copyright (C) 2014-2019 Klarälvdalens Datakonsult AB, a KDAB Group company, info@kdab.com
+  Copyright (C) 2014-2020 Klarälvdalens Datakonsult AB, a KDAB Group company, info@kdab.com
 
   Author: Mike Krus <mike.krus@kdab.com>
 
@@ -33,6 +33,7 @@ const QBluetoothUuid
 const QBluetoothUuid
     zeiOrientationCharacteristic(QLatin1Literal("{c7e70012-c847-11e6-8175-8c89a55d403c}"));
 const QLatin1String timeularDeviceIdKey("timeularDeviceId");
+const QLatin1String timeularDeviceName("Timeular ZEI");
 }
 
 TimeularManager::TimeularManager(QObject *parent)
@@ -109,20 +110,34 @@ void TimeularManager::startDiscovery()
 
 void TimeularManager::startConnection()
 {
-    if (m_status != Disconneted)
+    if ((m_status != Disconneted) || m_pairedDevice.isEmpty())
         return;
 
     qDebug() << "Starting Connection";
     setStatus(Connecting);
-    m_deviceDiscoveryAgent->start(QBluetoothDeviceDiscoveryAgent::LowEnergyMethod);
+
+
+#ifdef Q_OS_MACOS
+    QBluetoothDeviceInfo info(QBluetoothUuid(m_pairedDevice), timeularDeviceName, 0);
+#else
+    QBluetoothDeviceInfo info(QBluetoothAddress(m_pairedDevice), timeularDeviceName, 0);
+#endif
+
+    info.setCoreConfigurations(QBluetoothDeviceInfo::LowEnergyCoreConfiguration);
+
+    connectToDevice(info);
 }
 
 void TimeularManager::disconnect()
 {
-    delete m_service;
-    m_service = nullptr;
-    delete m_controller;
-    m_controller = nullptr;
+    if (m_service) {
+        delete m_service;
+        m_service = nullptr;
+    }
+    if (m_controller) {
+        delete m_controller;
+        m_controller = nullptr;
+    }
     setStatus(Disconneted);
     m_deviceDiscoveryAgent->stop();
 }
@@ -151,32 +166,12 @@ void TimeularManager::deviceDiscovered(const QBluetoothDeviceInfo &info)
 #endif
     };
 
-    qDebug() << info.name();
-
-    if (info.name() != QLatin1Literal("Timeular ZEI"))
+    if (info.name() != timeularDeviceName)
         return;
 
     if (m_status == Connecting) {
         if (deviceId(info) == m_pairedDevice) {
-            qDebug() << "Connecting to device";
-            if (!m_controller) {
-                m_controller = QLowEnergyController::createCentral(info, this);
-                m_controller->setRemoteAddressType(QLowEnergyController::RandomAddress);
-
-                connect(m_controller, &QLowEnergyController::connected, this,
-                        &TimeularManager::deviceConnected);
-                connect(m_controller,
-                        QOverload<QLowEnergyController::Error>::of(&QLowEnergyController::error),
-                        this, &TimeularManager::errorReceived);
-                connect(m_controller, &QLowEnergyController::disconnected, this,
-                        &TimeularManager::deviceDisconnected);
-                connect(m_controller, &QLowEnergyController::serviceDiscovered, this,
-                        &TimeularManager::addLowEnergyService);
-                connect(m_controller, &QLowEnergyController::discoveryFinished, this,
-                        &TimeularManager::serviceScanDone);
-            }
-
-            m_controller->connectToDevice();
+            connectToDevice(info);
         }
     } else if (m_status == Scanning) {
         auto id = deviceId(info);
@@ -187,6 +182,29 @@ void TimeularManager::deviceDiscovered(const QBluetoothDeviceInfo &info)
     }
 }
 
+void TimeularManager::connectToDevice(const QBluetoothDeviceInfo& info)
+{
+    qDebug() << "Connecting to device";
+    if (!m_controller) {
+        m_controller = QLowEnergyController::createCentral(info, this);
+        m_controller->setRemoteAddressType(QLowEnergyController::RandomAddress);
+
+        connect(m_controller, &QLowEnergyController::connected, this,
+                &TimeularManager::deviceConnected);
+        connect(m_controller,
+                QOverload<QLowEnergyController::Error>::of(&QLowEnergyController::error),
+                this, &TimeularManager::errorReceived);
+        connect(m_controller, &QLowEnergyController::disconnected, this,
+                &TimeularManager::deviceDisconnected);
+        connect(m_controller, &QLowEnergyController::serviceDiscovered, this,
+                &TimeularManager::addLowEnergyService);
+        connect(m_controller, &QLowEnergyController::discoveryFinished, this,
+                &TimeularManager::serviceScanDone);
+    }
+
+    m_controller->connectToDevice();
+}
+
 void TimeularManager::deviceConnected()
 {
     m_controller->discoverServices();
@@ -195,14 +213,16 @@ void TimeularManager::deviceConnected()
 void TimeularManager::deviceDisconnected()
 {
     setStatus(Disconneted);
-    delete m_service;
-    m_service = nullptr;
+    if (m_service) {
+        delete m_service;
+        m_service = nullptr;
+    }
     qDebug() << "Device Disconneted";
 }
 
 void TimeularManager::errorReceived(QLowEnergyController::Error /*error*/)
 {
-    qWarning() << "Error: " << m_controller->errorString();
+    qWarning() << "Error: " << m_controller->errorString() << m_controller->state();
 }
 
 void TimeularManager::serviceScanDone()
@@ -273,6 +293,7 @@ void TimeularManager::serviceStateChanged(QLowEnergyService::ServiceState newSta
 
         break;
     }
+    case QLowEnergyService::InvalidService:
     default:
         // nothing for now
         break;

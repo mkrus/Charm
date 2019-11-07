@@ -91,17 +91,26 @@ void TimeularAdaptor::deviceStatusChanged(TimeularManager::Status status)
     case TimeularManager::Disconneted:
         m_connectionAction->setChecked(false);
         m_connectionAction->setText(tr("Connect to Device"));
-        emit message(tr("Device Disconnected"));
+        if (m_wasScanning) {
+            m_wasScanning = false;
+            emit message(tr("Timeular discovery finished"));
+        } else {
+            emit message(tr("Timular Disconnected"));
+        }
         break;
     case TimeularManager::Connecting:
         m_connectionAction->setChecked(true);
         m_connectionAction->setText(tr("Connecting to Device..."));
-        emit message(tr("Connecting to Device..."));
+        emit message(tr("Connecting to Timeular..."));
         break;
     case TimeularManager::Connected:
         m_connectionAction->setChecked(true);
         m_connectionAction->setText(tr("Connected to Device"));
-        emit message(tr("Connected to Device"));
+        emit message(tr("Connected to Timeular"));
+        break;
+    case TimeularManager::Scanning:
+        m_wasScanning = true;
+        emit message(tr("Searching for Timeular"));
         break;
     default:
         break;

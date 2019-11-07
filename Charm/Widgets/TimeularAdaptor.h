@@ -73,6 +73,7 @@ private:
     TimeularManager *m_manager;
     QAction *m_connectionAction;
     QAction *m_setupAction;
+    bool m_wasScanning = false;
 };
 
 #endif // TIMEULARADAPTOR_H
