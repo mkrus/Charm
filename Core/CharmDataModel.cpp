@@ -29,6 +29,8 @@
 #include "CharmDataModel.h"
 #include "CharmConstants.h"
 #include "Configuration.h"
+#include "EventModel.h"
+#include "TaskModel.h"
 
 #include "charm_core_debug.h"
 #include <QDateTime>
@@ -43,6 +45,7 @@
 
 CharmDataModel::CharmDataModel()
     : QObject()
+    , m_eventModel(new EventModel(this))
     , m_taskModel(new TaskModel(this))
 {
     connect(&m_timer, &QTimer::timeout, this, &CharmDataModel::eventUpdateTimerEvent);
@@ -50,30 +53,17 @@ CharmDataModel::CharmDataModel()
 
 CharmDataModel::~CharmDataModel()
 {
-    m_adapters.clear();
     setAllTasks(TaskList());
 }
 
 void CharmDataModel::stateChanged(State previous, State next)
 {
     if (m_hasActiveEvent && previous == Connected && next == Disconnecting) {
-        const Event &event = findEvent(m_activeEventId);
+        Event event = *eventForId(m_activeEventId);
         const Task &task = m_taskModel->taskForId(event.taskId());
         Q_ASSERT(!task.isNull());
         endEventRequested(task);
     }
-}
-
-void CharmDataModel::registerAdapter(CharmDataModelAdapterInterface *adapter)
-{
-    m_adapters.append(adapter);
-    adapter->resetEvents();
-}
-
-void CharmDataModel::unregisterAdapter(CharmDataModelAdapterInterface *adapter)
-{
-    Q_ASSERT(m_adapters.contains(adapter));
-    m_adapters.removeAll(adapter);
 }
 
 TaskModel *CharmDataModel::taskModel() const
@@ -91,86 +81,53 @@ void CharmDataModel::setAllTasks(TaskList tasks)
     else
         m_taskModel->setTasks(tasks);
 
-    // notify adapters of changes
-    std::for_each(m_adapters.begin(), m_adapters.end(),
-        std::mem_fn(&CharmDataModelAdapterInterface::resetTasks));
-
+    emit tasksResetted();
     emit resetGUIState();
 }
 
 void CharmDataModel::clearTasks()
 {
     m_taskModel->clearTasks();
+    emit tasksResetted();
+}
 
-    for (auto adapter : m_adapters)
-        adapter->resetTasks();
+void CharmDataModel::setAllEvents(EventVector events)
+{
+    m_eventModel->setAllEvents(events);
+    emit eventsResetted();
 }
 
 void CharmDataModel::setAllEvents(const EventList &events)
 {
-    m_events.clear();
-
-    for (int i = 0; i < events.size(); ++i) {
-        if (!eventExists(events[i].id())) {
-            m_events[events[i].id()] = events[i];
-        } else {
-            qCCritical(CHARM_CORE_LOG) << "CharmDataModel::setAllEvents: event with id "
-                                       << events[i].id() << " ignored. THIS IS A BUG";
-        }
-    }
-
-    for (auto adapter : m_adapters)
-        adapter->resetEvents();
+    m_eventModel->setAllEvents(events);
+    emit eventsResetted();
 }
 
 void CharmDataModel::addEvent(const Event &event)
 {
-    Q_ASSERT_X(!eventExists(event.id()), Q_FUNC_INFO, "New event must have a unique id");
-
-    for (auto adapter : m_adapters)
-        adapter->eventAboutToBeAdded(event.id());
-
-    m_events[event.id()] = event;
-
-    for (auto adapter : m_adapters)
-        adapter->eventAdded(event.id());
+    m_eventModel->addEvent(event);
+    emit eventAdded(event);
 }
 
-void CharmDataModel::modifyEvent(const Event &newEvent)
+void CharmDataModel::modifyEvent(const Event &event)
 {
-    Q_ASSERT_X(eventExists(newEvent.id()), Q_FUNC_INFO, "Event to modify has to exist");
-
-    const Event oldEvent = eventForId(newEvent.id());
-
-    m_events[newEvent.id()] = newEvent;
-
-    for (auto adapter : m_adapters)
-        adapter->eventModified(newEvent.id(), oldEvent);
+    m_eventModel->modifyEvent(event);
+    emit eventModified(event);
 }
 
 void CharmDataModel::deleteEvent(const Event &event)
 {
-    Q_ASSERT_X(eventExists(event.id()), Q_FUNC_INFO, "Event to delete has to exist");
     Q_ASSERT_X(!m_hasActiveEvent || m_activeEventId != event.id(), Q_FUNC_INFO,
                "Cannot delete an active event");
 
-    for (auto adapter : m_adapters)
-        adapter->eventAboutToBeDeleted(event.id());
-
-    const auto it = m_events.find(event.id());
-    if (it != m_events.end())
-        m_events.erase(it);
-
-    for (auto adapter : m_adapters)
-        adapter->eventDeleted(event.id());
+    m_eventModel->deleteEvent(event);
+    emit eventDeleted(event);
 }
 
 void CharmDataModel::clearEvents()
 {
-    m_events.clear();
-
-    for (auto adapter : m_adapters)
-        adapter->resetEvents();
+    emit eventsResetted();
+    m_eventModel->clearEvents();
 }
 
 const Task &CharmDataModel::getTask(TaskId id) const
@@ -188,23 +145,14 @@ TaskIdList CharmDataModel::childrenTaskIds(TaskId id) const
     return m_taskModel->childrenIds(id);
 }
 
-const Event &CharmDataModel::eventForId(EventId id) const
+EventModel *CharmDataModel::eventModel() const
 {
-    static const Event InvalidEvent;
-    EventMap::const_iterator it = m_events.find(id);
-    if (it != m_events.end()) {
-        return it->second;
-    } else {
-        return InvalidEvent;
-    }
+    return m_eventModel;
 }
 
-Event &CharmDataModel::findEvent(int id)
+const Event *CharmDataModel::eventForId(EventId id) const
 {
-    // in this method, the event has to exist
-    const auto it = m_events.find(id);
-    Q_ASSERT(it != m_events.end());
-    return it->second;
+    return m_eventModel->eventForId(id);
 }
 
 bool CharmDataModel::activateEvent(const Event &activeEvent)
@@ -220,7 +168,7 @@ bool CharmDataModel::activateEvent(const Event &activeEvent)
                 return false;
             }
 
-            const Event &e = eventForId(m_activeEventId);
+            const Event &e = *eventForId(m_activeEventId);
             if (e.taskId() == taskId) {
                 Q_ASSERT(!"inconsistency (event already active for task)!");
                 return false;
@@ -231,21 +179,15 @@ bool CharmDataModel::activateEvent(const Event &activeEvent)
     m_activeEventId = activeEvent.id();
     m_hasActiveEvent = true;
 
-    for (auto adapter : m_adapters)
-        adapter->eventActivated(activeEvent.id());
+    emit eventActivated(activeEvent.id());
     m_timer.start(10000);
     return true;
-}
-
-bool CharmDataModel::eventExists(EventId id)
-{
-    return m_events.find(id) != m_events.end();
 }
 
 bool CharmDataModel::isTaskActive(TaskId id) const
 {
     if (m_hasActiveEvent) {
-        const Event &e = eventForId(m_activeEventId);
+        const Event &e = *eventForId(m_activeEventId);
         Q_ASSERT(e.isValid());
         if (e.taskId() == id)
             return true;
@@ -256,15 +198,15 @@ bool CharmDataModel::isTaskActive(TaskId id) const
 
 const Event &CharmDataModel::activeEventFor(TaskId id) const
 {
-    static Event InvalidEvent;
+    static const Event invalid;
 
     if (m_hasActiveEvent) {
-        const Event &e = eventForId(m_activeEventId);
+        const Event &e = *eventForId(m_activeEventId);
         if (e.taskId() == id)
             return e;
     }
 
-    return InvalidEvent;
+    return invalid;
 }
 
 void CharmDataModel::startEventRequested(const Task &task)
@@ -287,16 +229,15 @@ void CharmDataModel::endEventRequested(const Task &task)
     EventId eventId = 0;
 
     // remove the active event
-    if (m_hasActiveEvent && eventForId(m_activeEventId).taskId() == task.id) {
+    if (m_hasActiveEvent && eventForId(m_activeEventId)->taskId() == task.id) {
         eventId = m_activeEventId;
         m_hasActiveEvent = false;
 
-        for (auto adapter : m_adapters)
-            adapter->eventDeactivated(eventId);
+        emit eventDeactivated(eventId);
     }
 
     Q_ASSERT(eventId != 0);
-    Event &event = findEvent(eventId);
+    Event event = *eventForId(eventId);
     Event old = event;
     event.setEndDateTime(QDateTime::currentDateTime());
 
@@ -314,11 +255,10 @@ void CharmDataModel::endEventRequested()
         EventId eventId = m_activeEventId;
         m_hasActiveEvent = false;
 
-        for (auto adapter : m_adapters)
-            adapter->eventDeactivated(eventId);
+        emit eventDeactivated(eventId);
 
         Q_ASSERT(eventId != 0);
-        Event &event = findEvent(eventId);
+        Event event = *eventForId(eventId);
         Event old = event;
         event.setEndDateTime(currentDateTime);
 
@@ -333,8 +273,7 @@ void CharmDataModel::eventUpdateTimerEvent()
 {
     if (m_hasActiveEvent) {
         // Not a ref (Event &), since we want to diff "old event"
-        // and "new event" in *Adapter::eventModified
-        Event event = findEvent(m_activeEventId);
+        Event event = *eventForId(m_activeEventId);
         Event old = event;
         event.setEndDateTime(QDateTime::currentDateTime());
 
@@ -352,7 +291,7 @@ QString CharmDataModel::eventString() const
 {
     QString str;
     if (m_hasActiveEvent) {
-        Event event = eventForId(m_activeEventId);
+        Event event = *eventForId(m_activeEventId);
         if (event.isValid()) {
             const Task &task = getTask(event.taskId());
             str = tr("%1 - %2")
@@ -372,7 +311,7 @@ int CharmDataModel::totalDuration() const
 {
     int totalDuration = 0;
     if (m_hasActiveEvent) {
-        Event event = eventForId(m_activeEventId);
+        Event event = *eventForId(m_activeEventId);
         if (event.isValid())
             totalDuration += event.duration();
     }
@@ -392,9 +331,9 @@ void CharmDataModel::updateToolTip()
     emit sysTrayUpdate(toolTip, m_hasActiveEvent);
 }
 
-const EventMap &CharmDataModel::eventMap() const
+const EventVector &CharmDataModel::getEventVector() const
 {
-    return m_events;
+    return m_eventModel->getEventVector();
 }
 
 bool CharmDataModel::isEventActive(EventId id) const
@@ -408,15 +347,15 @@ EventIdList CharmDataModel::eventsThatStartInTimeFrame(const QDate &start, const
     // start and end date then
     const QDateTime startUTC = QDateTime(start, QTime(0, 0, 0)).toUTC();
     const QDateTime endUTC = QDateTime(end, QTime(0, 0, 0)).toUTC();
-    EventIdList events;
-    EventMap::const_iterator it;
-    for (it = m_events.begin(); it != m_events.end(); ++it) {
-        const Event &event(it->second);
+    const EventVector &events = getEventVector();
+    EventIdList result;
+    for (auto it = events.begin(); it != events.end(); ++it) {
+        const Event &event = *it;
         if (event.startDateTime(Qt::UTC) >= startUTC && event.startDateTime(Qt::UTC) < endUTC)
-            events << event.id();
+            result << event.id();
     }
 
-    return events;
+    return result;
 }
 
 EventIdList CharmDataModel::eventsThatStartInTimeFrame(const TimeSpan &timeSpan) const
@@ -437,9 +376,9 @@ EventId CharmDataModel::activeEvent() const
 TaskIdList CharmDataModel::mostFrequentlyUsedTasks() const
 {
     std::unordered_map<TaskId, quint32> mfuMap;
-    const EventMap &events = eventMap();
-    for (const auto &it : events) {
-        mfuMap[it.second.taskId()]++;
+    const EventVector &events = getEventVector();
+    for (const auto &event : events) {
+        mfuMap[event.taskId()]++;
     }
 
     const auto comp = [](quint32 a, quint32 b) { return a > b; };
@@ -459,14 +398,14 @@ TaskIdList CharmDataModel::mostFrequentlyUsedTasks() const
 TaskIdList CharmDataModel::mostRecentlyUsedTasks() const
 {
     std::unordered_map<TaskId, QDateTime> mruMap;
-    const EventMap &events = eventMap();
-    for (const auto &it : events) {
-        const TaskId id = it.second.taskId();
+    const EventVector &events = getEventVector();
+    for (const auto &event : events) {
+        const TaskId id = event.taskId();
         if (id == 0)
             continue;
         // process use date
         // Note: for a relative order, the UTC time is sufficient and much faster
-        const QDateTime date = it.second.startDateTime(Qt::UTC);
+        const QDateTime date = event.startDateTime(Qt::UTC);
         const auto old = mruMap.find(id);
         if (old != mruMap.cend()) {
             mruMap[id] = qMax(old->second, date);
@@ -493,10 +432,10 @@ QString CharmDataModel::taskName(TaskId id) const
 
 bool CharmDataModel::operator==(const CharmDataModel &other) const
 {
-    // not compared: m_timer, m_adapters
+    // not compared: m_timer
     if (&other == this)
         return true;
-    return getAllTasks() == other.getAllTasks() && m_events == other.m_events
+    return getAllTasks() == other.getAllTasks() && getEventVector() == other.getEventVector()
         && m_activeEventId == other.m_activeEventId;
 }
 
@@ -504,7 +443,7 @@ CharmDataModel *CharmDataModel::clone() const
 {
     auto c = new CharmDataModel();
     c->setAllTasks(getAllTasks());
-    c->m_events = m_events;
+    c->m_eventModel->setAllEvents(getEventVector());
     c->m_activeEventId = m_activeEventId;
     return c;
 }

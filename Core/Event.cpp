@@ -27,8 +27,6 @@
 #include <QDomElement>
 #include <QDomText>
 
-Event::Event() {}
-
 bool Event::operator==(const Event &other) const
 {
     return other.id() == id() && other.taskId() == taskId() && other.comment() == comment()

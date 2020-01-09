@@ -123,7 +123,7 @@ QByteArray MonthlyTimeSheetReport::saveToXml(SaveToXmlMode mode)
         EventList events;
         events.reserve(matchingEventIds.size());
         Q_FOREACH (const EventId &eventId, matchingEventIds)
-            events.append(DATAMODEL->eventForId(eventId));
+            events.append(*DATAMODEL->eventForId(eventId));
         timesheet.setEvents(events);
         return timesheet.saveToXml();
     } catch (const XmlSerializationException &e) {
@@ -165,7 +165,7 @@ void MonthlyTimeSheetReport::update()
     // for every week of a month ( int seconds[m_numberOfWeeks]), and store those in
     // a map by their task id
     for (EventId id : matchingEvents) {
-        const Event &event = DATAMODEL->eventForId(id);
+        const Event &event = *DATAMODEL->eventForId(id);
         QVector<int> seconds(m_numberOfWeeks);
         if (m_secondsMap.contains(event.taskId()))
             seconds = m_secondsMap.value(event.taskId());

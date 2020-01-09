@@ -23,33 +23,37 @@
 */
 
 #include "EventModelFilter.h"
+#include "Core/CharmDataModel.h"
+#include "Core/EventModel.h"
+#include "Core/CharmCommand.h"
 
-EventModelFilter::EventModelFilter(CharmDataModel *model, QObject *parent)
+EventModelFilter::EventModelFilter(CharmDataModel *dataModel, QObject *parent)
     : QSortFilterProxyModel(parent)
-    , m_model(model)
+    , m_model(dataModel->eventModel())
 {
-    setSourceModel(&m_model);
+    setSourceModel(m_model);
     setDynamicSortFilter(true);
     sort(0, Qt::AscendingOrder);
 
-    connect(&m_model, &EventModelAdapter::eventActivationNotice, this,
-            &EventModelFilter::eventActivationNotice);
-    connect(&m_model, &EventModelAdapter::eventDeactivationNotice, this,
-            &EventModelFilter::eventDeactivationNotice);
+    connect(dataModel, &CharmDataModel::eventActivated,
+        this, &EventModelFilter::eventActivationNotice);
+    connect(dataModel, &CharmDataModel::eventDeactivated,
+        this, &EventModelFilter::eventDeactivationNotice);
 }
 
 EventModelFilter::~EventModelFilter() {}
 
 void EventModelFilter::commitCommand(CharmCommand *command)
 {
-    m_model.commitCommand(command);
+    // TODO: does not seem to be the right place for this
+    command->finalize();
 }
 
 bool EventModelFilter::lessThan(const QModelIndex &left, const QModelIndex &right) const
 {
     if (left.column() == 0 && right.column() == 0) {
-        const Event &leftEvent = m_model.eventForIndex(left);
-        const Event &rightEvent = m_model.eventForIndex(right);
+        const Event &leftEvent = *m_model->eventForIndex(left);
+        const Event &rightEvent = *m_model->eventForIndex(right);
         // date comparison in UTC is much faster and just as correct
         return leftEvent.startDateTime(Qt::UTC) < rightEvent.startDateTime(Qt::UTC);
     } else {
@@ -59,12 +63,12 @@ bool EventModelFilter::lessThan(const QModelIndex &left, const QModelIndex &righ
 
 const Event &EventModelFilter::eventForIndex(const QModelIndex &index) const
 {
-    return m_model.eventForIndex(mapToSource(index));
+    return *m_model->eventForIndex(mapToSource(index));
 }
 
 QModelIndex EventModelFilter::indexForEvent(const Event &event) const
 {
-    const QModelIndex &sourceIndex = m_model.indexForEvent(event);
+    const QModelIndex &sourceIndex = m_model->indexForId(event.id());
     const QModelIndex &proxyIndex(mapFromSource(sourceIndex));
     // bool valid = proxyIndex.isValid();
     return proxyIndex;
@@ -75,7 +79,7 @@ bool EventModelFilter::filterAcceptsRow(int srow, const QModelIndex &sparent) co
     if (QSortFilterProxyModel::filterAcceptsRow(srow, sparent) == false)
         return false;
 
-    const Event &event = m_model.eventForIndex(m_model.index(srow, 0, sparent));
+    const Event &event = *m_model->eventForIndex(m_model->index(srow, 0, sparent));
 
     if (m_filterId != TaskId() && event.taskId() != m_filterId)
         return false;

@@ -4,6 +4,7 @@ SET(
     CharmExceptions.cpp
     Controller.cpp
     Dates.cpp
+    EventModel.cpp
     SqlRaiiTransactor.cpp
     Configuration.cpp
     SqlStorage.cpp

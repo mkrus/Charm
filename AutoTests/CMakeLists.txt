@@ -20,7 +20,6 @@ TARGET_LINK_LIBRARIES( ControllerTests ${TEST_LIBRARIES} )
 ADD_TEST( NAME ControllerTests COMMAND ControllerTests )
 
 SET( EventModelFilterTests_SRCS
-     ${Charm_SOURCE_DIR}/Charm/EventModelAdapter.cpp
      ${Charm_SOURCE_DIR}/Charm/EventModelFilter.cpp
      EventModelFilterTests.cpp
 )
@@ -35,6 +34,11 @@ SET( CharmDataModelTests_SRCS CharmDataModelTests.cpp )
 ADD_EXECUTABLE( CharmDataModelTests ${CharmDataModelTests_SRCS} )
 TARGET_LINK_LIBRARIES( CharmDataModelTests ${TEST_LIBRARIES} )
 ADD_TEST( NAME CharmDataModelTests COMMAND CharmDataModelTests )
+
+SET( EventModelTests_SRCS EventModelTests.cpp )
+ADD_EXECUTABLE( EventModelTests ${EventModelTests_SRCS} )
+TARGET_LINK_LIBRARIES( EventModelTests ${TEST_LIBRARIES} )
+ADD_TEST( NAME EventModelTests COMMAND EventModelTests )
 
 SET(
     BackendIntegrationTests_SRCS

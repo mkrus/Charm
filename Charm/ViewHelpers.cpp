@@ -72,8 +72,8 @@ public:
 
     bool operator()(EventId leftId, EventId rightId) const
     {
-        const Event &left = DATAMODEL->eventForId(leftId);
-        const Event &right = DATAMODEL->eventForId(rightId);
+        const Event &left = *DATAMODEL->eventForId(leftId);
+        const Event &right = *DATAMODEL->eventForId(rightId);
         int result = -1;
 
         foreach (const auto order, m_orders) {

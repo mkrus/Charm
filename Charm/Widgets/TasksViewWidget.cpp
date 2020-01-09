@@ -21,6 +21,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "Core/TaskModel.h"
 #include "TasksViewWidget.h"
 #include "ui_TasksViewWidget.h"
 

@@ -42,7 +42,7 @@ QVector<WeeklySummary> WeeklySummary::summariesForTimespan(CharmDataModel *dataM
     TaskIdList taskIds, uniqueTaskIds; // the list of tasks to show
     EventList events;
     for (EventId id : eventIds) {
-        Event event = dataModel->eventForId(id);
+        Event event = *dataModel->eventForId(id);
         events << event;
         taskIds << event.taskId();
     }

@@ -29,28 +29,25 @@
 #include <QSortFilterProxyModel>
 
 #include <Core/CommandEmitterInterface.h>
-#include <Core/EventModelInterface.h>
-
-#include "EventModelAdapter.h"
+#include "Core/Event.h"
 
 class CharmDataModel;
+class EventModel;
 
 class EventModelFilter : public QSortFilterProxyModel,
-                         public CommandEmitterInterface,
-                         public EventModelInterface
+                         public CommandEmitterInterface
 {
     Q_OBJECT
 
 public:
-    explicit EventModelFilter(CharmDataModel *, QObject *parent = nullptr);
+    explicit EventModelFilter(CharmDataModel *dataModel, QObject *parent = nullptr);
     ~EventModelFilter() override;
 
     /** Returns the total number of seconds of all events in the model. */
     int totalDuration() const;
 
-    // implement EventModelInterface:
-    const Event &eventForIndex(const QModelIndex &) const override;
-    QModelIndex indexForEvent(const Event &) const override;
+    const Event &eventForIndex(const QModelIndex &) const;
+    QModelIndex indexForEvent(const Event &) const;
 
     bool filterAcceptsRow(int srow, const QModelIndex &sparent) const override;
 
@@ -71,7 +68,7 @@ Q_SIGNALS:
     void eventDeactivationNotice(EventId id);
 
 private:
-    EventModelAdapter m_model;
+    EventModel *m_model;
     QDate m_start;
     QDate m_end;
     TaskId m_filterId = {};

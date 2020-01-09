@@ -162,7 +162,7 @@ void TimeTrackingTaskSelector::handleActiveEvent()
         m_stopGoAction->setChecked(true);
         m_editCommentAction->setEnabled(true);
 
-        const Event &event = DATAMODEL->eventForId(DATAMODEL->activeEvent());
+        const Event &event = *DATAMODEL->eventForId(DATAMODEL->activeEvent());
         const Task &task = DATAMODEL->getTask(event.taskId());
         m_taskSelectorButton->setText(escapeAmpersands(DATAMODEL->smartTaskName(task.id)));
     } else {

@@ -27,8 +27,8 @@
 #include <QTimer>
 #include <QMainWindow>
 
-#include "Core/CharmDataModelAdapterInterface.h"
 #include "Core/CommandEmitterInterface.h"
+#include "Core/Event.h"
 #include "Core/UIStateInterface.h"
 
 #include "Charm/HttpClient/CheckForUpdatesJob.h"
@@ -47,7 +47,7 @@ class ReportConfigurationDialog;
 class WeeklyTimesheetConfigurationDialog;
 class MonthlyTimesheetConfigurationDialog;
 
-class TimeTrackingWindow : public QMainWindow, public UIStateInterface, public CharmDataModelAdapterInterface
+class TimeTrackingWindow : public QMainWindow, public UIStateInterface
 {
     Q_OBJECT
 
@@ -77,17 +77,6 @@ public:
 
     void setHideAtStartup(bool);
 
-    // model adapter:
-    void resetTasks() override;
-    void resetEvents() override;
-    void eventAboutToBeAdded(EventId id) override;
-    void eventAdded(EventId id) override;
-    void eventModified(EventId id, const Event &discardedEvent) override;
-    void eventAboutToBeDeleted(EventId id) override;
-    void eventDeleted(EventId id) override;
-    void eventActivated(EventId id) override;
-    void eventDeactivated(EventId id) override;
-
 public Q_SLOTS:
     // slots migrated from the old main window:
     void showView();
@@ -109,6 +98,10 @@ public Q_SLOTS:
     void slotUserInfoDownloaded(HttpJob *);
     void slotCheckForUpdatesManual();
     void slotStartEvent(TaskId);
+
+    // TODO: how do those differ from slotStartEvent and slotStopEvent
+    void slotEventActivated(EventId id);
+    void slotEventDeactivated(EventId id);
 
 protected:
     /** The window name is the human readable name the application uses to reference the window.

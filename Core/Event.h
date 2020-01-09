@@ -41,8 +41,6 @@ typedef int EventId;
 class Event
 {
 public:
-    Event();
-
     bool operator==(const Event &other) const;
 
     bool operator!=(const Event &other) const { return !operator==(other); }
@@ -100,6 +98,9 @@ typedef QList<EventId> EventIdList;
 
 /** A map of events. */
 typedef std::map<EventId, Event> EventMap;
+
+/** A vector of events. */
+using EventVector = std::vector<Event>;
 
 void dumpEvents(const EventList &events);
 

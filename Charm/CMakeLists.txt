@@ -4,7 +4,6 @@ SET(
     CharmApplication_SRCS
     ApplicationCore.cpp
     Data.cpp
-    EventModelAdapter.cpp
     EventModelFilter.cpp
     GUIState.cpp
     ModelConnector.cpp

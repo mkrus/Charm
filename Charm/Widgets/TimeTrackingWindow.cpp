@@ -116,8 +116,6 @@ TimeTrackingWindow::TimeTrackingWindow(QWidget *parent)
 
 TimeTrackingWindow::~TimeTrackingWindow()
 {
-    if (ApplicationCore::hasInstance())
-        DATAMODEL->unregisterAdapter(this);
 }
 
 QMenu *TimeTrackingWindow::menu() const
@@ -153,9 +151,27 @@ void TimeTrackingWindow::stateChanged(State previous)
         setEnabled(false);
         restoreGuiState();
         configurationChanged();
+
         connect(ApplicationCore::instance().dateChangeWatcher(), &DateChangeWatcher::dateChanged,
                 this, &TimeTrackingWindow::slotSelectTasksToShow);
-        DATAMODEL->registerAdapter(this);
+
+        // update view when events or tasks change
+        connect(DATAMODEL, &CharmDataModel::tasksResetted, this,
+            &TimeTrackingWindow::slotSelectTasksToShow);
+        connect(DATAMODEL, &CharmDataModel::eventsResetted, this,
+            &TimeTrackingWindow::slotSelectTasksToShow);
+        connect(DATAMODEL, &CharmDataModel::eventAdded, this,
+            &TimeTrackingWindow::slotSelectTasksToShow);
+        connect(DATAMODEL, &CharmDataModel::eventModified, this,
+            &TimeTrackingWindow::slotSelectTasksToShow);
+        connect(DATAMODEL, &CharmDataModel::eventDeleted, this,
+            &TimeTrackingWindow::slotSelectTasksToShow);
+
+        connect(DATAMODEL, &CharmDataModel::eventActivated, this,
+            &TimeTrackingWindow::slotEventActivated);
+        connect(DATAMODEL, &CharmDataModel::eventDeactivated, this,
+            &TimeTrackingWindow::slotEventDeactivated);
+
         m_summaryWidget->setSummaries(QVector<WeeklySummary>());
         m_summaryWidget->handleActiveEvent();
         break;
@@ -183,47 +199,17 @@ void TimeTrackingWindow::restore()
     show();
 }
 
-// model adapter:
-void TimeTrackingWindow::resetTasks()
-{
-    slotSelectTasksToShow();
-}
-
-void TimeTrackingWindow::resetEvents()
-{
-    slotSelectTasksToShow();
-}
-
-void TimeTrackingWindow::eventAboutToBeAdded(EventId) {}
-
-void TimeTrackingWindow::eventAdded(EventId)
-{
-    slotSelectTasksToShow();
-}
-
-void TimeTrackingWindow::eventModified(EventId, const Event &)
-{
-    slotSelectTasksToShow();
-}
-
-void TimeTrackingWindow::eventAboutToBeDeleted(EventId) {}
-
-void TimeTrackingWindow::eventDeleted(EventId)
-{
-    slotSelectTasksToShow();
-}
-
-void TimeTrackingWindow::eventActivated(EventId)
+void TimeTrackingWindow::slotEventActivated(EventId)
 {
     m_summaryWidget->handleActiveEvent();
 }
 
-void TimeTrackingWindow::eventDeactivated(EventId id)
+void TimeTrackingWindow::slotEventDeactivated(EventId id)
 {
     m_summaryWidget->handleActiveEvent();
 
     if (CONFIGURATION.requestEventComment) {
-        Event event = DATAMODEL->eventForId(id);
+        Event event = *DATAMODEL->eventForId(id);
         if (event.isValid() && event.comment().isEmpty()) {
             CommentEditorPopup popup;
             popup.loadEvent(id);
@@ -556,7 +542,7 @@ void TimeTrackingWindow::handleIdleEvents(IdleDetector *detector, bool restart)
     const IdleDetector::IdlePeriod period = periods.last();
 
     if (hadActiveEvent) {
-        Event event = DATAMODEL->eventForId(activeEvent);
+        Event event = *DATAMODEL->eventForId(activeEvent);
         Q_ASSERT(event.isValid());
 
         QDateTime start = period.first; // initializes a valid QDateTime
@@ -694,7 +680,7 @@ void TimeTrackingWindow::uploadStagedTimesheet()
         EventList events;
         events.reserve(matchingEventIds.size());
         for (const EventId &id : matchingEventIds)
-            events.append(DATAMODEL->eventForId(id));
+            events.append(*DATAMODEL->eventForId(id));
         timesheet.setEvents(events);
 
         QScopedPointer<UploadTimesheetJob> job(new UploadTimesheetJob);

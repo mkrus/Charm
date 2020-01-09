@@ -30,22 +30,19 @@
 #include <QObject>
 #include <QTimer>
 
-#include "CharmDataModelAdapterInterface.h"
 #include "Event.h"
 #include "State.h"
 #include "Task.h"
-#include "TaskModel.h"
 #include "TimeSpans.h"
 
+class EventModel;
+class TaskModel;
 class QAbstractItemModel;
 
 /** CharmDataModel is the application's model.
     CharmDataModel holds all data that makes up the application's
     current data space: the list of tasks, the list of events,
     and the active (currently timed) event.
-    It will notify all registered CharmDataModelAdapterInterfaces
-    about changes in the model. Those interfaces could, for example,
-    implement QAbstractItemModel.
 */
 class CharmDataModel : public QObject
 {
@@ -57,10 +54,6 @@ public:
     ~CharmDataModel() override;
 
     void stateChanged(State previous, State next);
-    /** Register a CharmDataModelAdapterInterface. */
-    void registerAdapter(CharmDataModelAdapterInterface *);
-    /** Unregister a CharmDataModelAdapterInterface. */
-    void unregisterAdapter(CharmDataModelAdapterInterface *);
 
     // Tasks
     // =====
@@ -72,10 +65,13 @@ public:
     /** Return the list of child ids for a given task. */
     TaskIdList childrenTaskIds(TaskId id) const;
 
+    // Evemts
+    // ======
+    EventModel *eventModel() const;
     /** Retrieve an event for the given event id. */
-    const Event &eventForId(EventId id) const;
-    /** Constant access to the map of events. */
-    const EventMap &eventMap() const;
+    const Event *eventForId(EventId id) const;
+    /** Constant access to the vector of events. */
+    const EventVector &getEventVector() const;
     /**
      * Get all events that start in a given time frame (e.g. a given day, a given week etc.)
      * More precisely, all events that start at or after @p start, and start before @p end (@p end
@@ -130,10 +126,21 @@ Q_SIGNALS:
     void sysTrayUpdate(const QString &, bool);
     void resetGUIState();
 
+    void eventActivated(EventId id);
+    void eventDeactivated(EventId id);
+
+    void eventAdded(const Event &);
+    void eventModified(const Event &);
+    void eventDeleted(const Event &);
+    void eventsResetted();
+
+    void tasksResetted();
+
 public Q_SLOTS:
     void setAllTasks(TaskList tasks);
     void clearTasks();
 
+    void setAllEvents(EventVector events);
     void setAllEvents(const EventList &events);
     void addEvent(const Event &);
     void modifyEvent(const Event &);
@@ -141,24 +148,18 @@ public Q_SLOTS:
     void clearEvents();
 
 private:
-    bool eventExists(EventId id);
-
-    Event &findEvent(EventId id);
-
     int totalDuration() const;
     QString eventString() const;
     QString totalDurationString() const;
     void updateToolTip();
 
-    EventMap m_events;
     bool m_hasActiveEvent = false;
     EventId m_activeEventId;
-    // adapters are notified when the model changes
-    CharmDataModelAdapterList m_adapters;
 
     // event update timer:
     QTimer m_timer;
 
+    EventModel *m_eventModel = nullptr;
     TaskModel *m_taskModel = nullptr;
 
 private Q_SLOTS:

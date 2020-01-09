@@ -47,7 +47,7 @@ CommentEditorPopup::~CommentEditorPopup()
 
 void CommentEditorPopup::loadEvent(EventId id)
 {
-    Event event = DATAMODEL->eventForId(id);
+    Event event = *DATAMODEL->eventForId(id);
 
     if (!event.isValid()) {
         m_id = EventId();
@@ -61,7 +61,7 @@ void CommentEditorPopup::loadEvent(EventId id)
 void CommentEditorPopup::accept()
 {
     const QString t = ui->textEdit->toPlainText();
-    Event event = DATAMODEL->eventForId(m_id);
+    Event event = *DATAMODEL->eventForId(m_id);
     if (event.isValid()) {
         event.setComment(t);
         DATAMODEL->modifyEvent(event);

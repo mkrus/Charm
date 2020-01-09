@@ -352,9 +352,12 @@ void EventView::slotConfigureUi()
 
 void EventView::slotUpdateCurrent()
 {
-    Event event = DATAMODEL->eventForId(m_event.id());
-    if (event != m_event)
-        setCurrentEvent(event);
+    // TODO: investigate why event might not be valid and try to omit invalid state
+    if (m_event.isValid()) {
+        Event event = *DATAMODEL->eventForId(m_event.id());
+        if (event != m_event)
+            setCurrentEvent(event);
+    }
     slotUpdateTotal();
 }
 
