@@ -4,6 +4,7 @@ PROJECT( Charm CXX )
 # Enable C++17
 SET(CMAKE_CXX_STANDARD 17)
 
+include(ExternalProject)
 include(FeatureSummary)
 
 set(ECM_MODULE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake/ECM/modules/")
@@ -66,12 +67,17 @@ IF(UNIX AND NOT APPLE)
     find_package(Qt5DBus ${QT_REQUIRED_VERSION} QUIET)
 ENDIF()
 
-
-find_package(Qt5Keychain REQUIRED)
-set_package_properties(Qt5Keychain PROPERTIES
-                                   DESCRIPTION "Provides support for secure credentials storage"
-                                   URL "https://github.com/frankosterfeld/qtkeychain"
-                                   TYPE REQUIRED)
+option(BUILD_INTERNAL_QTKEYCHAIN "Enable build of external project qtkeychain" OFF)
+add_feature_info("Internal build of qtkeychain" BUILD_INTERNAL_QTKEYCHAIN "enable with BUILD_INTERNAL_QTKEYCHAIN=ON")
+if(BUILD_INTERNAL_QTKEYCHAIN)
+    include(cmake/QtKeychainProject.cmake)
+else()
+    find_package(Qt5Keychain REQUIRED)
+    set_package_properties(Qt5Keychain PROPERTIES
+                           DESCRIPTION "Provides support for secure credentials storage"
+                           URL "https://github.com/frankosterfeld/qtkeychain"
+                           TYPE REQUIRED)
+endif()
 
 SET(CHARM_MAC_HIGHRES_SUPPORT_ENABLED ON)
 

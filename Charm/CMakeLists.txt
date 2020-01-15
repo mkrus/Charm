@@ -147,7 +147,8 @@ TARGET_LINK_LIBRARIES(CharmApplication ${CharmApplication_LIBS}
     Qt5::Network
     Qt5::Sql
     Qt5::PrintSupport
-    qt5keychain)
+    ${QTKEYCHAIN_LIBRARIES}
+)
 
 IF (WIN32)
     TARGET_LINK_LIBRARIES(CharmApplication
