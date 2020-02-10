@@ -201,8 +201,8 @@ void Controller::provideMetaData(Configuration &configuration)
 
 void Controller::initializeBackEnd()
 {
-    Q_ASSERT_X(!m_storage, Q_FUNC_INFO, "Backend already initialized");
-    m_storage = new SqlStorage;
+    if (!m_storage)
+        m_storage = new SqlStorage;
 }
 
 bool Controller::connectToBackend()
