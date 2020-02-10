@@ -199,10 +199,7 @@ bool SqlStorage::connect(Configuration &configuration)
     const QString databaseName = fileInfo.absoluteFilePath();
     m_database.setDatabaseName(databaseName);
 
-    bool error = false;
-
     if (!fileInfo.exists() && !configuration.newDatabase) {
-        error = true;
         configuration.failureMessage =
             QObject::tr("<html><head><meta name=\"qrichtext\" content=\"1\" /></head>"
                         "<body><p>The configuration seems to be valid, but the database "
@@ -211,6 +208,7 @@ bool SqlStorage::connect(Configuration &configuration)
                         "the configuration.</p>"
                         "<p>If the configuration is correct, just close the dialog.</p>"
                         "</body></html>");
+        return false;
     }
 
     if (!m_database.open()) {
@@ -226,9 +224,6 @@ bool SqlStorage::connect(Configuration &configuration)
             return false;
         }
     }
-
-    if (error)
-        return false;
 
     configuration.failure = false;
     return true;
