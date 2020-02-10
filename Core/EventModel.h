@@ -44,7 +44,7 @@ public:
     bool eventExists(EventId eventId) const;
     const Event *eventForId(EventId id) const;
     const Event *eventForIndex(QModelIndex idx) const;
-    QModelIndex indexForId(EventId id) const;
+    QModelIndex indexForEvent(EventId id) const;
 
     // QAbstractItemModel implementations
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;

@@ -74,11 +74,11 @@ const Event *EventModel::eventForIndex(QModelIndex idx) const
     return nullptr;
 }
 
-QModelIndex EventModel::indexForId(EventId id) const
+QModelIndex EventModel::indexForEvent(EventId id) const
 {
     auto it = std::lower_bound(std::begin(m_events), std::end(m_events), id, byLtEventId());
     if (it != std::end(m_events) && it->id() == id) {
-        auto row = std::distance(it, std::end(m_events));
+        int row = std::distance(std::begin(m_events), it);
         return QAbstractListModel::index(row);
     }
 
@@ -150,7 +150,7 @@ bool EventModel::deleteEvent(const Event &event)
         return false;
     }
 
-    int row = std::distance(m_events.begin(), it);
+    int row = std::distance(std::begin(m_events), it);
     beginRemoveRows({}, row, row);
     m_events.erase(it);
     endRemoveRows();

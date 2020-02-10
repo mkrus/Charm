@@ -113,7 +113,7 @@ void EventModelTests::modelTest()
         auto index = model.index(i);
         auto id = model.data(index, EventModel::IdRole).value<EventId>();
         auto eventForIndex = model.eventForIndex(index);
-        auto indexForId = model.indexForId(id);
+        auto indexForId = model.indexForEvent(id);
 
         QVERIFY(eventForIndex && id == eventForIndex->id());
         QVERIFY(indexForId.isValid() && index == indexForId);
