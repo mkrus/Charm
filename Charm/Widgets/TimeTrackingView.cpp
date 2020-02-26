@@ -263,7 +263,7 @@ void TimeTrackingView::data(DataField &field, int column, int row) const
     if (row == HeaderRow) {
         field.font = m_narrowFont;
         if (column == TaskColumn) {
-            field.text = tr("Task");
+            field.text = tr("Activity");
         } else if (column == TotalsColumn) {
             field.text = tr("Total");
         } else {

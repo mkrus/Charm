@@ -240,7 +240,7 @@ void MonthlyTimeSheetReport::update()
             QDomElement headerRow = doc.createElement(QStringLiteral("tr"));
             headerRow.setAttribute(QStringLiteral("class"), QStringLiteral("header_row"));
             table.appendChild(headerRow);
-            addTblHdr(headerRow, tr("Task"));
+            addTblHdr(headerRow, tr("Project Code"));
             for (int i = 0; i < m_numberOfWeeks; ++i)
                 addTblHdr(headerRow, tr("Week"));
             addTblHdr(headerRow, tr("Total"));

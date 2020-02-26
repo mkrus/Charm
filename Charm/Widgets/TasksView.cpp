@@ -33,7 +33,7 @@
 TasksView::TasksView(QWidget *parent)
     : QDialog(parent)
 {
-    setWindowTitle(tr("Tasks View"));
+    setWindowTitle(tr("Project Code Lookup"));
 
     TasksViewWidget *view = new TasksViewWidget(this);
     auto layout = new QVBoxLayout(this);

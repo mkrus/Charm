@@ -65,7 +65,7 @@ EventView::EventView(QWidget *parent)
     , m_labelTotal(new QLabel(this))
     , m_listView(new QListView(this))
 {
-    setWindowTitle(tr("Event Editor"));
+    setWindowTitle(tr("Activity Editor"));
     auto layout = new QVBoxLayout(this);
     layout->setMargin(0);
     layout->setSpacing(0);
@@ -84,25 +84,25 @@ EventView::EventView(QWidget *parent)
     //              SLOT(slotCommitTimeout()) );
     //     m_commitTimer.setSingleShot( true );
 
-    m_actionNewEvent.setText(tr("New Event..."));
-    m_actionNewEvent.setToolTip(tr("Create a new Event"));
+    m_actionNewEvent.setText(tr("New Activity..."));
+    m_actionNewEvent.setToolTip(tr("Create a new activity entry"));
     m_actionNewEvent.setIcon(Data::newTaskIcon());
     m_actionNewEvent.setShortcut(QKeySequence::New);
     m_toolBar->addAction(&m_actionNewEvent);
 
-    m_actionEditEvent.setText(tr("Edit Event..."));
+    m_actionEditEvent.setText(tr("Edit Activity..."));
     m_actionEditEvent.setShortcut(Qt::CTRL + Qt::Key_E);
     m_actionEditEvent.setIcon(Data::editEventIcon());
     m_toolBar->addAction(&m_actionEditEvent);
 
-    m_actionFindAndReplace.setText(tr("Search/Replace Events..."));
-    m_actionFindAndReplace.setToolTip(tr("Change the task events belong to"));
+    m_actionFindAndReplace.setText(tr("Find and Replace Activities..."));
+    m_actionFindAndReplace.setToolTip(tr("Find and Replace activities"));
     m_actionFindAndReplace.setIcon(Data::searchIcon());
     m_toolBar->addAction(&m_actionFindAndReplace);
 
     connect(&m_actionFindAndReplace, &QAction::triggered, this, &EventView::slotFindAndReplace);
 
-    m_actionDeleteEvent.setText(tr("Delete Event..."));
+    m_actionDeleteEvent.setText(tr("Delete Activity..."));
     QList<QKeySequence> deleteShortcuts;
     deleteShortcuts << QKeySequence::Delete;
 #ifdef Q_OS_OSX
@@ -244,7 +244,7 @@ void EventView::slotDeleteEvent()
                            hoursAndMinutes(m_event.duration()));
     }
 
-    QMessageBox mbox(QMessageBox::Question, tr("Delete Event?"), message,
+    QMessageBox mbox(QMessageBox::Question, tr("Delete Activity Entry?"), message,
                      QMessageBox::Yes | QMessageBox::Cancel);
     auto buttonYes = mbox.button(QMessageBox::Yes);
     buttonYes->setText(tr("Delete"));

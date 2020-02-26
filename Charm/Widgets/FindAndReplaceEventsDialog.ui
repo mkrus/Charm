@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>332</width>
+    <width>351</width>
     <height>396</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Find Event</string>
+   <string>Find Activity</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_3">
    <item row="0" column="0">
@@ -109,14 +109,14 @@
             <item>
              <widget class="QPushButton" name="selectSearchTaskPB">
               <property name="text">
-               <string>Select Task</string>
+               <string>Select Activity</string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QPushButton" name="selectReplaceWithTaskPB">
               <property name="text">
-               <string>Select Task</string>
+               <string>Select Activity</string>
               </property>
              </widget>
             </item>

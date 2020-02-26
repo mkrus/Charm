@@ -62,8 +62,8 @@ TimeTrackingTaskSelector::TimeTrackingTaskSelector(QWidget *parent)
     , m_editCommentButton(new QToolButton(this))
     , m_editCommentAction(new QAction(this))
     , m_taskSelectorButton(new QToolButton(this))
-    , m_startOtherTaskAction(new QAction(tr("Start Other Task..."), this))
-    , m_menu(new QMenu(tr("Start Task"), this))
+    , m_startOtherTaskAction(new QAction(tr("Start Other Activity..."), this))
+    , m_menu(new QMenu(tr("Start Activity"), this))
 {
     QLayout *hbox = new QHBoxLayout(this);
     hbox->addWidget(m_stopGoButton);
@@ -73,7 +73,7 @@ TimeTrackingTaskSelector::TimeTrackingTaskSelector(QWidget *parent)
     hbox->setContentsMargins(0, 0, 0, 0);
     m_taskSelectorButton->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
 
-    m_stopGoAction->setText(tr("Start Task"));
+    m_stopGoAction->setText(tr("Start Activity"));
     m_stopGoAction->setIcon(Data::goIcon());
     m_stopGoAction->setShortcut(QKeySequence(Qt::Key_Space));
     m_stopGoAction->setCheckable(true);
@@ -91,7 +91,7 @@ TimeTrackingTaskSelector::TimeTrackingTaskSelector(QWidget *parent)
 
     m_taskSelectorButton->setPopupMode(QToolButton::InstantPopup);
     m_taskSelectorButton->setMenu(m_menu);
-    m_taskSelectorButton->setText(tr("Select Task"));
+    m_taskSelectorButton->setText(tr("Select Activity"));
 
     m_startOtherTaskAction->setShortcut(Qt::Key_T);
     connect(m_startOtherTaskAction, &QAction::triggered, this,
@@ -157,7 +157,7 @@ void TimeTrackingTaskSelector::handleActiveEvent()
 {
     if (DATAMODEL->hasActiveEvent()) {
         m_stopGoAction->setIcon(Data::stopIcon());
-        m_stopGoAction->setText(tr("Stop Task"));
+        m_stopGoAction->setText(tr("Stop Activity"));
         m_stopGoAction->setEnabled(true);
         m_stopGoAction->setChecked(true);
         m_editCommentAction->setEnabled(true);
@@ -167,7 +167,7 @@ void TimeTrackingTaskSelector::handleActiveEvent()
         m_taskSelectorButton->setText(escapeAmpersands(DATAMODEL->smartTaskName(task.id)));
     } else {
         m_stopGoAction->setIcon(Data::goIcon());
-        m_stopGoAction->setText(tr("Start Task"));
+        m_stopGoAction->setText(tr("Start Activity"));
         if (m_selectedTask != 0) {
             const Task &task = DATAMODEL->getTask(m_selectedTask);
             m_stopGoAction->setEnabled(task.isValid());
@@ -235,10 +235,10 @@ void TimeTrackingTaskSelector::updateThumbBar()
     }
     if (m_stopGoThumbButton) {
         if (m_stopGoButton->isChecked()) {
-            m_stopGoThumbButton->setToolTip(tr("Stop Task"));
+            m_stopGoThumbButton->setToolTip(tr("Stop Activity"));
             m_stopGoThumbButton->setIcon(Data::stopIcon());
         } else {
-            m_stopGoThumbButton->setToolTip(tr("Start Task"));
+            m_stopGoThumbButton->setToolTip(tr("Start Activity"));
             m_stopGoThumbButton->setIcon(Data::goIcon());
         }
         m_stopGoThumbButton->setEnabled(m_stopGoButton->isEnabled());

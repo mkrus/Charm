@@ -48,14 +48,14 @@
      <item>
       <widget class="QLabel" name="label_6">
        <property name="text">
-        <string>Task:</string>
+        <string>Activity:</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QLabel" name="taskLabel">
        <property name="text">
-        <string>TASK</string>
+        <string>ACTIVITY</string>
        </property>
       </widget>
      </item>
@@ -75,7 +75,7 @@
      <item>
       <widget class="QPushButton" name="selectTaskButton">
        <property name="text">
-        <string>Select Task...</string>
+        <string>Select Activity...</string>
        </property>
       </widget>
      </item>

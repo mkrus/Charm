@@ -25,7 +25,7 @@
 #include "Core/Controller.h"
 
 CommandDeleteEvent::CommandDeleteEvent(const Event &event, QObject *parent)
-    : CharmCommand(tr("Delete Event"), parent)
+    : CharmCommand(tr("Delete Activity Entry"), parent)
     , m_event(event)
 {
 }

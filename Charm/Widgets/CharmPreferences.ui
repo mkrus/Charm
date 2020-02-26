@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>358</width>
-    <height>158</height>
+    <width>399</width>
+    <height>183</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -96,7 +96,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>Comment finished events</string>
+        <string>Comment finished activities</string>
        </property>
        <property name="buddy">
         <cstring>cbRequestEventComment</cstring>
@@ -132,7 +132,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>Limit recently used tasks to</string>
+        <string>Limit recently used project codes to</string>
        </property>
        <property name="buddy">
         <cstring>sbNumberOfTaskSelectorEntries</cstring>

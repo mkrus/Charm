@@ -171,7 +171,7 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
             Qt::QueuedConnection);
 
     // system tray icon:
-    m_actionStopAllTasks.setText(tr("Stop Current Task"));
+    m_actionStopAllTasks.setText(tr("Stop Current Activity"));
     m_actionStopAllTasks.setShortcut(Qt::Key_Escape);
     m_actionStopAllTasks.setShortcutContext(Qt::ApplicationShortcut);
     mainView().addAction(&m_actionStopAllTasks); // for the shortcut to work
@@ -205,11 +205,11 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
             &TimeTrackingWindow::slotEditPreferences);
     m_actionPreferences.setEnabled(true);
 
-    m_actionSyncTasks.setText(tr("Update Task Definitions..."));
+    m_actionSyncTasks.setText(tr("Update Project Code Definitions..."));
     // the signature of QAction::triggered does not match slotSyncTasks
     connect(&m_actionSyncTasks, &QAction::triggered, &m_timeTracker,
             &TimeTrackingWindow::slotSyncTasksVerbose);
-    m_actionImportTasks.setText(tr("Import and Merge Task Definitions..."));
+    m_actionImportTasks.setText(tr("Import and Merge Project Code Definitions..."));
     connect(&m_actionImportTasks, &QAction::triggered, &m_timeTracker,
             &TimeTrackingWindow::slotImportTasks);
     m_actionCheckForUpdates.setText(tr("Check for Updates..."));
@@ -323,9 +323,9 @@ void ApplicationCore::createWindowMenu(QMenuBar *menuBar)
 {
     auto menu = new QMenu(menuBar);
     menu->setTitle(tr("Window"));
-    menu->addAction(tr("Show Tasks Window"), this, &ApplicationCore::slotShowTasksEditor,
+    menu->addAction(tr("Activity Editor"), this, &ApplicationCore::slotShowEventEditor,
                     QKeySequence(tr("Ctrl+1")));
-    menu->addAction(tr("Show Event Editor Window"), this, &ApplicationCore::slotShowEventEditor,
+    menu->addAction(tr("Project Code Lookup"), this, &ApplicationCore::slotShowTasksEditor,
                     QKeySequence(tr("Ctrl+2")));
     menu->addSeparator();
     menu->addAction(&m_actionEnterVacation);

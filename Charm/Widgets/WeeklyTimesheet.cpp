@@ -340,7 +340,7 @@ void WeeklyTimeSheetReport::update()
         table.appendChild(headerDayRow);
 
         const QString Headlines[NumberOfColumns] = {
-            tr("Task"),
+            tr("Project Code"),
             QLocale::system().dayName(1, QLocale::ShortFormat),
             QLocale::system().dayName(2, QLocale::ShortFormat),
             QLocale::system().dayName(3, QLocale::ShortFormat),
