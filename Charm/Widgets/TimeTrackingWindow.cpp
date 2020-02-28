@@ -231,6 +231,8 @@ void TimeTrackingWindow::configurationChanged()
 
 void TimeTrackingWindow::slotSelectTasksToShow()
 {
+    if (!ApplicationCore::hasInstance())
+        return;
     // we would like to always show some tasks, if there are any
     // first, we select tasks that most recently where active
     const NamedTimeSpan thisWeek = TimeSpans().thisWeek();
