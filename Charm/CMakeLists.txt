@@ -88,7 +88,7 @@ IF( CHARM_IDLE_DETECTION )
             FIND_PACKAGE( XCB )
             SET_PACKAGE_PROPERTIES(XCB PROPERTIES
                                    DESCRIPTION "Provides idle detection support for X11"
-                                   URL "http://xcb.freedesktop.org"
+                                   URL "https://xcb.freedesktop.org"
                                    TYPE RECOMMENDED)
             IF( XCB_FOUND)
                 INCLUDE_DIRECTORIES( ${XCB_INCLUDE_DIRS} )
