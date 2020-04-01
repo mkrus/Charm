@@ -28,6 +28,7 @@ private:
     void deviceSelectionChanged();
     void setPairedDevice();
     void connectToDevice();
+    void statusChanged(TimeularManager::Status status);
 
     QScopedPointer<Ui::TimeularSetupDialog> m_ui;
     QVector<TimeularAdaptor::FaceMapping> m_mappings;

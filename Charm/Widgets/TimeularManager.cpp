@@ -40,7 +40,7 @@ TimeularManager::TimeularManager(QObject *parent)
     : QObject(parent)
 {
     m_deviceDiscoveryAgent = new QBluetoothDeviceDiscoveryAgent(this);
-    m_deviceDiscoveryAgent->setLowEnergyDiscoveryTimeout(5000);
+    m_deviceDiscoveryAgent->setLowEnergyDiscoveryTimeout(30000);
 
     connect(m_deviceDiscoveryAgent, &QBluetoothDeviceDiscoveryAgent::finished, [this]() {
         if (m_status != Connected)
@@ -106,6 +106,16 @@ void TimeularManager::startDiscovery()
     m_discoveredDevices.clear();
     emit discoveredDevicesChanged(m_discoveredDevices);
     m_deviceDiscoveryAgent->start(QBluetoothDeviceDiscoveryAgent::LowEnergyMethod);
+}
+
+void TimeularManager::stopDiscovery()
+{
+    if (m_status != Scanning)
+        return;
+
+    qDebug() << "Stoping Discovery";
+    setStatus(Disconneted);
+    m_deviceDiscoveryAgent->stop();
 }
 
 void TimeularManager::startConnection()
@@ -213,6 +223,8 @@ void TimeularManager::deviceConnected()
 void TimeularManager::deviceDisconnected()
 {
     setStatus(Disconneted);
+    delete m_controller;
+    m_controller = nullptr;
     if (m_service) {
         delete m_service;
         m_service = nullptr;

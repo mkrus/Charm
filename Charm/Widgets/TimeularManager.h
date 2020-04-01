@@ -68,6 +68,7 @@ public:
 
 public Q_SLOTS:
     void startDiscovery();
+    void stopDiscovery();
     void startConnection();
     void disconnect();
     void setPairedDevice(const QString &pairedDevice);

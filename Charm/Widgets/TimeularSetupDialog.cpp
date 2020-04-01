@@ -101,32 +101,45 @@ TimeularSetupDialog::TimeularSetupDialog(QVector<TimeularAdaptor::FaceMapping> m
 
     QStringListModel *model = new QStringListModel(this);
     if (m_manager->isPaired()) {
-        QStringList sl = {m_manager->pairedDevice() + QLatin1String(" *")};
+        QStringList sl = {m_manager->pairedDevice() + QLatin1String(" - Paired")};
         model->setStringList(sl);
     }
     m_ui->listView->setModel(model);
     connect(m_manager, &TimeularManager::discoveredDevicesChanged, this,
             &TimeularSetupDialog::discoveredDevicesChanged);
-    connect(m_manager, &TimeularManager::statusChanged, this, [this](TimeularManager::Status s) {
-        if (s == TimeularManager::Disconneted) {
-            m_ui->discoverButton->setText(QLatin1Literal("Discover"));
-            m_ui->discoverButton->setEnabled(true);
+    connect(m_manager, &TimeularManager::statusChanged, this, &TimeularSetupDialog::statusChanged);
+    statusChanged(m_manager->status());
+
+    //Discovery
+    m_ui->discoverButton->setEnabled(m_manager->status() == TimeularManager::Disconneted);
+    connect(m_ui->discoverButton, &QPushButton::clicked, this, [this] {
+        auto status = m_manager->status();
+        if (status == TimeularManager::Disconneted) {
+            m_manager->startDiscovery();
+        } else if (status == TimeularManager::Scanning) {
+            m_manager->stopDiscovery();
         }
     });
-    connect(m_ui->discoverButton, &QPushButton::clicked, this, [this] {
-        m_manager->startDiscovery();
-        m_ui->discoverButton->setText(QLatin1Literal("Searching..."));
-        m_ui->discoverButton->setEnabled(false);
+    connect(m_manager, &TimeularManager::pairedChanged, this, [this]() {
+        discoveredDevicesChanged(m_manager->discoveredDevices());
     });
 
+    //Pairing
     m_ui->pairButton->setEnabled(false);
     connect(m_ui->listView->selectionModel(), &QItemSelectionModel::selectionChanged, this,
             &TimeularSetupDialog::deviceSelectionChanged);
     connect(m_ui->pairButton, &QPushButton::clicked, this, &TimeularSetupDialog::setPairedDevice);
 
+    //Connection
     m_ui->connectButton->setEnabled(m_manager->isPaired());
-    connect(m_ui->connectButton, &QPushButton::clicked, this,
-            &TimeularSetupDialog::connectToDevice);
+    connect(m_ui->connectButton, &QPushButton::clicked, this, [this] {
+        auto status = m_manager->status();
+        if (status == TimeularManager::Disconneted) {
+            m_manager->startConnection();
+        } else if (status == TimeularManager::Connecting || status == TimeularManager::Connected) {
+            m_manager->disconnect();
+        }
+    });
     connect(m_manager, &TimeularManager::pairedChanged, m_ui->connectButton,
             &QPushButton::setEnabled);
 }
@@ -199,7 +212,7 @@ void TimeularSetupDialog::discoveredDevicesChanged(QStringList dl)
     QStringList fl;
     std::transform(dl.cbegin(), dl.cend(), std::back_inserter(fl), [this](QString deviceId) {
         return deviceId
-            + (m_manager->pairedDevice() == deviceId ? QLatin1String(" *") : QLatin1String(""));
+            + (m_manager->pairedDevice() == deviceId ? QLatin1String(" - Paired") : QLatin1String(""));
     });
     model->setStringList(fl);
 }
@@ -208,10 +221,14 @@ void TimeularSetupDialog::deviceSelectionChanged()
 {
     auto sr = m_ui->listView->selectionModel()->selectedRows();
     if (sr.size() == 1) {
-        m_ui->pairButton->setEnabled(true);
-    } else {
-        m_ui->pairButton->setEnabled(false);
+        int r = sr.front().row();
+        if (r < m_manager->discoveredDevices().size() && m_manager->status() == TimeularManager::Disconneted) {
+            m_ui->pairButton->setEnabled(m_manager->pairedDevice() != m_manager->discoveredDevices().at(r));
+            return;
+        }
     }
+
+    m_ui->pairButton->setEnabled(false);
 }
 
 void TimeularSetupDialog::setPairedDevice()
@@ -229,4 +246,30 @@ void TimeularSetupDialog::connectToDevice()
 {
     if (m_manager->isPaired())
         m_manager->startConnection();
+}
+
+void TimeularSetupDialog::statusChanged(TimeularManager::Status status)
+{
+    m_ui->discoverButton->setText(QLatin1Literal("Discover"));
+    m_ui->connectButton->setText(QLatin1Literal("Connect"));
+
+    if (status == TimeularManager::Disconneted) {
+        m_ui->discoverButton->setEnabled(true);
+        m_ui->connectButton->setEnabled(m_manager->isPaired());
+    } else if (status == TimeularManager::Scanning) {
+        m_ui->discoverButton->setText(QLatin1Literal("Stop Discovery"));
+        m_ui->discoverButton->setEnabled(true);
+        m_ui->connectButton->setEnabled(false);
+    } else if (status == TimeularManager::Connecting) {
+        m_ui->connectButton->setText(QLatin1Literal("Cancel Connection"));
+        m_ui->discoverButton->setEnabled(false);
+        m_ui->connectButton->setEnabled(true);
+    } else if (status == TimeularManager::Connected) {
+        m_ui->connectButton->setText(QLatin1Literal("Disconnect"));
+        m_ui->discoverButton->setEnabled(false);
+        m_ui->connectButton->setEnabled(true);
+    } else {
+        m_ui->discoverButton->setEnabled(false);
+        m_ui->connectButton->setEnabled(false);
+    }
 }
