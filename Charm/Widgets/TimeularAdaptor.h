@@ -3,7 +3,7 @@
 
   This file is part of Charm, a task-based time tracking application.
 
-  Copyright (C) 2014-2019 Klarälvdalens Datakonsult AB, a KDAB Group company, info@kdab.com
+  Copyright (C) 2014-2020 Klarälvdalens Datakonsult AB, a KDAB Group company, info@kdab.com
 
   Author: Mike Krus <mike.krus@kdab.com>
 
@@ -36,29 +36,23 @@ class QMenu;
 class TimeularAdaptor : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(Status status READ status NOTIFY statusChanged)
+    Q_PROPERTY(TimeularManager::Status status READ status NOTIFY statusChanged)
 public:
     struct FaceMapping
     {
         int face = 0;
         TaskId taskId = 0;
     };
-    enum Status {
-        Disconneted,
-        Scanning,
-        Connecting,
-        Connected,
-    };
-    Q_ENUMS(Status)
+
 
     explicit TimeularAdaptor(QObject *parent = nullptr);
 
-    Status status() const;
+    TimeularManager::Status status() const;
 
     void addActions(QMenu *menu);
 
 Q_SIGNALS:
-    void statusChanged(Status status);
+    void statusChanged(TimeularManager::Status status);
     void message(QString message);
 
 private Q_SLOTS:

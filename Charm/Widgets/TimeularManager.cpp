@@ -101,7 +101,6 @@ void TimeularManager::startDiscovery()
     if (m_status != Disconneted)
         return;
 
-    qDebug() << "Starting Discovery";
     setStatus(Scanning);
     m_discoveredDevices.clear();
     emit discoveredDevicesChanged(m_discoveredDevices);
@@ -113,7 +112,6 @@ void TimeularManager::stopDiscovery()
     if (m_status != Scanning)
         return;
 
-    qDebug() << "Stoping Discovery";
     setStatus(Disconneted);
     m_deviceDiscoveryAgent->stop();
 }
@@ -123,7 +121,6 @@ void TimeularManager::startConnection()
     if ((m_status != Disconneted) || m_pairedDevice.isEmpty())
         return;
 
-    qDebug() << "Starting Connection";
     setStatus(Connecting);
 
 
@@ -156,10 +153,9 @@ void TimeularManager::setPairedDevice(const QString &pairedDevice)
 {
     if (pairedDevice != m_pairedDevice) {
         m_pairedDevice = pairedDevice;
-        emit pairedChanged(m_pairedDevice.size() > 0);
-
         QSettings settings;
         settings.setValue(timeularDeviceIdKey, m_pairedDevice);
+        emit pairedChanged(m_pairedDevice.size() > 0);
     }
 }
 
@@ -194,7 +190,6 @@ void TimeularManager::deviceDiscovered(const QBluetoothDeviceInfo &info)
 
 void TimeularManager::connectToDevice(const QBluetoothDeviceInfo& info)
 {
-    qDebug() << "Connecting to device";
     if (!m_controller) {
         m_controller = QLowEnergyController::createCentral(info, this);
         m_controller->setRemoteAddressType(QLowEnergyController::RandomAddress);
@@ -229,7 +224,6 @@ void TimeularManager::deviceDisconnected()
         delete m_service;
         m_service = nullptr;
     }
-    qDebug() << "Device Disconneted";
 }
 
 void TimeularManager::errorReceived(QLowEnergyController::Error /*error*/)
@@ -256,7 +250,8 @@ void TimeularManager::serviceScanDone()
                 &TimeularManager::confirmedDescriptorWrite);
         m_service->discoverDetails();
     } else {
-        qDebug() << "Service not found";
+        //TODO report to user
+        qWarning() << "Service not found";
     }
 }
 
@@ -287,7 +282,6 @@ void TimeularManager::serviceStateChanged(QLowEnergyService::ServiceState newSta
         const QLowEnergyCharacteristic orientationChar =
             m_service->characteristic(QBluetoothUuid(zeiOrientationCharacteristic));
         if (!orientationChar.isValid()) {
-            qDebug() << "Orientation data not found";
             setStatus(Disconneted);
             break;
         }
@@ -295,7 +289,6 @@ void TimeularManager::serviceStateChanged(QLowEnergyService::ServiceState newSta
         m_notificationDesc = orientationChar.descriptor(
             QBluetoothUuid(QLatin1String("{00002902-0000-1000-8000-00805f9b34fb}")));
         if (m_notificationDesc.isValid()) {
-            qDebug() << "Device Connected";
             setStatus(Connected);
             m_service->writeDescriptor(m_notificationDesc,
                                        QByteArray::fromHex(QByteArrayLiteral("0200")));
@@ -305,7 +298,6 @@ void TimeularManager::serviceStateChanged(QLowEnergyService::ServiceState newSta
 
         break;
     }
-    case QLowEnergyService::InvalidService:
     default:
         // nothing for now
         break;
@@ -319,7 +311,6 @@ void TimeularManager::deviceDataChanged(const QLowEnergyCharacteristic &c, const
 
     auto data = reinterpret_cast<const quint8 *>(value.constData());
     quint8 orientation = *data;
-    qDebug() << "Orientation" << orientation;
     if (orientation > 8)
         orientation = 0;
     if (orientation != m_orientation) {

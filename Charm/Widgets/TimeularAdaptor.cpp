@@ -3,7 +3,7 @@
 
   This file is part of Charm, a task-based time tracking application.
 
-  Copyright (C) 2014-2019 Klarälvdalens Datakonsult AB, a KDAB Group company, info@kdab.com
+  Copyright (C) 2014-2020 Klarälvdalens Datakonsult AB, a KDAB Group company, info@kdab.com
 
   Author: Mike Krus <mike.krus@kdab.com>
 
@@ -31,6 +31,7 @@
 #include <QDebug>
 #include <QMenu>
 #include <QSettings>
+#include <QPointer>
 
 namespace {
 const QLatin1String timeularMappingsKey("timeularMappings");
@@ -40,21 +41,17 @@ TimeularAdaptor::TimeularAdaptor(QObject *parent)
     : QObject(parent)
     , m_manager(new TimeularManager(this))
 {
-    QObject::connect(m_manager, &TimeularManager::orientationChanged, this,
-                     &TimeularAdaptor::faceChanged);
-    QObject::connect(m_manager, &TimeularManager::statusChanged, this,
-                     &TimeularAdaptor::deviceStatusChanged);
+    connect(m_manager, &TimeularManager::orientationChanged, this, &TimeularAdaptor::faceChanged);
+    connect(m_manager, &TimeularManager::statusChanged, this, &TimeularAdaptor::deviceStatusChanged);
 
-    m_connectionAction = new QAction(QLatin1String("Connect to Device"), this);
+    m_connectionAction = new QAction(tr("Connect to Device"), this);
     m_connectionAction->setCheckable(true);
     m_connectionAction->setEnabled(false);
-    QObject::connect(m_connectionAction, &QAction::triggered, this,
-                     &TimeularAdaptor::toggleConnection);
-    QObject::connect(m_manager, &TimeularManager::pairedChanged, m_connectionAction,
-                     &QAction::setEnabled);
+    connect(m_connectionAction, &QAction::triggered, this, &TimeularAdaptor::toggleConnection);
+    connect(m_manager, &TimeularManager::pairedChanged, m_connectionAction, &QAction::setEnabled);
 
-    m_setupAction = new QAction(QLatin1String("Device Settings..."), this);
-    QObject::connect(m_setupAction, &QAction::triggered, this, &TimeularAdaptor::setupTasks);
+    m_setupAction = new QAction(tr("Device Settings..."), this);
+    connect(m_setupAction, &QAction::triggered, this, &TimeularAdaptor::setupTasks);
 
     QTimer::singleShot(0, [this]() {
         // delay init until app is done constructing so settings are read
@@ -74,9 +71,9 @@ TimeularAdaptor::TimeularAdaptor(QObject *parent)
     });
 }
 
-TimeularAdaptor::Status TimeularAdaptor::status() const
+TimeularManager::Status TimeularAdaptor::status() const
 {
-    return static_cast<Status>(m_manager->status());
+    return m_manager->status();
 }
 
 void TimeularAdaptor::addActions(QMenu *menu)
@@ -116,34 +113,34 @@ void TimeularAdaptor::deviceStatusChanged(TimeularManager::Status status)
         break;
     }
 
-    emit this->statusChanged(static_cast<TimeularAdaptor::Status>(status));
+    emit this->statusChanged(status);
 }
 
 void TimeularAdaptor::toggleConnection(bool checked)
 {
     if (checked && m_manager->status() == TimeularManager::Disconneted) {
         m_manager->startConnection();
-        return;
-    }
-    if (!checked && m_manager->status() != TimeularManager::Disconneted) {
+    } else if (!checked && m_manager->status() != TimeularManager::Disconneted) {
         m_manager->disconnect();
-        return;
     }
 }
 
 void TimeularAdaptor::setupTasks()
 {
-    TimeularSetupDialog dlg(m_faceMappings, m_manager);
-    if (dlg.exec() == QDialog::Accepted) {
-        m_faceMappings = dlg.mappings();
+    QPointer<TimeularSetupDialog> dlg(new TimeularSetupDialog(m_faceMappings, m_manager));
+    if (dlg->exec() == QDialog::Accepted) {
+        if (dlg) {
+            m_faceMappings = dlg->mappings();
 
-        QStringList s;
-        for (auto m : qAsConst(m_faceMappings))
-            s << QString::number(m.face) << QString::number(m.taskId);
+            QStringList s;
+            for (auto m : qAsConst(m_faceMappings))
+                s << QString::number(m.face) << QString::number(m.taskId);
 
-        QSettings settings;
-        settings.setValue(timeularMappingsKey, s);
+            QSettings settings;
+            settings.setValue(timeularMappingsKey, s);
+        }
     }
+    delete dlg;
 }
 
 void TimeularAdaptor::faceChanged(TimeularManager::Orientation face)
@@ -163,5 +160,4 @@ void TimeularAdaptor::faceChanged(TimeularManager::Orientation face)
     }
 
     emit message(tr("Face %1 is not assigned a task").arg(face));
-    qWarning() << "Orientation not matching any task:" << face;
 }
