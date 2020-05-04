@@ -211,7 +211,6 @@ void EventEditor::updateValues(int updateFlag)
     m_ui->labelTaskName->setText(name);
 
     bool active = MODEL.charmDataModel()->isEventActive(m_event.id());
-    m_ui->pushButtonSelectTask->setEnabled(!active);
     m_ui->startToNowButton->setEnabled(!active);
     m_ui->endToNowButton->setEnabled(!active);
 
