@@ -62,13 +62,9 @@ int main(int argc, char **argv)
     bool hideAtStart = false;
 
     try {
-#ifdef Q_OS_WIN
         // High DPI support
         QGuiApplication::setAttribute(Qt::AA_UseHighDpiPixmaps, true);
-        // High DPI support
         QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-        QGuiApplication::setAttribute(Qt::AA_UseHighDpiPixmaps, true);
-#endif // Q_OS_WIN
 
         QApplication app(argc, argv);
 
