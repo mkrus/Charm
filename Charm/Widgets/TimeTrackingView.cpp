@@ -28,6 +28,7 @@
 #include "Core/CharmConstants.h"
 #include "Core/Configuration.h"
 
+#include <QApplication>
 #include <QFont>
 #include <QFontMetrics>
 #include <QMessageBox>
@@ -350,18 +351,42 @@ bool TimeTrackingView::isTracking() const
 
 void TimeTrackingView::configurationChanged()
 {
-    m_fixedFont = font();
+    auto font = QApplication::font();
+    font.setPointSize(9);
+
 #ifdef Q_OS_OSX
-    m_fixedFont.setFamily(QStringLiteral("Andale Mono"));
-    m_fixedFont.setPointSize(11);
+    font.setFamily(QStringLiteral("Andale Mono"));
+    font.setPointSize(11);
 #endif
+
+    switch (CONFIGURATION.timeTrackerFontSize) {
+    case Configuration::TimeTrackerFont_ExtraSmall:
+        font.setPointSizeF(.8f * font.pointSize());
+        break;
+    case Configuration::TimeTrackerFont_Small:
+        font.setPointSizeF(.9f * font.pointSize());
+        break;
+    case Configuration::TimeTrackerFont_Regular:
+        break;
+    case Configuration::TimeTrackerFont_Large:
+        font.setPointSizeF(1.2f * font.pointSize());
+        break;
+    case Configuration::TimeTrackerFont_ExtraLarge:
+        font.setPointSizeF(1.4f * font.pointSize());
+        break;
+    }
+
+    QApplication::setFont(font);
+    for (auto& widget : QApplication::allWidgets()) {
+        widget->setFont(font);
+    }
+
+    m_fixedFont = font;
+    m_narrowFont = font; // stay with the desktop
 
     // re-populate menu:
     m_taskSelector->populate(m_summaries);
     emit taskMenuChanged();
-
-    m_narrowFont = font(); // stay with the desktop
-    m_narrowFont.setPointSize(m_fixedFont.pointSize());
 
     /* invalidate cache and force recalc */
     m_cachedSizeHint = QSize();

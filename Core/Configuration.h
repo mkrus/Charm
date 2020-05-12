@@ -33,6 +33,17 @@ class Configuration
 {
 public:
     // only append to that, to no break old configurations:
+
+    enum TimeTrackerFontSize {
+        TimeTrackerFont_ExtraSmall,
+        TimeTrackerFont_Small,
+        TimeTrackerFont_Regular,
+        TimeTrackerFont_Large,
+        TimeTrackerFont_ExtraLarge
+    };
+
+    enum DurationFormat { Minutes = 0, Decimal };
+
     bool operator==(const Configuration &other) const;
 
     static Configuration &instance();
@@ -49,6 +60,8 @@ public:
 
     quint32 createInstallationId() const;
 
+    TimeTrackerFontSize timeTrackerFontSize = TimeTrackerFont_Regular;
+    DurationFormat durationFormat = Minutes;
     Qt::ToolButtonStyle toolButtonStyle = Qt::ToolButtonFollowStyle;
     bool detectIdling = true;
     bool warnUnuploadedTimesheets = true;
@@ -73,7 +86,8 @@ private:
     friend class ControllerTests;
     // these are all the persisted metadata settings, and the constructor is only used during test
     // runs:
-    Configuration(bool detectIdling, Qt::ToolButtonStyle buttonstyle,
+    Configuration(TimeTrackerFontSize _timeTrackerFontSize, DurationFormat _durationFormat,
+                  bool detectIdling, Qt::ToolButtonStyle buttonstyle,
                   bool showStatusBar, bool warnUnuploadedTimesheets, bool _requestEventComment,
                   int _numberOfTaskSelectorEntries);
     Configuration();

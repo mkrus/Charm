@@ -70,9 +70,11 @@ void ControllerTests::initializeConnectBackendTest()
 void ControllerTests::persistProvideMetaDataTest()
 {
     Configuration configs[] = {
-        Configuration(true,
+        Configuration(Configuration::TimeTrackerFont_Small,
+                      Configuration::Minutes, true,
                       Qt::ToolButtonIconOnly, true, true, true, 5),
-        Configuration(false,
+        Configuration(Configuration::TimeTrackerFont_Small,
+                      Configuration::Minutes, false,
                       Qt::ToolButtonTextOnly, false, false, false, 5),
     };
     const int NumberOfConfigurations = sizeof configs / sizeof configs[0];

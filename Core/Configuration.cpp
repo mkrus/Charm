@@ -46,10 +46,13 @@ Configuration::Configuration()
 {
 }
 
-Configuration::Configuration(bool _detectIdling, Qt::ToolButtonStyle _buttonstyle, bool _showStatusBar,
+Configuration::Configuration(TimeTrackerFontSize _timeTrackerFontSize, DurationFormat _durationFormat,
+                             bool _detectIdling, Qt::ToolButtonStyle _buttonstyle, bool _showStatusBar,
                              bool _warnUnuploadedTimesheets, bool _requestEventComment,
                              int _numberOfTaskSelectorEntries)
-    : toolButtonStyle(_buttonstyle)
+    : timeTrackerFontSize(_timeTrackerFontSize)
+    , durationFormat(_durationFormat)
+    , toolButtonStyle(_buttonstyle)
     , detectIdling(_detectIdling)
     , warnUnuploadedTimesheets(_warnUnuploadedTimesheets)
     , requestEventComment(_requestEventComment)
@@ -60,8 +63,9 @@ Configuration::Configuration(bool _detectIdling, Qt::ToolButtonStyle _buttonstyl
 
 bool Configuration::operator==(const Configuration &other) const
 {
-
     return detectIdling == other.detectIdling
+        && timeTrackerFontSize == other.timeTrackerFontSize
+        && durationFormat == other.durationFormat && detectIdling == other.detectIdling
         && warnUnuploadedTimesheets == other.warnUnuploadedTimesheets
         && requestEventComment == other.requestEventComment
         && toolButtonStyle == other.toolButtonStyle && configurationName == other.configurationName
@@ -98,6 +102,8 @@ void Configuration::dump(const QString &why)
     qDebug() << "Configuration: configuration:" << (why.isEmpty() ? QString() : why) << endl
              << "--> installation id:          " << installationId << endl
              << "--> local storage database:   " << localStorageDatabase << endl
+             << "--> task tracker font size:   " << timeTrackerFontSize << endl
+             << "--> duration format:          " << durationFormat << endl
              << "--> Idle Detection:           " << detectIdling << endl
              << "--> toolButtonStyle:          " << toolButtonStyle << endl
              << "--> warnUnuploadedTimesheets: " << warnUnuploadedTimesheets << endl
