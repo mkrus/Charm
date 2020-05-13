@@ -326,7 +326,7 @@ QString CharmDataModel::totalDurationString() const
 void CharmDataModel::updateToolTip()
 {
     QString toolTip;
-    toolTip = m_hasActiveEvent ? tr("No active event") : eventString();
+    toolTip = m_hasActiveEvent ? eventString() : tr("No active event");
 
     emit sysTrayUpdate(toolTip, m_hasActiveEvent);
 }
