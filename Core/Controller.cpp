@@ -164,7 +164,9 @@ void Controller::persistMetaData(Configuration &configuration)
         {MetaKey_Key_RequestEventComment, stringForBool(configuration.requestEventComment)},
         {MetaKey_Key_ToolButtonStyle, QString().setNum(configuration.toolButtonStyle)},
         {MetaKey_Key_NumberOfTaskSelectorEntries,
-         QString::number(configuration.numberOfTaskSelectorEntries)}};
+         QString::number(configuration.numberOfTaskSelectorEntries)},
+        {MetaKey_Key_InstallationId, QString::number(configuration.installationId)}
+    };
 
     int NumberOfSettings = sizeof settings / sizeof settings[0];
 
@@ -198,6 +200,7 @@ void Controller::provideMetaData(Configuration &configuration)
     loadConfigValue(MetaKey_Key_ToolButtonStyle, configuration.toolButtonStyle);
     loadConfigValue(MetaKey_Key_NumberOfTaskSelectorEntries,
                     configuration.numberOfTaskSelectorEntries);
+    loadConfigValue(MetaKey_Key_InstallationId, configuration.installationId);
     configuration.numberOfTaskSelectorEntries = qMax(0, configuration.numberOfTaskSelectorEntries);
 
     CONFIGURATION.dump();

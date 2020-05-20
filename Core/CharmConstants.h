@@ -27,6 +27,7 @@
 #define CHARMCONSTANTS_H
 
 #include <QString>
+#include <sstream>
 
 #include "CharmDataModel.h"
 #include "Configuration.h"
@@ -66,15 +67,13 @@ extern const QString FalseString;
 
 // helper functions to persist meta data:
 template <class T>
-T strToT(const QString &str);
-template <>
-inline int strToT(const QString &str)
+T strToT(const QString &str)
 {
-    bool ok;
-    int ret = str.toInt(&ok);
-    Q_ASSERT(ok);
-    Q_UNUSED(ok);
-    return ret;
+    T result;
+    std::istringstream is(str.toStdString());
+    is >> result;
+    Q_ASSERT(!is.fail());
+    return result;
 }
 
 template <>

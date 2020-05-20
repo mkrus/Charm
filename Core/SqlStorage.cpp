@@ -283,7 +283,6 @@ bool SqlStorage::verifyDatabase()
             settings.remove(MetaKey_Key_InstallationId);
         } else {
             installationId = QString::number(CONFIGURATION.createInstallationId());
-            CONFIGURATION.installationId = installationId.toInt();
         }
 
         SqlRaiiTransactor transactor(m_database);

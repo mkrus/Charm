@@ -60,6 +60,7 @@ public:
 
     quint32 createInstallationId() const;
 
+    // these are stored in the database
     TimeTrackerFontSize timeTrackerFontSize = TimeTrackerFont_Regular;
     DurationFormat durationFormat = Minutes;
     Qt::ToolButtonStyle toolButtonStyle = Qt::ToolButtonFollowStyle;
@@ -67,11 +68,10 @@ public:
     bool warnUnuploadedTimesheets = true;
     bool requestEventComment = false;
     int numberOfTaskSelectorEntries = 5;
-
-    // these are stored in QSettings, since we need this information to locate and open the
-    // database:
-    QString configurationName;
     quint32 installationId = 0;
+
+    // these are stored in QSettings, since we need this information to locate and open the database
+    QString configurationName;
     QString localStorageDatabase; // database name (path, with sqlite)
     bool newDatabase = false; // true if the configuration has just been created
     bool failure = false; // used to reconfigure on failures
