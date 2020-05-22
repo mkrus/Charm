@@ -26,6 +26,8 @@
 
 #include <QSqlDatabase>
 #include <QString>
+#include <functional>
+#include <optional>
 
 #include "CharmExceptions.h"
 #include "Event.h"
@@ -74,6 +76,9 @@ private:
     bool createDatabase();
     bool createDatabaseTables();
 
+    using OptError = std::optional<QString>;
+    using QueryFn = std::function<OptError(QSqlDatabase&)>;
+
     /** Verify database content and database version.
      * Will return false if the database is found, but for some reason does not contain
      * the complete structure (which is a very unusual odd case).
@@ -81,8 +86,11 @@ private:
      * not match the one the client was compiled against.
      * @throws UnsupportedDatabaseVersionException
      */
-    bool verifyDatabase();
-    bool migrateDB(const QString &queryString, int oldVersion);
+    OptError verifyDatabase();
+    // calling backupDatabase twice within one second with the same version will fail at least once
+    OptError backupDatabase(int oldVersion);
+    OptError migrateDB(QueryFn queryFn, int oldVersion);
+    OptError migrateDB(const QString &queryString, int oldVersion);
 
     QSqlDatabase m_database;
 };

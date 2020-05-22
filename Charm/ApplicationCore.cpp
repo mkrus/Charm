@@ -553,9 +553,9 @@ void ApplicationCore::enterConnectingState()
         QString message =
             QObject::tr(
                 "<html><body>"
-                "<p>Your current Charm database is not supported by this version. "
-                "The error message is: %1."
-                "You have two options here:</p><ul>"
+                "<p>Your current Charm database is not supported by this version. The error message is:</p>"
+                "<p>%1</p>"
+                "<p>You have two options here:</p><ul>"
                 "<li>Start over with an empty database by moving or deleting your %2 folder "
                 "then re-running this version of Charm.</li>"
                 "<li>Load an older version of Charm that supports your current database and select "

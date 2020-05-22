@@ -217,12 +217,24 @@ bool SqlStorage::connect(Configuration &configuration)
         return false;
     }
 
-    if (!verifyDatabase()) {
-        if (!createDatabase()) {
-            configuration.failureMessage =
-                QObject::tr("SqLiteStorage::connect: error creating default database contents");
-            return false;
-        }
+    if (configuration.newDatabase && !createDatabase()) {
+        configuration.failureMessage =
+            QObject::tr("Could not create default database contents");
+        return false;
+    }
+
+    // TODO: split this error into backup failure and verification failure
+    if (auto error = verifyDatabase(); error) {
+        configuration.failureMessage =
+            QObject::tr("<html><head><meta name=\"qrichtext\" content=\"1\" />"
+                        "</head>"
+                        "<body>"
+                            "<p>There was a problem verifying your database with the reason:</p>"
+                            "<p>\"%1\"</p>"
+                            "<p>You can create a new database if you like.</p>"
+                            "<p><b>CAUTION: Overwriting the database file will erase all your data.</b></p>"
+                        "</body>").arg(*error);
+        return false;
     }
 
     configuration.failure = false;
@@ -236,11 +248,12 @@ bool SqlStorage::disconnect()
     return true; // neither of the two methods return a value
 }
 
-bool SqlStorage::verifyDatabase()
+SqlStorage::OptError SqlStorage::verifyDatabase()
 {
     // if the database is empty, it is not ok :-)
     if (m_database.tables().isEmpty())
-        return false;
+        return QObject::tr("Database is empty");
+
     // check database metadata, throw an exception in case the version does not match:
     int version = 1;
     QString versionString = getMetaData(QLatin1String(DatabseSchemaVersionKey));
@@ -253,7 +266,7 @@ bool SqlStorage::verifyDatabase()
     }
 
     if (version == DatabaseVersion)
-        return true;
+        return std::nullopt;
 
     if (version > DatabaseVersion)
         throw UnsupportedDatabaseVersionException(QObject::tr("Database version is too new."));
@@ -285,13 +298,11 @@ bool SqlStorage::verifyDatabase()
             installationId = QString::number(CONFIGURATION.createInstallationId());
         }
 
-        SqlRaiiTransactor transactor(m_database);
-        doSetMetaData(MetaKey_Key_InstallationId, installationId, m_database);
-        doSetMetaData(QLatin1String(DatabseSchemaVersionKey),
-                      QString::number(VersionBeforeInstallationIdAddedToDatabase + 1), m_database);
-        transactor.commit();
-
-        return verifyDatabase();
+        return migrateDB([installationId] (QSqlDatabase &database) -> OptError {
+            if (!doSetMetaData(MetaKey_Key_InstallationId, installationId, database))
+                return {QString::fromUtf8("Unable to set MetaData with key = ") + MetaKey_Key_InstallationId};
+            return std::nullopt;
+        }, VersionBeforeInstallationIdAddedToDatabase);
     }
 
     throw UnsupportedDatabaseVersionException(QObject::tr("Database version is not supported."));
@@ -581,32 +592,56 @@ bool SqlStorage::createDatabase()
     return success;
 }
 
-bool SqlStorage::migrateDB(const QString &queryString, int oldVersion)
+SqlStorage::OptError SqlStorage::backupDatabase(int oldVersion)
 {
-    const QFileInfo info(Configuration::instance().localStorageDatabase);
-    if (info.exists()) {
-        QFile::copy(info.fileName(),
-                    info.fileName().append(QStringLiteral("-backup-version-%1").arg(oldVersion)));
-    }
+    const QFileInfo info(CONFIGURATION.localStorageDatabase);
+    auto postfix = QObject::tr("-backup_version_%1_%2_%3")
+        .arg(oldVersion)
+        .arg(QDate::currentDate().toString(QStringLiteral("yyyy-MM-dd")))
+        .arg(QTime::currentTime().toString(QStringLiteral("HH-mm-ss")));
+    auto from = info.absoluteFilePath();
+    auto to = info.absoluteFilePath().append(postfix);
+    auto result = info.exists() && QFile::copy(from, to);
+
+    return result ? std::nullopt : OptError{
+        QObject::tr("Could not backup database version %1 from \"%2\" to \"%3\"")
+            .arg(oldVersion)
+            .arg(from)
+            .arg(to)};
+}
+
+SqlStorage::OptError SqlStorage::migrateDB(QueryFn queryFn, int oldVersion)
+{
+    if (auto error = backupDatabase(oldVersion); error)
+        return error;
 
     SqlRaiiTransactor transactor(m_database);
-    QSqlQuery query(m_database);
 
-    const QStringList queryStrings = queryString.split(QStringLiteral(";"));
-    for (const QString &singleQuery : queryStrings) {
-        query.prepare(singleQuery);
-        if (!runQuery(query)) {
-            throw UnsupportedDatabaseVersionException(
-                QObject::tr("Could not upgrade database from version %1 to version %2: %3")
-                    .arg(QString::number(oldVersion), QString ::number(oldVersion + 1),
-                         query.lastError().text()));
-        }
-    }
+    if (auto error = queryFn(m_database); error)
+        throw UnsupportedDatabaseVersionException(
+            QObject::tr("Could not upgrade database from version %1 to version %2. %3")
+                .arg(QString::number(oldVersion), QString ::number(oldVersion + 1), *error));
 
-    doSetMetaData(QLatin1String(DatabseSchemaVersionKey), QString::number(oldVersion + 1),
-                  m_database);
+    doSetMetaData(QLatin1String(DatabseSchemaVersionKey),
+        QString::number(oldVersion + 1),
+        m_database);
+
     transactor.commit();
     return verifyDatabase();
+}
+
+SqlStorage::OptError SqlStorage::migrateDB(const QString &queryString, int oldVersion)
+{
+    return migrateDB([queryString] (QSqlDatabase &database) -> OptError {
+        const QStringList queryStrings = queryString.split(QStringLiteral(";"), QString::SkipEmptyParts);
+        QSqlQuery query(database);
+
+        for (const QString &queryString : queryStrings)
+            if (!query.prepare(queryString) || !runQuery(query))
+                return query.lastError().text();
+
+        return std::nullopt;
+    }, oldVersion);
 }
 
 bool SqlStorage::setMetaData(const QString &key, const QString &value)
