@@ -580,6 +580,9 @@ void ApplicationCore::enterConnectedState()
 #ifdef Q_OS_WIN
     updateTaskList();
 #endif
+
+    if (CONFIGURATION.newDatabase)
+        m_controller.persistMetaData(CONFIGURATION);
 }
 
 void ApplicationCore::leaveConnectedState()
