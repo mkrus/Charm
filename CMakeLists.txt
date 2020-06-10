@@ -118,21 +118,21 @@ IF( NOT APPLE )
     INSTALL( FILES "${LICENSE_FILE}" "${README_FILE}" DESTINATION ${DOC_INSTALL_DIR} )
 ENDIF()
 
+FIND_PACKAGE( OpenSSL REQUIRED)
+set_package_properties(OpenSSL PROPERTIES
+                               PURPOSE "Deployment of openssl libraries."
+                               TYPE REQUIRED)
+
 IF (WIN32)
     FIND_PACKAGE( PythonInterp 3.5 QUIET)
     set_package_properties(PythonInterp PROPERTIES
                                         PURPOSE "Used to create Windows installer"
                                         TYPE OPTIONAL)
 
-
     IF(PYTHONINTERP_FOUND)
         OPTION(CHARM_SIGN_INSTALLER "Sign the installer and the contained files" ON)
 
         SET(EXTRA_PACKAGE_COMMANDS )
-        FIND_PACKAGE( OpenSSL QUIET)
-        set_package_properties(OpenSSL PROPERTIES
-                                       PURPOSE "Deployment of openssl libraries."
-                                       TYPE OPTIONAL)
 
         IF (OPENSSL_FOUND)
             SET(EXTRA_PACKAGE_COMMANDS ${EXTRA_PACKAGE_COMMANDS} --deployOpenSSL "${OPENSSL_INCLUDE_DIR}/../")
