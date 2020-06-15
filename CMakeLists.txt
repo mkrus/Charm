@@ -116,12 +116,11 @@ SET( LICENSE_FILE "License.txt" )
 SET( README_FILE "ReadMe.md" )
 IF( NOT APPLE )
     INSTALL( FILES "${LICENSE_FILE}" "${README_FILE}" DESTINATION ${DOC_INSTALL_DIR} )
+    FIND_PACKAGE( OpenSSL REQUIRED)
+    set_package_properties(OpenSSL PROPERTIES
+                                   PURPOSE "Deployment of openssl libraries."
+                                   TYPE REQUIRED)
 ENDIF()
-
-FIND_PACKAGE( OpenSSL REQUIRED)
-set_package_properties(OpenSSL PROPERTIES
-                               PURPOSE "Deployment of openssl libraries."
-                               TYPE REQUIRED)
 
 IF (WIN32)
     FIND_PACKAGE( PythonInterp 3.5 QUIET)
