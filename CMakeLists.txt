@@ -101,6 +101,11 @@ IF( CHARM_PREPARE_DEPLOY AND WIN32 OR APPLE)
     SET( DOC_INSTALL_DIR . )
 ENDIF()
 
+IF( APPLE )
+    option(PACKAGE_DO_NOTARIZE "Notarize the application bundle and DMG when packaging Charm" OFF)
+    option(PACKAGE_DEVELOPER_ACCOUNT "The Apple developer account to use for the notarization process" "")
+ENDIF()
+
 OPTION( CHARM_IDLE_DETECTION "Build the Charm idle detector" ON )
 set( CHARM_IDLE_TIME "360" CACHE STRING "Set the idle timeout (in seconds, default 360)" )
 
@@ -168,6 +173,30 @@ IF (WIN32)
                 ${Charm_EXECUTABLE}
             VERBATIM)
     ENDIF()
+ELSEIF( APPLE )
+    set(QT5_BIN_DIR "${Qt5Core_DIR}/../../../bin")
+
+    # use absolute file paths for dependent libraries so they're found properly while packaging
+    set(APP_DIR ${CMAKE_BINARY_DIR}/Charm/${PROJECT_NAME}.app)
+
+    set(NOTARIZE_ARGS "")
+    if(PACKAGE_DO_NOTARIZE)
+        if ("${PACKAGE_DEVELOPER_ACCOUNT}" STREQUAL "")
+            message(FATAL_ERROR "PACKAGE_DO_NOTARIZE is on, but no PACKAGE_DEVELOPER_ACCOUNT email address has been provided.")
+        else()
+            set(NOTARIZE_ARGS -notarize-ac=${PACKAGE_DEVELOPER_ACCOUNT})
+        endif()
+    endif()
+
+    add_custom_target(createInstaller
+        COMMAND ${QT5_BIN_DIR}/macdeployqt ${APP_DIR} -always-overwrite -verbose=2
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/deploy/fix-rpaths.sh -app-dir=${APP_DIR} -app-name=${PROJECT_NAME}
+        COMMAND ${CMAKE_COMMAND} -E remove ${PROJECT_NAME}.dmg
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/deploy/notarize.sh -qt5-bin-dir=${QT5_BIN_DIR} ${NOTARIZE_ARGS} -entitlements=${CMAKE_CURRENT_SOURCE_DIR}/deploy/charm.entitlements
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_NAME}.dmg ${PROJECT_NAME}-${Charm_VERSION}.dmg # buildbot tries to always copy Charm.dmg too for currently unknown reasons, so we copy instead of rename
+        COMMAND ${CMAKE_COMMAND} -E echo "Generated package file: Charm/${PROJECT_NAME}-${Charm_VERSION}.dmg" # needed so buildbot picks up the right filename to move the package to the download site
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/Charm
+    )
 ENDIF()
 
 install( FILES charm.categories DESTINATION ${SYSCONF_INSTALL_DIR}/xdg )
