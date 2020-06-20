@@ -98,17 +98,17 @@ ApplicationCore::ApplicationCore(TaskId startupTask, bool hideAtStart, QObject *
     // note that this modifies the behaviour of QSettings:
     QCoreApplication::setOrganizationName(QStringLiteral("KDAB"));
     QCoreApplication::setOrganizationDomain(QStringLiteral("kdab.com"));
-#ifdef NDEBUG
-    QCoreApplication::setApplicationName(QStringLiteral("Charm"));
+#ifdef CHARM_DEVELOPER_MODE
+    QCoreApplication::setApplicationName(QStringLiteral("Charm_dev"));
 #else
-    QCoreApplication::setApplicationName(QStringLiteral("Charm_debug"));
+    QCoreApplication::setApplicationName(QStringLiteral("Charm"));
 #endif
     QCoreApplication::setApplicationVersion(CharmVersion());
 
     QLocalSocket uniqueApplicationSocket;
     QString serverName(QStringLiteral("com.kdab.charm"));
-#ifndef NDEBUG
-    serverName.append(QStringLiteral("_debug"));
+#ifndef CHARM_DEVELOPER_MODE
+    serverName.append(QStringLiteral("_dev"));
 #endif
     uniqueApplicationSocket.connectToServer(serverName, QIODevice::ReadWrite);
     if (uniqueApplicationSocket.waitForConnected(1000)) {
@@ -639,21 +639,15 @@ bool ApplicationCore::configure()
             << CONFIGURATION.configurationName;
         // FIXME maybe move to Configuration::loadDefaults
 
-        const QString storageDatabaseDirectory = charmDataDir();
-        const QString storageDatabaseFileRelease = QStringLiteral("Charm.db");
-        const QString storageDatabaseFileDebug = QStringLiteral("Charm_debug.db");
-        const QString storageDatabaseRelease =
-            storageDatabaseDirectory + storageDatabaseFileRelease;
-        const QString storageDatabaseDebug = storageDatabaseDirectory + storageDatabaseFileDebug;
-        QString storageDatabase;
-#ifdef NDEBUG
-        Q_UNUSED(storageDatabaseDebug);
-        storageDatabase = storageDatabaseRelease;
+#ifdef CHARM_DEVELOPER_MODE
+        const QString storageDatabaseFile = QStringLiteral("Charm_dev.db");
 #else
-        Q_UNUSED(storageDatabaseRelease);
-        storageDatabase = storageDatabaseDebug;
+        const QString storageDatabaseFile = QStringLiteral("Charm.db");
 #endif
-        CONFIGURATION.localStorageDatabase = QDir::toNativeSeparators(storageDatabase);
+        const QString storageDatabaseDirectory = charmDataDir();
+        const QString storageDatabase = storageDatabaseDirectory + storageDatabaseFile;
+
+        CONFIGURATION.localStorageDatabase = storageDatabase;
         ConfigurationDialog dialog(CONFIGURATION, &mainView());
         if (dialog.exec()) {
             CONFIGURATION = dialog.configuration();

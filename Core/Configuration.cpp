@@ -29,10 +29,10 @@
 #include "charm_core_debug.h"
 #include <QSettings>
 
-#ifdef NDEBUG
-#define DEFAULT_CONFIG_GROUP QStringLiteral("default")
+#ifdef CHARM_DEVELOPER_MODE
+#define DEFAULT_CONFIG_GROUP QStringLiteral("configuration_dev")
 #else
-#define DEFAULT_CONFIG_GROUP QStringLiteral("debug")
+#define DEFAULT_CONFIG_GROUP QStringLiteral("configuration")
 #endif
 
 Configuration &Configuration::instance()
@@ -86,13 +86,37 @@ bool Configuration::readFrom(QSettings &settings)
     if (settings.contains(MetaKey_Key_LocalStorageDatabase)) {
         localStorageDatabase = settings.value(MetaKey_Key_LocalStorageDatabase).toString();
     } else {
-        complete = false;
+        complete = readFromOldConfiguration_2020_06();
     }
     dump(QStringLiteral("(Configuration::readFrom loaded configuration)"));
     if (complete) {
         writeTo(settings);
     }
     return complete;
+}
+
+bool Configuration::readFromOldConfiguration_2020_06()
+{
+#ifdef NDEBUG
+#define OLD_CONFIG_GROUP_FIRST QStringLiteral("default")
+#define OLD_CONFIG_GROUP_SECOND QStringLiteral("debug")
+#else
+#define OLD_CONFIG_GROUP_FIRST QStringLiteral("debug")
+#define OLD_CONFIG_GROUP_SECOND QStringLiteral("default")
+#endif
+
+    QSettings settings;
+    settings.beginGroup(OLD_CONFIG_GROUP_FIRST);
+    if (settings.contains(MetaKey_Key_LocalStorageDatabase)) {
+        localStorageDatabase = settings.value(MetaKey_Key_LocalStorageDatabase).toString();
+        return true;
+    }
+    settings.beginGroup(OLD_CONFIG_GROUP_SECOND);
+    if (settings.contains(MetaKey_Key_LocalStorageDatabase)) {
+        localStorageDatabase = settings.value(MetaKey_Key_LocalStorageDatabase).toString();
+        return true;
+    }
+    return false;
 }
 
 void Configuration::dump(const QString &why)

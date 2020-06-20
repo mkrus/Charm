@@ -111,6 +111,11 @@ set( CHARM_IDLE_TIME "360" CACHE STRING "Set the idle timeout (in seconds, defau
 
 OPTION(CHARM_PREPARE_DEPLOY "Deploy dependencies with install target(Windows, Apple)" ON)
 
+OPTION (CHARM_DEVELOPER_MODE "Build in developer mode. Use a separate database and configuration" OFF)
+IF (CHARM_DEVELOPER_MODE)
+    ADD_DEFINITIONS(-DCHARM_DEVELOPER_MODE)
+ENDIF (CHARM_DEVELOPER_MODE)
+
 ADD_SUBDIRECTORY( Core )
 ADD_SUBDIRECTORY( Charm )
 ADD_SUBDIRECTORY( AutoTests )

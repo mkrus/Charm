@@ -91,6 +91,8 @@ private:
                   bool showStatusBar, bool warnUnuploadedTimesheets, bool _requestEventComment,
                   int _numberOfTaskSelectorEntries);
     Configuration();
+
+    bool readFromOldConfiguration_2020_06();
 };
 
 #endif
