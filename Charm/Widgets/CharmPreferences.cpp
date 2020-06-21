@@ -37,7 +37,6 @@ CharmPreferences::CharmPreferences(const Configuration &config, QWidget *parent_
 {
     m_ui.setupUi(this);
     const bool haveIdleDetection = ApplicationCore::instance().idleDetector()->available();
-    const bool haveCommandInterface = (ApplicationCore::instance().commandInterface() != nullptr);
     const bool httpJobPossible = Lotsofcake::Configuration().isConfigured();
 
     m_ui.lbWarnUnuploadedTimesheets->setVisible(httpJobPossible);

@@ -78,7 +78,7 @@ QString EventEditorDelegate::dateAndDuration(const Event &event) const
     QDate date = event.startDateTime().date();
     QTime time = event.startDateTime().time();
     QTime endTime = event.endDateTime().time();
-    dateStream << date.toString(Qt::SystemLocaleDate) << " "
+    dateStream << QLocale::system().toString(date, QLocale::LongFormat) << " "
                << time.toString(QStringLiteral("h:mm")) << " - "
                << endTime.toString(QStringLiteral("h:mm")) << " ("
                << hoursAndMinutes(event.duration()) << ") Week " << date.weekNumber();

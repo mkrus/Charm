@@ -74,7 +74,7 @@ public:
 
     QDomElement toXml(QDomDocument) const;
 
-    static Event fromXml(const QDomElement &, int databaseSchemaVersion = 1);
+    static Event fromXml(const QDomElement &);
     static QString tagName();
 
 private:

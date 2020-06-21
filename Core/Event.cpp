@@ -146,7 +146,7 @@ QString Event::tagName()
     return tag;
 }
 
-Event Event::fromXml(const QDomElement &element, int databaseSchemaVersion)
+Event Event::fromXml(const QDomElement &element)
 { // in case any event object creates trouble with
     // serialization/deserialization, add an object of it to
     // void XmlSerializationTests::testEventSerialization()

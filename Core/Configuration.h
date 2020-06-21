@@ -88,7 +88,7 @@ private:
     // runs:
     Configuration(TimeTrackerFontSize _timeTrackerFontSize, DurationFormat _durationFormat,
                   bool detectIdling, Qt::ToolButtonStyle buttonstyle,
-                  bool showStatusBar, bool warnUnuploadedTimesheets, bool _requestEventComment,
+                  bool warnUnuploadedTimesheets, bool _requestEventComment,
                   int _numberOfTaskSelectorEntries);
     Configuration();
 

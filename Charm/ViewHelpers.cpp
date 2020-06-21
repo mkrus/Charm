@@ -135,7 +135,7 @@ QString Charm::elidedTaskName(const QString &text, const QFont &font, int width)
     QFontMetrics metrics(font);
     const QString &projectCode =
         text.section(QLatin1Char(' '), 0, 0, QString::SectionIncludeTrailingSep);
-    const int projectCodeWidth = metrics.width(projectCode);
+    const int projectCodeWidth = metrics.horizontalAdvance(projectCode);
     if (width > projectCodeWidth) {
         const QString &taskName = text.section(QLatin1Char(' '), 1);
         const int taskNameWidth = width - projectCodeWidth;

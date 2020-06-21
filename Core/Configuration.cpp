@@ -28,6 +28,7 @@
 
 #include "charm_core_debug.h"
 #include <QSettings>
+#include <QRandomGenerator>
 
 #ifdef CHARM_DEVELOPER_MODE
 #define DEFAULT_CONFIG_GROUP QStringLiteral("configuration_dev")
@@ -47,7 +48,7 @@ Configuration::Configuration()
 }
 
 Configuration::Configuration(TimeTrackerFontSize _timeTrackerFontSize, DurationFormat _durationFormat,
-                             bool _detectIdling, Qt::ToolButtonStyle _buttonstyle, bool _showStatusBar,
+                             bool _detectIdling, Qt::ToolButtonStyle _buttonstyle,
                              bool _warnUnuploadedTimesheets, bool _requestEventComment,
                              int _numberOfTaskSelectorEntries)
     : timeTrackerFontSize(_timeTrackerFontSize)
@@ -137,6 +138,5 @@ void Configuration::dump(const QString &why)
 
 quint32 Configuration::createInstallationId() const
 {
-    qsrand(QDateTime::currentMSecsSinceEpoch());
-    return qrand() + 2;
+    return QRandomGenerator::global()->generate() + 2;
 }
