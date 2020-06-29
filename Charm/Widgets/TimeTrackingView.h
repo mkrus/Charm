@@ -89,6 +89,9 @@ Q_SIGNALS:
     void stopEvents();
     void taskMenuChanged();
 
+protected:
+    void changeEvent(QEvent *event) override;
+
 private Q_SLOTS:
     void slotUpdateSummaries();
 

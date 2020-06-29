@@ -412,6 +412,13 @@ QString TimeTrackingView::elidedText(const QString &text, const QFont &font, int
     return m_elidedTexts.value(text);
 }
 
+void TimeTrackingView::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::PaletteChange) {
+        m_paintAttributes.initialize(palette());
+    }
+}
+
 void TimeTrackingView::slotUpdateSummaries()
 {
     setSummaries(m_summaries);
