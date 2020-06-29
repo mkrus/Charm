@@ -352,19 +352,13 @@ bool TimeTrackingView::isTracking() const
 void TimeTrackingView::configurationChanged()
 {
     auto font = QApplication::font();
-    font.setPointSize(9);
-
-#ifdef Q_OS_OSX
-    font.setFamily(QStringLiteral("Andale Mono"));
-    font.setPointSize(11);
-#endif
 
     switch (CONFIGURATION.timeTrackerFontSize) {
     case Configuration::TimeTrackerFont_ExtraSmall:
-        font.setPointSizeF(.8f * font.pointSize());
+        font.setPointSizeF(.6f * font.pointSize());
         break;
     case Configuration::TimeTrackerFont_Small:
-        font.setPointSizeF(.9f * font.pointSize());
+        font.setPointSizeF(.8f * font.pointSize());
         break;
     case Configuration::TimeTrackerFont_Regular:
         break;
@@ -376,12 +370,16 @@ void TimeTrackingView::configurationChanged()
         break;
     }
 
-    QApplication::setFont(font);
-    for (auto& widget : QApplication::allWidgets()) {
-        widget->setFont(font);
-    }
+#ifdef Q_OS_OSX
+    m_fixedFont.setFamily(QStringLiteral("Andale Mono"));
+    m_fixedFont.setPointSize(font.pointSize());
+#else
+    // use a fixed-width font specified by the system
+    m_fixedFont = QFont(QStringLiteral("doesnotexist"));
+    m_fixedFont.setStyleHint(QFont::TypeWriter);
+    m_fixedFont.setPointSizeF(font.pointSizeF());
+#endif
 
-    m_fixedFont = font;
     m_narrowFont = font; // stay with the desktop
 
     // re-populate menu:
