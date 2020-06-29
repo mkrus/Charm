@@ -213,8 +213,12 @@ const TaskModel::TreeItem &TaskModel::treeItemForIndex(const QModelIndex &index)
 {
     if (index.isValid())
         return m_items.at(static_cast<int>(index.internalId()));
-    else
-        return m_items[0];
+    if (m_items.isEmpty()) {
+        static const TreeItem nullItem;
+        return nullItem;
+    }
+
+    return m_items[0];
 }
 
 const Task &TaskModel::taskForItem(const TreeItem &item) const
