@@ -1,6 +1,6 @@
 ; basic script template for NullsoftInstallerPackager
 ;
-; Copyright 2016-2018 Hannnah von Reth <hannah.vonreth@kdab.com>
+; Copyright 2016 Hannnah von Reth <hannah.vonreth@kdab.com>
 ; Copyright 2010 Patrick Spendrin <ps_ml@gmx.de>
 
 
@@ -48,6 +48,9 @@ ${productLicence}
 
 !insertmacro MUI_PAGE_INSTFILES
 
+!define MUI_FINISHPAGE_RUN_TEXT "Run ${productname}"
+!define MUI_FINISHPAGE_RUN "$INSTDIR\${applicationFileName}"
+
 !insertmacro MUI_PAGE_FINISH
 
 ;uninstaller
@@ -83,7 +86,7 @@ Section "--hidden ${productName}" BASE
     WriteRegStr HKLM "${regkey}" "" "$INSTDIR\uninstall.exe"
 
     WriteRegStr HKLM "${uninstkey}" "DisplayName" "${productName} (remove only)"
-    WriteRegStr HKLM "${uninstkey}" "DisplayIcon" "$INSTDIR\${applicationName}"
+    WriteRegStr HKLM "${uninstkey}" "DisplayIcon" "$INSTDIR\${applicationFileName}"
     WriteRegStr HKLM "${uninstkey}" "DisplayVersion" "${productVersion}"
     WriteRegStr HKLM "${uninstkey}" "UninstallString" '"$INSTDIR\${uninstaller}"'
     WriteRegStr HKLM "${uninstkey}" "Publisher" "${companyName}"
@@ -96,11 +99,10 @@ Section "--hidden ${productName}" BASE
 
     File /a /r /x "*.nsi" /x "${setupname}" "${deployDir}\*.*"
 
-    !if "${vcredist}" != "none"
-        ExecWait '"$INSTDIR\${vcredist}" /passive'
-        Delete "$INSTDIR\${vcredist}"
+    !if "${vcredist2013}" != "none"
+        ExecWait '"$INSTDIR\${vcredist2013}" /install /passive /norestart'
+        Delete "$INSTDIR\${vcredist2013}"
     !endif
-
 
     WriteUninstaller "${uninstaller}"
 
@@ -108,8 +110,11 @@ Section "--hidden ${productName}" BASE
     ;Create shortcuts
     !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
         CreateDirectory "$SMPROGRAMS\$StartMenuFolder"
-        CreateShortCut "$SMPROGRAMS\$StartMenuFolder\${productName}.lnk" "$INSTDIR\${applicationName}"
+        CreateShortCut "$SMPROGRAMS\$StartMenuFolder\${productName}.lnk" "$INSTDIR\${applicationFileName}"
     !insertmacro MUI_STARTMENU_WRITE_END
+
+    IfSilent "" +2 ; If the installer is always silent then you don't need this check
+    ExecShell "" "$InstDir\KDABViewer.exe"
 SectionEnd
 
 ; Uninstaller
@@ -138,6 +143,6 @@ Function .onInit
     ;Run the uninstaller
     ;uninst:
     ClearErrors
-    ExecWait '$R0 _?=$INSTDIR' ;Do not copy the uninstaller to a temp file
+    ExecWait '$R0 /S _?=$INSTDIR' ;Do not copy the uninstaller to a temp file
     done:
 FunctionEnd
