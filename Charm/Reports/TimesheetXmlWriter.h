@@ -65,7 +65,6 @@ private:
     EventList m_events;
     TaskId m_rootTask = {};
     QString m_templateName;
-    bool m_includeTaskList = true;
 };
 
 #endif
