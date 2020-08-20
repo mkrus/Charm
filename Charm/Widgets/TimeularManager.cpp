@@ -38,16 +38,8 @@ const QLatin1String timeularDeviceName("Timeular ZEI");
 
 TimeularManager::TimeularManager(QObject *parent)
     : QObject(parent)
+    , m_deviceDiscoveryAgent(nullptr)
 {
-    m_deviceDiscoveryAgent = new QBluetoothDeviceDiscoveryAgent(this);
-    m_deviceDiscoveryAgent->setLowEnergyDiscoveryTimeout(30000);
-
-    connect(m_deviceDiscoveryAgent, &QBluetoothDeviceDiscoveryAgent::finished, [this]() {
-        if (m_status != Connected)
-            setStatus(Disconneted);
-    });
-    connect(m_deviceDiscoveryAgent, &QBluetoothDeviceDiscoveryAgent::deviceDiscovered, this,
-            &TimeularManager::deviceDiscovered);
 }
 
 void TimeularManager::init()
@@ -83,6 +75,11 @@ QStringList TimeularManager::discoveredDevices() const
     return m_discoveredDevices;
 }
 
+bool TimeularManager::isBluetoothEnabled()
+{
+    return !QBluetoothLocalDevice::allDevices().isEmpty();
+}
+
 TimeularManager::Status TimeularManager::status() const
 {
     return m_status;
@@ -101,6 +98,18 @@ void TimeularManager::startDiscovery()
     if (m_status != Disconneted)
         return;
 
+    if (!m_deviceDiscoveryAgent) {
+        m_deviceDiscoveryAgent = new QBluetoothDeviceDiscoveryAgent(this);
+        m_deviceDiscoveryAgent->setLowEnergyDiscoveryTimeout(30000);
+
+        connect(m_deviceDiscoveryAgent, &QBluetoothDeviceDiscoveryAgent::finished, [this]() {
+            if (m_status != Connected)
+                setStatus(Disconneted);
+        });
+        connect(m_deviceDiscoveryAgent, &QBluetoothDeviceDiscoveryAgent::deviceDiscovered, this,
+                &TimeularManager::deviceDiscovered);
+    }
+
     setStatus(Scanning);
     m_discoveredDevices.clear();
     emit discoveredDevicesChanged(m_discoveredDevices);
@@ -113,7 +122,8 @@ void TimeularManager::stopDiscovery()
         return;
 
     setStatus(Disconneted);
-    m_deviceDiscoveryAgent->stop();
+    if (m_deviceDiscoveryAgent)
+        m_deviceDiscoveryAgent->stop();
 }
 
 void TimeularManager::startConnection()
@@ -122,7 +132,6 @@ void TimeularManager::startConnection()
         return;
 
     setStatus(Connecting);
-
 
 #ifdef Q_OS_MACOS
     QBluetoothDeviceInfo info(QBluetoothUuid(m_pairedDevice), timeularDeviceName, 0);
@@ -147,7 +156,8 @@ void TimeularManager::disconnect()
         m_controller = nullptr;
     }
     setStatus(Disconneted);
-    m_deviceDiscoveryAgent->stop();
+    if (m_deviceDiscoveryAgent)
+        m_deviceDiscoveryAgent->stop();
 }
 
 void TimeularManager::setPairedDevice(const QString &pairedDevice)
@@ -188,7 +198,7 @@ void TimeularManager::deviceDiscovered(const QBluetoothDeviceInfo &info)
     }
 }
 
-void TimeularManager::connectToDevice(const QBluetoothDeviceInfo& info)
+void TimeularManager::connectToDevice(const QBluetoothDeviceInfo &info)
 {
     if (!m_controller) {
         m_controller = QLowEnergyController::createCentral(info, this);
@@ -197,8 +207,8 @@ void TimeularManager::connectToDevice(const QBluetoothDeviceInfo& info)
         connect(m_controller, &QLowEnergyController::connected, this,
                 &TimeularManager::deviceConnected);
         connect(m_controller,
-                QOverload<QLowEnergyController::Error>::of(&QLowEnergyController::error),
-                this, &TimeularManager::errorReceived);
+                QOverload<QLowEnergyController::Error>::of(&QLowEnergyController::error), this,
+                &TimeularManager::errorReceived);
         connect(m_controller, &QLowEnergyController::disconnected, this,
                 &TimeularManager::deviceDisconnected);
         connect(m_controller, &QLowEnergyController::serviceDiscovered, this,
@@ -250,7 +260,7 @@ void TimeularManager::serviceScanDone()
                 &TimeularManager::confirmedDescriptorWrite);
         m_service->discoverDetails();
     } else {
-        //TODO report to user
+        // TODO report to user
         qWarning() << "Service not found";
     }
 }

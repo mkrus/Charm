@@ -60,6 +60,8 @@ public:
     QString pairedDevice() const;
     QStringList discoveredDevices() const;
 
+    static bool isBluetoothEnabled();
+
 public Q_SLOTS:
     void startDiscovery();
     void stopDiscovery();
@@ -71,7 +73,7 @@ Q_SIGNALS:
     void statusChanged(Status status);
     void orientationChanged(Orientation orientation);
     void pairedChanged(bool paired);
-    void discoveredDevicesChanged(const QStringList& discoveredDevices);
+    void discoveredDevicesChanged(const QStringList &discoveredDevices);
 
 private:
     void setStatus(Status status);

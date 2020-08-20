@@ -22,16 +22,16 @@
 */
 
 #include "TimeularAdaptor.h"
+#include "Core/TaskModel.h"
 #include "TimeularManager.h"
 #include "TimeularSetupDialog.h"
 #include "ViewHelpers.h"
-#include "Core/TaskModel.h"
 
 #include <QAction>
 #include <QDebug>
 #include <QMenu>
-#include <QSettings>
 #include <QPointer>
+#include <QSettings>
 
 namespace {
 const QLatin1String timeularMappingsKey("timeularMappings");
@@ -42,15 +42,19 @@ TimeularAdaptor::TimeularAdaptor(QObject *parent)
     , m_manager(new TimeularManager(this))
 {
     connect(m_manager, &TimeularManager::orientationChanged, this, &TimeularAdaptor::faceChanged);
-    connect(m_manager, &TimeularManager::statusChanged, this, &TimeularAdaptor::deviceStatusChanged);
+    connect(m_manager, &TimeularManager::statusChanged, this,
+            &TimeularAdaptor::deviceStatusChanged);
 
     m_connectionAction = new QAction(tr("Connect to Device"), this);
     m_connectionAction->setCheckable(true);
     m_connectionAction->setEnabled(false);
     connect(m_connectionAction, &QAction::triggered, this, &TimeularAdaptor::toggleConnection);
-    connect(m_manager, &TimeularManager::pairedChanged, m_connectionAction, &QAction::setEnabled);
+    if (TimeularManager::isBluetoothEnabled())
+        connect(m_manager, &TimeularManager::pairedChanged, m_connectionAction,
+                &QAction::setEnabled);
 
     m_setupAction = new QAction(tr("Device Settings..."), this);
+    m_setupAction->setEnabled(TimeularManager::isBluetoothEnabled());
     connect(m_setupAction, &QAction::triggered, this, &TimeularAdaptor::setupTasks);
 
     QTimer::singleShot(0, [this]() {
