@@ -48,6 +48,7 @@ QString labelText(TaskId taskId, int face, TimeularManager::Orientation activeFa
 }
 
 }
+
 TimeularSetupDialog::TimeularSetupDialog(QVector<TimeularAdaptor::FaceMapping> mappings,
                                          TimeularManager *manager, QWidget *parent)
     : QDialog(parent)
@@ -227,7 +228,7 @@ void TimeularSetupDialog::deviceSelectionChanged()
     auto sr = m_ui->listView->selectionModel()->selectedRows();
     if (sr.size() == 1) {
         int r = sr.front().row();
-        if (r < m_manager->discoveredDevices().size() && m_manager->status() == TimeularManager::Disconneted) {
+        if (r < m_manager->discoveredDevices().size() && (m_manager->status() == TimeularManager::Disconneted || m_manager->status() == TimeularManager::Scanning)) {
             m_ui->pairButton->setEnabled(m_manager->pairedDevice() != m_manager->discoveredDevices().at(r));
             return;
         }

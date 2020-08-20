@@ -29,9 +29,9 @@
 
 namespace {
 const QBluetoothUuid
-    zeiOrientationService(QLatin1Literal("{c7e70010-c847-11e6-8175-8c89a55d403c}"));
+    zeiOrientationService(QStringLiteral("{c7e70010-c847-11e6-8175-8c89a55d403c}"));
 const QBluetoothUuid
-    zeiOrientationCharacteristic(QLatin1Literal("{c7e70012-c847-11e6-8175-8c89a55d403c}"));
+    zeiOrientationCharacteristic(QStringLiteral("{c7e70012-c847-11e6-8175-8c89a55d403c}"));
 const QLatin1String timeularDeviceIdKey("timeularDeviceId");
 const QLatin1String timeularDeviceName("Timeular ZEI");
 }
@@ -142,6 +142,7 @@ void TimeularManager::disconnect()
         m_service = nullptr;
     }
     if (m_controller) {
+        m_controller->disconnect(this);
         delete m_controller;
         m_controller = nullptr;
     }
@@ -176,9 +177,8 @@ void TimeularManager::deviceDiscovered(const QBluetoothDeviceInfo &info)
         return;
 
     if (m_status == Connecting) {
-        if (deviceId(info) == m_pairedDevice) {
+        if (deviceId(info) == m_pairedDevice)
             connectToDevice(info);
-        }
     } else if (m_status == Scanning) {
         auto id = deviceId(info);
         if (!m_discoveredDevices.contains(id)) {
