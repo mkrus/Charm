@@ -24,7 +24,6 @@
 #include "TimeularManager.h"
 
 #include <QBluetoothUuid>
-#include <QDebug>
 #include <QSettings>
 
 namespace {
@@ -32,8 +31,8 @@ const QBluetoothUuid
     zeiOrientationService(QStringLiteral("{c7e70010-c847-11e6-8175-8c89a55d403c}"));
 const QBluetoothUuid
     zeiOrientationCharacteristic(QStringLiteral("{c7e70012-c847-11e6-8175-8c89a55d403c}"));
-const QLatin1String timeularDeviceIdKey("timeularDeviceId");
-const QLatin1String timeularDeviceName("Timeular ZEI");
+const QLatin1String timeularDeviceIdKey("timeularDevice/Id");
+const QLatin1String timeularDeviceNameKey("timeularDevice/Name");
 }
 
 TimeularManager::TimeularManager(QObject *parent)
@@ -45,8 +44,9 @@ TimeularManager::TimeularManager(QObject *parent)
 void TimeularManager::init()
 {
     QSettings settings;
-    m_pairedDevice = settings.value(timeularDeviceIdKey).toString();
-    if (!m_pairedDevice.isEmpty())
+    m_pairedDevice.m_id = settings.value(timeularDeviceIdKey).toString();
+    m_pairedDevice.m_name = settings.value(timeularDeviceNameKey).toString();
+    if (!m_pairedDevice.m_id.isEmpty())
         emit pairedChanged(true);
 }
 
@@ -62,17 +62,30 @@ TimeularManager::Orientation TimeularManager::orientation() const
 
 bool TimeularManager::isPaired() const
 {
-    return !m_pairedDevice.isEmpty();
+    return !m_pairedDevice.m_id.isEmpty();
 }
 
-QString TimeularManager::pairedDevice() const
+QString TimeularManager::pairedDeviceId() const
 {
-    return m_pairedDevice;
+    return m_pairedDevice.m_id;
+}
+
+QString TimeularManager::pairedDeviceName() const
+{
+    return m_pairedDevice.m_name;
 }
 
 QStringList TimeularManager::discoveredDevices() const
 {
-    return m_discoveredDevices;
+    QStringList res;
+    std::transform(std::begin(m_discoveredDevices), std::end(m_discoveredDevices),
+                   std::back_inserter(res), [this](const DeviceInfo &i) {
+                       QString res = i.m_name;
+                       if (i.m_id == m_pairedDevice.m_id)
+                           res += QLatin1String(" - paired");
+                       return res;
+                   });
+    return res;
 }
 
 bool TimeularManager::isBluetoothEnabled()
@@ -112,7 +125,7 @@ void TimeularManager::startDiscovery()
 
     setStatus(Scanning);
     m_discoveredDevices.clear();
-    emit discoveredDevicesChanged(m_discoveredDevices);
+    emit discoveredDevicesChanged(discoveredDevices());
     m_deviceDiscoveryAgent->start(QBluetoothDeviceDiscoveryAgent::LowEnergyMethod);
 }
 
@@ -128,15 +141,15 @@ void TimeularManager::stopDiscovery()
 
 void TimeularManager::startConnection()
 {
-    if ((m_status != Disconneted) || m_pairedDevice.isEmpty())
+    if ((m_status != Disconneted) || m_pairedDevice.m_id.isEmpty())
         return;
 
     setStatus(Connecting);
 
 #ifdef Q_OS_MACOS
-    QBluetoothDeviceInfo info(QBluetoothUuid(m_pairedDevice), timeularDeviceName, 0);
+    QBluetoothDeviceInfo info(QBluetoothUuid(m_pairedDevice.m_id), m_pairedDevice.m_name, 0);
 #else
-    QBluetoothDeviceInfo info(QBluetoothAddress(m_pairedDevice), timeularDeviceName, 0);
+    QBluetoothDeviceInfo info(QBluetoothAddress(m_pairedDevice.m_id), m_pairedDevice.m_name, 0);
 #endif
 
     info.setCoreConfigurations(QBluetoothDeviceInfo::LowEnergyCoreConfiguration);
@@ -160,13 +173,14 @@ void TimeularManager::disconnect()
         m_deviceDiscoveryAgent->stop();
 }
 
-void TimeularManager::setPairedDevice(const QString &pairedDevice)
+void TimeularManager::setPairedDevice(int index)
 {
-    if (pairedDevice != m_pairedDevice) {
-        m_pairedDevice = pairedDevice;
+    if (index >= 0 && index < m_discoveredDevices.size()) {
+        m_pairedDevice = m_discoveredDevices[index];
         QSettings settings;
-        settings.setValue(timeularDeviceIdKey, m_pairedDevice);
-        emit pairedChanged(m_pairedDevice.size() > 0);
+        settings.setValue(timeularDeviceIdKey, m_pairedDevice.m_id);
+        settings.setValue(timeularDeviceNameKey, m_pairedDevice.m_name);
+        emit pairedChanged(m_pairedDevice.m_id.size() > 0);
     }
 }
 
@@ -183,17 +197,16 @@ void TimeularManager::deviceDiscovered(const QBluetoothDeviceInfo &info)
 #endif
     };
 
-    if (info.name() != timeularDeviceName)
-        return;
-
     if (m_status == Connecting) {
-        if (deviceId(info) == m_pairedDevice)
+        if (deviceId(info) == m_pairedDevice.m_id)
             connectToDevice(info);
     } else if (m_status == Scanning) {
-        auto id = deviceId(info);
-        if (!m_discoveredDevices.contains(id)) {
-            m_discoveredDevices.push_back(id);
-            emit discoveredDevicesChanged(m_discoveredDevices);
+        QString id = deviceId(info);
+        auto it = std::find_if(std::begin(m_discoveredDevices), std::end(m_discoveredDevices),
+                               [id](const DeviceInfo &i) { return id == i.m_id; });
+        if (it == std::end(m_discoveredDevices)) {
+            m_discoveredDevices.push_back({id, info.name()});
+            emit discoveredDevicesChanged(discoveredDevices());
         }
     }
 }
@@ -278,9 +291,8 @@ void TimeularManager::confirmedDescriptorWrite(const QLowEnergyDescriptor &d,
 
 void TimeularManager::addLowEnergyService(const QBluetoothUuid &serviceUuid)
 {
-    if (serviceUuid == QBluetoothUuid(zeiOrientationService)) {
+    if (serviceUuid == QBluetoothUuid(zeiOrientationService))
         m_serviceDiscovered = true;
-    }
 }
 
 void TimeularManager::serviceStateChanged(QLowEnergyService::ServiceState newState)

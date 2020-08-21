@@ -105,7 +105,7 @@ TimeularSetupDialog::TimeularSetupDialog(QVector<TimeularAdaptor::FaceMapping> m
 
     QStringListModel *model = new QStringListModel(this);
     if (m_manager->isPaired()) {
-        QStringList sl = {tr("%1 - Paired").arg(m_manager->pairedDevice())};
+        QStringList sl = {tr("%1 - Paired").arg(m_manager->pairedDeviceName())};
         model->setStringList(sl);
     }
     m_ui->listView->setModel(model);
@@ -218,7 +218,7 @@ void TimeularSetupDialog::discoveredDevicesChanged(const QStringList& dl)
     QStringListModel *model = qobject_cast<QStringListModel *>(m_ui->listView->model());
     QStringList fl;
     std::transform(dl.cbegin(), dl.cend(), std::back_inserter(fl), [this](QString deviceId) {
-        return m_manager->pairedDevice() == deviceId ? tr("%1 - Paired").arg(deviceId) : deviceId;
+        return m_manager->pairedDeviceId() == deviceId ? tr("%1 - Paired").arg(deviceId) : deviceId;
     });
     model->setStringList(fl);
 }
@@ -229,7 +229,7 @@ void TimeularSetupDialog::deviceSelectionChanged()
     if (sr.size() == 1) {
         int r = sr.front().row();
         if (r < m_manager->discoveredDevices().size() && (m_manager->status() == TimeularManager::Disconneted || m_manager->status() == TimeularManager::Scanning)) {
-            m_ui->pairButton->setEnabled(m_manager->pairedDevice() != m_manager->discoveredDevices().at(r));
+            m_ui->pairButton->setEnabled(m_manager->pairedDeviceName() != m_manager->discoveredDevices().at(r));
             return;
         }
     }
@@ -245,7 +245,7 @@ void TimeularSetupDialog::setPairedDevice()
 
     int r = sr.front().row();
     if (r < m_manager->discoveredDevices().size())
-        m_manager->setPairedDevice(m_manager->discoveredDevices().at(r));
+        m_manager->setPairedDevice(r);
 }
 
 void TimeularSetupDialog::connectToDevice()

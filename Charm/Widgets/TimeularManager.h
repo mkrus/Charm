@@ -29,6 +29,7 @@
 #include <QBluetoothServiceDiscoveryAgent>
 #include <QLowEnergyController>
 #include <QObject>
+#include <vector>
 
 class TimeularManager : public QObject
 {
@@ -57,7 +58,8 @@ public:
     Status status() const;
     Orientation orientation() const;
     bool isPaired() const;
-    QString pairedDevice() const;
+    QString pairedDeviceId() const;
+    QString pairedDeviceName() const;
     QStringList discoveredDevices() const;
 
     static bool isBluetoothEnabled();
@@ -67,7 +69,7 @@ public Q_SLOTS:
     void stopDiscovery();
     void startConnection();
     void disconnect();
-    void setPairedDevice(const QString &pairedDevice);
+    void setPairedDevice(int index);
 
 Q_SIGNALS:
     void statusChanged(Status status);
@@ -97,8 +99,14 @@ private:
     QBluetoothLocalDevice *m_localDevice = nullptr;
     QLowEnergyDescriptor m_notificationDesc;
     Orientation m_orientation = Vertical;
-    QString m_pairedDevice;
-    QStringList m_discoveredDevices;
+
+    struct DeviceInfo {
+        QString m_id;
+        QString m_name;
+    };
+
+    DeviceInfo m_pairedDevice;
+    std::vector<DeviceInfo> m_discoveredDevices;
 };
 
 #endif // TIMEULARMANAGER_H
